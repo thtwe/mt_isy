@@ -1,0 +1,1030 @@
+<odoo>
+    <menuitem id="isy_menu_budget_template_root" name="ISY Budgeting" parent="account_accountant.menu_accounting" sequence="5"/>
+    <menuitem id="isy_menu_budget_template_sub_root" name="Extended Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="5"/>
+    <menuitem id="isy_menu_budget_template_sub_payroll_budget" name="Payroll Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
+    <menuitem id="isy_menu_budget_template_sub_allowance_budget" name="Allowance Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
+    <menuitem id="isy_menu_budget_template_sub_rental_budget" name="Rental Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
+    <menuitem id="isy_menu_budget_template_sub_capital_budget" name="Capital Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
+    <menuitem id="isy_menu_budget_template_sub_revenue_budget" name="Revenue Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
+
+
+
+
+    <record id="isy_budget_view_tree" model="ir.ui.view">
+        <field name="name">budget.tree</field>
+        <field name="model">budgetextension.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Tree" decoration-danger="state==1" decoration-info="state==3">
+                <field name="name"/>
+                <field name="account_id" invisible="1"/>
+                <field name="start_date" invisible="1"/>
+                <field name="end_date" invisible="1"/>
+                <!-- <field name="category_id"/> -->
+                <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/> -->
+                <field name="last_2_year_planned_amount_100_neg" sum="Total of last 2 years planned amount 100"/>
+                <field name="last_2_year_practical_amount_neg" sum="Total of last 2 years practical amount"/>
+
+                <!-- <field name="last_year_planned_amount" sum="Total of last year planned amount"/> -->
+                <field name="x_last_year_planned_amount_100" sum="Total of last year planned amount 100"/>
+                <field name="last_year_practical_amount_neg" sum="Total of last year practical amount"/>
+
+                <field name="planned_amount_100_neg" sum="Total of current year planned amount 100"/>
+                <!-- <field name="planned_amount" sum="Total of current year planned amount"/> -->
+                <!-- <field name="practical_amount" sum="Total of current year practical amount"/> -->
+
+                <field name="last_year_variance_amount" string="Variance (E-C)" sum="Total"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="isy_budget_action" model="ir.actions.act_window">
+        <field name="name">ISY Extended Budgets - ( Current Year Based )</field>
+        <field name="res_model">budgetextension.budget</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="view_id" ref="isy_budget_view_tree"/>
+        <field name="domain">[('state', '=', '2')]</field>
+        <field name="context">{'state':'2'}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create the first budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_budget_view_tree_action" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_budget_view_tree"/>
+        <field name="act_window_id" ref="isy_budget_action"/>
+    </record>
+
+    <record id="isy_budget_view_form_action" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="accounting_budget_extension_V7.budget_view_form"/>
+        <field name="act_window_id" ref="isy_budget_action"/>
+    </record>
+
+    <!-- <record id="budget_view_form_inherit" model="ir.ui.view"> 
+        <field name="name">budget_view_form_inherit</field> 
+        <field name="model">budgetextension.budget</field> 
+        <field name="inherit_id" ref="accounting_budget_extension_V7.budget_view_form"/> 
+        <field name="arch" type="xml"> 
+            <field name='last_year_variance_amount' position='after'>
+                <field name="company_id" groups="base.group_no_one"/>
+            </field>
+        </field> 
+    </record> -->
+
+    <menuitem id="budget_menu" name="ISY Extended Budgets - ( Current Year Based )" parent="mt_isy.isy_menu_budget_template_sub_root" action="isy_budget_action" sequence="1"/>
+
+
+    <record id="all_year_isy_budget_view_tree" model="ir.ui.view">
+        <field name="name">budget.tree.all.year</field>
+        <field name="model">budgetextension.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Tree" decoration-danger="state==1" decoration-info="state==3" create='0'>
+               <field name="name"/>
+                <field name="account_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <!-- <field name="category_id"/> -->
+                <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/>
+                <field name="last_2_year_planned_amount_100" sum="Total of last 2 years planned amount 100"/>
+                <field name="last_2_year_practical_amount" sum="Total of last 2 years practical amount"/>
+
+                <field name="last_year_planned_amount" sum="Total of last year planned amount"/>
+                <field name="last_year_planned_amount_100" sum="Total of last year planned amount 100"/>
+                <field name="last_year_practical_amount" sum="Total of last year practical amount"/> -->
+
+                <field name="planned_amount_100_neg" sum="Total of current year planned amount 100" string="Planned Amount 100"/>
+                <field name="planned_amount" sum="Total of current year planned amount" string="Planned Amount"/>
+                <field name="practical_amount" sum="Total of current year practical amount" string="Actual Amount"/>
+
+                <field name="last_year_variance_amount" string="Variance" sum="Total"/>
+                <field name="state" invisible="1"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="all_year_isy_budget_action" model="ir.actions.act_window">
+        <field name="name">ISY Extended Budgets - ( All Years )</field>
+        <field name="res_model">budgetextension.budget</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="view_id" ref="all_year_isy_budget_view_tree"/>
+        <field name="domain">[('state', 'in', ('1','2','3'))]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create the first budget!</p>
+        </field>
+    </record>
+
+    <record id="all_year_isy_budget_view_tree_action" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="all_year_isy_budget_view_tree"/>
+        <field name="act_window_id" ref="all_year_isy_budget_action"/>
+    </record>
+
+    <record id="all_year_isy_budget_view_form_action" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="accounting_budget_extension_V7.budget_view_form"/>
+        <field name="act_window_id" ref="all_year_isy_budget_action"/>
+    </record>
+
+    <!-- <record id="budget_buttons" model="ir.ui.view"> <field name="name">budget.buttons</field> <field name="model">budgetextension.budget</field> <field name="inherit_id" ref="accounting_budget_extension_V7.budget_view_form"/> <field name="arch" type="xml"> <button type="object" class="oe_stat_button" icon="fa-refresh" name="update_planned_amount"> <div class="o_form_field o_stat_info"> <span class="o_stat_text">Update Budget</span> </div> </button> </field> </record> -->
+    <menuitem id="all_year_budget_menu" name="ISY Extended Budgets - ( All Years )" parent="mt_isy.isy_menu_budget_template_sub_root" action="all_year_isy_budget_action" sequence="3"/>
+
+
+
+    <record id="future_year_isy_budget_view_tree" model="ir.ui.view">
+        <field name="name">budget.tree.future.year</field>
+        <field name="model">budgetextension.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Tree" decoration-danger="state==1" decoration-info="state==3">
+              <field name="name"/>
+                <field name="account_id" invisible="1"/>
+                <field name="start_date" invisible="1"/>
+                <field name="end_date" invisible="1"/>
+                <!-- <field name="category_id"/> -->
+                <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/> -->
+                <field name="last_2_year_planned_amount_100_neg" sum="Total of last 2 years planned amount 100"/>
+                <field name="last_2_year_practical_amount_neg" sum="Total of last 2 years practical amount"/>
+
+                <!-- <field name="last_year_planned_amount" sum="Total of last year planned amount"/> -->
+                <field name="x_last_year_planned_amount_100" sum="Total of last year planned amount 100"/>
+                <field name="last_year_practical_amount_neg" sum="Total of last year practical amount"/>
+
+                <field name="planned_amount_100_neg" sum="Total of current year planned amount 100"/>
+                <!-- <field name="planned_amount" sum="Total of current year planned amount"/> -->
+                <!-- <field name="practical_amount" sum="Total of current year practical amount"/> -->
+
+                <field name="last_year_variance_amount" string="Variance (E-C)" sum="Total"/>
+                <field name="state" invisible="1"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="future_year_isy_budget_action" model="ir.actions.act_window">
+        <field name="name">ISY Extended Budgets - ( Future Year Based )</field>
+        <field name="res_model">budgetextension.budget</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="view_id" ref="future_year_isy_budget_view_tree"/>
+        <field name="domain">[('state', '=', '3')]</field>
+        <field name="context">{'state':'3'}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create the first budget!</p>
+        </field>
+    </record>
+
+    <record id="future_year_isy_budget_view_tree_action" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="future_year_isy_budget_view_tree"/>
+        <field name="act_window_id" ref="future_year_isy_budget_action"/>
+    </record>
+
+    <record id="future_year_isy_budget_view_form_action" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="accounting_budget_extension_V7.budget_view_form"/>
+        <field name="act_window_id" ref="future_year_isy_budget_action"/>
+    </record>
+
+    <!-- <record id="budget_buttons" model="ir.ui.view"> <field name="name">budget.buttons</field> <field name="model">budgetextension.budget</field> <field name="inherit_id" ref="accounting_budget_extension_V7.budget_view_form"/> <field name="arch" type="xml"> <button type="object" class="oe_stat_button" icon="fa-refresh" name="update_planned_amount"> <div class="o_form_field o_stat_info"> <span class="o_stat_text">Update Budget</span> </div> </button> </field> </record> -->
+    <menuitem id="future_year_budget_menu" name="ISY Extended Budgets - ( Future Year Based )" parent="mt_isy.isy_menu_budget_template_sub_root" action="future_year_isy_budget_action" sequence="2"/>
+
+
+
+    <!-- Payroll Budget Tree View -->
+    <record id="isy_payroll_budget_view_tree" model="ir.ui.view">
+        <field name="name">isy_payroll.buget.tree</field>
+        <field name="model">payroll.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll Budget Tree">
+                <field name="name"/>
+                <field name="base_budget_amount" sum="Total"/>
+                <field name="mt_new_feature" invisible="1"/>
+                <field name="retirement_budget_amount" invisible="mt_new_feature == True" sum="Total"/>
+                <field name="retirement_budget_amount_mt_new_feature" invisible="mt_new_feature == False" sum="Total"/>
+                <field name="provident_fund_budget_amount" sum="Total"/>
+                <field name="gratuity_budget_amount" sum="Total"/>
+                <field name="contingency_percentage"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Payroll Budget Form View -->
+    <record id="isy_payroll_budget_view_form" model="ir.ui.view">
+        <field name="name">payroll.budget.form</field>
+        <field name="model">payroll.budget</field>
+        <field name="arch" type="xml">
+            <form string="Budget Form">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1>
+                        <field name="name" placeholder="e.g. Security Guards" required="1"/>
+                    </h1>
+                    <group>
+                        <group name="budget_info">
+                            <field name="budget_id"/>
+                            <field name="base_budget_amount"/>
+                            <field name="retirement_budget_id"/>
+                            <field name="mt_new_feature" invisible="1"/>
+                            <field name="retirement_budget_amount" invisible="mt_new_feature == True"/>
+                            <field name="retirement_budget_amount_mt_new_feature" invisible="mt_new_feature == False"/>
+                            <field name="provident_fund_budget_id"/>
+                            <field name="provident_fund_budget_amount"/>
+                            <field name="gratuity_budget_id" string="Severance Allowance Budget"/>
+                            <field name="gratuity_budget_amount" string="Severance Allowance Amount"/>
+                            <field name="gratuity_budget_percent" string="Severance Allowance Line Percentage" readonly="1"/>
+                        </group>
+                        <group name="totals">
+                            <field name="contingency_amount"/>
+                            <field name="contingency_percentage"/>
+                        </group>
+                        <group name="dates">
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payroll Lines" name="payroll_lines">
+                            <field name="payroll_line_m_ids" nolable="1">
+                                <tree string="Payroll Lines" editable="bottom">
+                                    <!-- MT-->
+                                    <field name="employee_id"/>
+                                    <!-- MT DONE-->
+                                    <field name="employee" required="1"/>
+                                    <field name="position"/>
+                                    <field name="employee_type" required="1"/>
+                                    <field name="budget_id" string="Budget"/>
+                                    <!-- KMS Update (29/9/2020) -->
+                                    <field name="current_year_base" string="20-21 Base (A)" readonly="1" sum="Total"/>
+                                    <!-- END -->
+                                    <field name="retirement_percentage" string="Retirement % (B)" force_save="True" readonly="employee_type == 'local' or employee_type == False"/>
+                                    <field name="provident_fund_percentage" string="Provident Fund % (C)" force_save="True" readonly="employee_type == 'expatriate' or employee_type == False"/>
+                                    <field name="current_year_retirement" string="20-21 Retirement (D=A*B)" sum="Total"/>
+                                    <field name="current_year_provident_fund" string="20-21 Provident Fund (E=A*C)" sum="Total"/>
+                                    <field name="current_year_budget" string="20-21 Budget (F=A+D|E)" sum="Total"/>
+                                    <!-- KMS Update -->
+                                    <field name="current_year_allowance" string="20 - 21 Allowance (Z)" sum="Total" readonly="employee_type == 'expatriate' or employee_type == False" />
+                                    <field name="current_year_tax_amount" string="20 - 21 Tax (X)" sum="Total" readonly="employee_type == 'expatriate' or employee_type == False" />
+                                    <!-- END -->
+                                    <!-- KMS Update (29/9/2020) -->
+                                    <field name="next_year_origin" string="21 - 22 Origin (G)" />
+                                    <!-- END -->
+                                    <field name="inflation" string="Inflation % (H)"/>
+                                    <field name="next_year_base" string="21-22 Base (I=G+(G*H)" force_save="True" readonly="1" sum="Total"/>
+                                    <field name="additional_stipend" string="Additional Stipend % (J)"/>
+                                    <field name="next_year_base_additional" string="21-22 Base (Additional) (K=I+(I*J))" sum="Total"/>
+                                    <field name="next_year_retirement" string="21-22 Retirement (L=I*B)" sum="Total"/>
+                                    <field name="next_year_provident_fund" string="21-22 Provident Fund (M=I*C)" sum="Total"/>
+                                    <!-- MT-->
+                                    <field name="next_year_allowance" string="21-22 Allowance (N)" sum="Total" force_save="True" readonly="1" />
+                                    <field name="gratuity_budget_line_percent" string="Gratuity Budget Line %" invisible="1"/>
+                                    <field name="next_year_gratuity_m" string="21-22 Gratuity (O=(N+K)*(Graduity Budget Percent/100))" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_tax_amount" string="21-22 Tax (P)" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_net_income" string="21-22 Net Income (Q=(I+N+O)-P)" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_net_income_provident_fund" string="21-22 Net Income Provident Fund (R=M+Q)" sum="Total" invisible="1" force_save="True" readonly="1" />
+                                    <!-- MT DONE-->
+                                    <!-- KMS Update -->
+                                    <field name="current_year_net_budget" string="20 - 21 Net Budget (Y=F+20-21 Gratuity+Z)" sum="Total" readonly="1" />
+                                    <!-- END -->
+                                    <field name="next_year_budget" string="21-22 Budget (S=K+L|K+M+N+O)" sum="Total"/>
+                                    <!-- KMS Update -->
+                                    <field name="variance" string="Variance (T=((S-P)-(Y-X))" sum="Total"/>
+                                    <!-- END -->
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Payroll Budget Search View -->
+    <record id="isy_payroll_budget_view_search" model="ir.ui.view">
+        <field name="name">isy_payroll.budget.search</field>
+        <field name="model">payroll.budget</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="this_fiscal_year" string="This Fiscal Year" domain="[('state','=','2')]"/>
+                <filter name="past_fiscal_year" string="Past Fiscal Year" domain="[('state','=','1')]"/>
+                <filter name="future_fiscal_year" string="Future Fiscal Year" domain="[('state','=','3')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Payroll Budget View Action -->
+    <record id="isy_payroll_budget_action" model="ir.actions.act_window">
+        <field name="name">Payroll Budget - ( Current Year Based )</field>
+        <field name="res_model">payroll.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[('state', '=', '2')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a payroll budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_payroll_budget_view_tree_action" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_payroll_budget_view_tree"/>
+        <field name="act_window_id" ref="isy_payroll_budget_action"/>
+    </record>
+
+    <record id="isy_payroll_budget_view_form_action" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_payroll_budget_view_form"/>
+        <field name="act_window_id" ref="isy_payroll_budget_action"/>
+    </record>
+
+
+    <!-- Payroll Buget Menu -->
+    <menuitem id="isy_menu_payroll_budget" name="Payroll Budget - ( Current Year Based )" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_action" sequence="1"/>
+
+   
+    <!-- Payroll Budget View Action -->
+    <record id="isy_payroll_budget_action_future" model="ir.actions.act_window">
+        <field name="name">Payroll Budget - ( Future Year Based )</field>
+        <field name="res_model">payroll.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[('state', '=', '3')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a payroll budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_payroll_budget_view_tree_action_future" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_payroll_budget_view_tree"/>
+        <field name="act_window_id" ref="isy_payroll_budget_action_future"/>
+    </record>
+
+    <record id="isy_payroll_budget_view_form_action_future" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_payroll_budget_view_form"/>
+        <field name="act_window_id" ref="isy_payroll_budget_action_future"/>
+    </record>
+
+    <menuitem id="isy_menu_payroll_budget_future" name="Payroll Budget - ( Future Year Based )" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_action_future" sequence="1"/>
+
+    <!-- Payroll Budget View Action -->
+    <record id="isy_payroll_budget_action_all" model="ir.actions.act_window">
+        <field name="name">Payroll Budget - ( All Years )</field>
+        <field name="res_model">payroll.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[('state', '=', '1')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a payroll budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_payroll_budget_view_tree_action_all" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_payroll_budget_view_tree"/>
+        <field name="act_window_id" ref="isy_payroll_budget_action_all"/>
+    </record>
+
+    <record id="isy_payroll_budget_view_form_action_all" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_payroll_budget_view_form"/>
+        <field name="act_window_id" ref="isy_payroll_budget_action_all"/>
+    </record>
+    
+    <menuitem id="isy_menu_payroll_budget_all" name="Payroll Budget - ( All Years )" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_action_all" sequence="1"/>
+
+
+    <!-- Allowance Tree View -->
+    <record id="isy_allowance_budget_view_tree" model="ir.ui.view">
+        <field name="name">isy_allowance.budget.tree</field>
+        <field name="model">allowance.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Allowance Budget Tree" editable="top">
+                <field name="budget_id" required="1"/>
+                <field name="parent_budget_id" domain="[('state','=','3')]"/>
+                <field name="employee_count"/>
+                <field name="allowance"/>
+                <field name="total" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Allowance Search View -->
+    <record id="isy_allowance_budget_view_search" model="ir.ui.view">
+        <field name="name">isy_allowance.budget.search</field>
+        <field name="model">allowance.budget</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="budget_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Allowance View Action -->
+    <record id="isy_allowance_budget_action" model="ir.actions.act_window">
+        <field name="name">Allowance Budget</field>
+        <field name="res_model">allowance.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create an allowance budget!</p>
+        </field>
+    </record>
+
+    <!-- Allowance Menu -->
+    <menuitem id="isy_menu_allowance_budget" name="Allowance Budget" parent="mt_isy.isy_menu_budget_template_sub_allowance_budget" action="isy_allowance_budget_action" sequence="3"/>
+
+    <!-- Payroll Budget Line (Master) Tree View -->
+    <!-- <record id="isy_payroll_budget_line_master_view_tree" model="ir.ui.view">
+        <field name="name">isy_payroll.buget.line.master.budget.tree</field>
+        <field name="model">payroll.budget.line.master</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll Budget Line (Master) Tree" editable="top">
+                <field name="employee_id" required="1"/>
+                <field name="position"/>
+                <field name="employee_type"/>
+                <field name="budget_id" string="Budget"/>
+                <field name="current_year_base" string="19-20 Base (A)" sum="Total"/>
+                <field name="gratuity_percentage" string="Provident Fund (B)"/>
+                <field name="current_year_gratuity" string="19-20 Provident Fund (C=A*B)" sum="Total"/>
+                <field name="current_year_budget" string="19-20 Budget (D=A+C)" sum="Total"/>
+                <field name="inflation" string="Inflation (E)"/>
+                <field name="next_year_base" string="20-21 Base (F=A+(A*E)" sum="Total"/>
+                <field name="additional_stipend" string="Additional Stipend (G)"/>
+                <field name="next_year_base_additional" string="20-21 Base (Additional) (H=F+(F*G))" sum="Total"/>
+                <field name="next_year_gratuity" string="20-21 Provident Fund (I=F*B)" sum="Total"/>
+                <field name="next_year_budget" string="20-21 Budget (J=H+I)" sum="Total"/> -->
+                <!-- <field name="variance" string="Variance (J-D)" sum="Total" /> -->
+            <!-- </tree>
+        </field>
+    </record> -->
+
+    <!-- Payroll Budget Line (Master) Search View -->
+    <!-- <record id="isy_payroll_budget_line_master_view_search" model="ir.ui.view">
+        <field name="name">isy_payroll.buget.line.master.budget.search</field>
+        <field name="model">payroll.budget.line.master</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="position"/>
+                <field name="employee_type"/>
+                <filter name="local_employee" string="Local" domain="[('employee_type','=', 'local')]"/>
+                <filter name="expatriate_employee" string="Expatriate" domain="[('employee_type','=', 'expatriate')]"/>
+                <group string="Group By">
+                    <filter name="group_by_position" string="Position" context="{'group_by': 'position'}"/>
+                    <filter name="group_by_type" string="Type" context="{'group_by': 'employee_type'}"/>
+                    <filter name="group_by_budget" string="Budget" context="{'group_by': 'budget_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record> -->
+
+    <!-- Payroll Budget Line (Master) View Action -->
+    <!-- <record id="isy_payroll_budget_line_master_action" model="ir.actions.act_window">
+        <field name="name">Payroll Budget Line (Master)</field>
+        <field name="res_model">payroll.budget.line.master</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a line!</p>
+        </field>
+    </record> -->
+
+    <!-- Payroll Buget Line (Master) Menu -->
+    <!-- <menuitem id="isy_menu_payroll_budget_line_master" name="Payroll Budget Line (Master)" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_line_master_action" sequence="4"/> -->
+
+
+    <!-- Rental Budget Tree View -->
+    <record id="isy_rental_budget_view_tree" model="ir.ui.view">
+        <field name="name">isy_rental.buget.tree</field>
+        <field name="model">rental.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Rental Budget Tree">
+                <field name="name"/>
+                <field name="budget_amount" sum="Total"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Rental Budget Form View -->
+    <record id="isy_rental_budget_view_form" model="ir.ui.view">
+        <field name="name">isy_rental.budget.form</field>
+        <field name="model">rental.budget</field>
+        <field name="arch" type="xml">
+            <form string="Budget Form">
+                <sheet>
+                    <h1>
+                        <field name="name" placeholder="e.g. Expatriate Rental" required="1"/>
+                    </h1>
+                    <group>
+                        <group name="budget_info">
+                            <field name="budget_id"/>
+                            <field name="budget_amount"/>
+                        </group>
+                        <group name="totals">
+                            <field name="budget_total"/>
+                            <field name="contingency_amount"/>
+                            <field name="contingency_percentage"/>
+                            <field name="line_annual_total"/>
+                            <field name="acutal_rent_total"/>
+                        </group>
+                        <group name="dates">
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Rental Lines" name="rental_lines">
+                            <field name="rental_line_ids" nolable="1">
+                                <tree string="Rental Lines" editable="bottom">
+                                    <field name="employee_id" required="1"/>
+                                    <field name="categ_id"/>
+                                    <field name="monthly_allowance" sum="Total" readonly="1"/>
+                                    <field name="annual_allowance" sum="Total"/>
+                                    <field name="actual_monthly_rent" sum="Total"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Rental Budget Search View -->
+    <record id="isy_rental_budgetview_search" model="ir.ui.view">
+        <field name="name">rental.buget.search</field>
+        <field name="model">rental.budget</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Rental Budget View Action -->
+    <record id="isy_rental_budget_action" model="ir.actions.act_window">
+        <field name="name">Rental Budget</field>
+        <field name="res_model">rental.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a rental budget!</p>
+        </field>
+    </record>
+
+    <!-- Rental Buget Menu -->
+    <menuitem id="isy_menu_rental_budget" name="Rental Budget" parent="mt_isy.isy_menu_budget_template_sub_rental_budget" action="isy_rental_budget_action" sequence="1"/>
+
+
+    <!-- Rental Budget Category Tree View -->
+    <record id="isy_rental_budget_category_view_tree" model="ir.ui.view">
+        <field name="name">isy_rental.budget.category.tree</field>
+        <field name="model">rental.budget.category</field>
+        <field name="arch" type="xml">
+            <tree string="Rental Budget Category Tree" editable="top">
+                <field name="name" required="1"/>
+                <field name="monthly_allowance"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Rental Budget Category Search View -->
+    <record id="isy_rental_budget_category_view_search" model="ir.ui.view">
+        <field name="name">isy_rental.budget.category.search</field>
+        <field name="model">rental.budget.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Rental Buget Category View Action -->
+    <record id="isy_rental_budget_category_action" model="ir.actions.act_window">
+        <field name="name">Rental Budget Category</field>
+        <field name="res_model">rental.budget.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a category!</p>
+        </field>
+    </record>
+
+    <!-- Rental Budget Category Menu -->
+    <menuitem id="isy_menu_rental_budget_category" name="Rental Category" parent="mt_isy.isy_menu_budget_template_sub_rental_budget" action="isy_rental_budget_category_action" sequence="3"/>
+
+    <!-- Capital Budget Tree View -->
+    <record id="isy_capital_budget_template_view_tree" model="ir.ui.view">
+        <field name="name">capital.budget.template.tree</field>
+        <field name="model">capital.budget.template</field>
+        <field name="arch" type="xml">
+            <tree string="Capital Budget Tree">
+                <field name="name" string="Budget"/>
+                <field name="last_2_year_planned_amount" invisible="1" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount" invisible="1" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount" invisible="1" string="21-22 Budget (C)" sum="Total"/>
+                <field name="last_2_year_planned_amount_neg" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount_neg" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount_neg" string="21-22 Budget (C)" sum="Total"/>
+                <field name="variance" string="Variance (D-C)" sum="Total"/>
+                <!-- <field name="variance_percentage"/> -->
+            </tree>
+        </field>
+    </record>
+
+    <!-- Capital Budget Form View -->
+    <record id="isy_capital_budget_template_view_form" model="ir.ui.view">
+        <field name="name">capital.budget.template.form</field>
+        <field name="model">capital.budget.template</field>
+        <field name="arch" type="xml">
+            <form string="Budget Form">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1>
+                        <field name="name" placeholder="e.g. Application Fees" required="1"/>
+                    </h1>
+                    <group>
+                        <group name="budget_info">
+                            <field name="planned_amount" string="Allowed Amount" readonly='0'/>
+                            <field name="planned_amount_100" string="21-22 Budget (C)"/>
+                            <field name="last_year_planned_amount" string="20-21 Budget (B)" readonly='1'/>
+                            <field name="last_2_year_planned_amount" string="19-20 Budget (A)" readonly='1'/>
+                        </group>
+                        <group name="calculations">
+                            <field name="contingency_amount"/>
+                            <field name="contingency_percentage"/>
+                            <field name="line_total"/>
+                        </group>
+                        <group name="application">
+                            <field name="is_application"/>
+                            <field name="is_enrollment"/>
+                            <field name="is_reserve"/>
+                        </group>
+                        <group name="misc">
+                            <field name="type_id"/>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                        </group>
+                        <group name="application_fee" invisible="is_application == False">
+                            <field name="application_fee"/>
+                        </group>
+                        <group name="enrollment_fee" invisible="is_enrollment == False">
+                            <field name="enrollment_fee"/>
+                        </group>
+                        <group name="reserve" invisible="is_reserve == False">
+                            <field name="current_income" string="This Year Income Budget (E)"/>
+                            <field name="previous_income" string="Next Year Income Budget (D)"/>
+                            <field name="current_year_reserve" string="20% of (D-E)"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Capital Budget Lines" name="payroll_lines">
+                            <field name="capital_line_ids" nolable="1">
+                                <tree string="Capital Budget Lines" editable="bottom">
+                                    <field name="name" string="Description"/>
+                                    <field name="total"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Capital Budget Search View -->
+    <record id="isy_capital_budget_template_view_search" model="ir.ui.view">
+        <field name="name">capital.budget.template.search</field>
+        <field name="model">capital.budget.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="type_id"/>
+                <group string="Group By">
+                    <filter name="group_by_type" string="Type" context="{'group_by': 'type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Capital Budget View Action -->
+    <record id="isy_capital_budget_template_action" model="ir.actions.act_window">
+        <field name="name">Capital Budget - ( Current Year Based )</field>
+        <field name="res_model">capital.budget.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', '2')]</field>
+        <field name="context">{'search_default_group_by_type': 1,'state':'2'}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a capital budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_capital_budget_template_action_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_capital_budget_template_view_tree"/>
+        <field name="act_window_id" ref="isy_capital_budget_template_action"/>
+    </record>
+
+    <record id="isy_capital_budget_template_action_form" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_capital_budget_template_view_form"/>
+        <field name="act_window_id" ref="isy_capital_budget_template_action"/>
+    </record>
+
+
+    <!-- Capital Buget Menu -->
+    <menuitem id="isy_menu_capital_budget" name="Capital Budget - ( Current Year Based )" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="isy_capital_budget_template_action" sequence="3"/>
+
+    <!-- Capital Budget View Action Future -->
+
+    <record id="isy_capital_budget_template_view_tree_future" model="ir.ui.view">
+        <field name="name">capital.budget.template.tree</field>
+        <field name="model">capital.budget.template</field>
+        <field name="arch" type="xml">
+            <tree string="Capital Budget Tree">
+                <field name="name" string="Budget"/>
+                <field name="last_2_year_planned_amount" invisible="1" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount" invisible="1" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount" invisible="1" string="21-22 Budget (C)" sum="Total"/>
+                <field name="last_2_year_planned_amount_neg" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount_neg" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount_neg" string="21-22 Budget (C)" sum="Total"/>
+                <field name="variance" string="Variance (D-C)" sum="Total"/>
+                <!-- <field name="variance_percentage"/> -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="isy_capital_budget_template_action_future" model="ir.actions.act_window">
+        <field name="name">Capital Budget - ( Future Year Based )</field>
+        <field name="res_model">capital.budget.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', '3')]</field>
+        <field name="context">{'search_default_group_by_type': 1,'state':'3'}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a capital budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_capital_budget_template_action_tree_future" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_capital_budget_template_view_tree_future"/>
+        <field name="act_window_id" ref="isy_capital_budget_template_action_future"/>
+    </record>
+
+    <record id="isy_capital_budget_template_action_form_future" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_capital_budget_template_view_form"/>
+        <field name="act_window_id" ref="isy_capital_budget_template_action_future"/>
+    </record>
+
+
+    <!-- Capital Buget Menu -->
+    <menuitem id="isy_menu_capital_budget_future" name="Capital Budget - ( Future Year Based )" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="isy_capital_budget_template_action_future" sequence="4"/>
+
+    <!-- Capital Budget View Action All Years-->
+
+    <record id="isy_capital_budget_template_view_tree_all" model="ir.ui.view">
+        <field name="name">capital.budget.template.tree</field>
+        <field name="model">capital.budget.template</field>
+        <field name="arch" type="xml">
+            <tree string="Capital Budget Tree">
+                <field name="name" string="Budget"/>
+                <field name="last_2_year_planned_amount" invisible="1" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount" invisible="1" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount" invisible="1" string="21-22 Budget (C)" sum="Total"/>
+                <field name="last_2_year_planned_amount_neg" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount_neg" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount_neg" string="21-22 Budget (C)" sum="Total"/>
+                <field name="variance" string="Variance (D-C)" sum="Total"/>
+                <!-- <field name="variance_percentage"/> -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="isy_capital_budget_template_action_all" model="ir.actions.act_window">
+        <field name="name">Capital Budget - ( All Years )</field>
+        <field name="res_model">capital.budget.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', '1')]</field>
+        <field name="context">{'search_default_group_by_type': 1,'state':'1'}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a capital budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_capital_budget_template_action_tree_all" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_capital_budget_template_view_tree_all"/>
+        <field name="act_window_id" ref="isy_capital_budget_template_action_all"/>
+    </record>
+
+    <record id="isy_capital_budget_template_action_form_all" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_capital_budget_template_view_form"/>
+        <field name="act_window_id" ref="isy_capital_budget_template_action_all"/>
+    </record>
+
+
+    <!-- Payroll Buget Menu -->
+    <menuitem id="isy_menu_capital_budget_all" name="Capital Budget - ( All Years )" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="isy_capital_budget_template_action_all" sequence="5"/>
+
+    <!-- Revenue YGN Tree View -->
+    <record id="isy_revenue_budget_ygn_view_tree" model="ir.ui.view">
+        <field name="name">isy_revenue.budget.ygn.tree</field>
+        <field name="model">revenue.budget.ygn</field>
+        <field name="arch" type="xml">
+            <tree string="Revenue Budget (YGN) Tree" editable="top">
+                <field name="budget_id" required="1"/>
+                <field name="current_year_student" string="19-20 Student" sum="Total"/>
+                <field name="current_year_fee" string="19-20 Fee"/>
+                <field name="current_year_total" string="19-20 Total" sum="Total"/>
+                <field name="percentage" string="%"/>
+                <field name="next_year_student" string="20-21 Student" sum="Total"/>
+                <field name="next_year_fee" string="20-21 Fee"/>
+                <field name="surcharge_amount" />
+                <field name="next_year_total" string="20-21 Total" sum="Total"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Revenue YGN Search View -->
+    <record id="isy_revenue_budget_ygn_view_search" model="ir.ui.view">
+        <field name="name">isy_revenue.budget.ygn.search</field>
+        <field name="model">revenue.budget.ygn</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="budget_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Revenue YGN View Action -->
+    <record id="isy_revenue_budget_ygn_action" model="ir.actions.act_window">
+        <field name="name">Revenue Budget (YGN - Current Year Based)</field>
+        <field name="res_model">revenue.budget.ygn</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', '2')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a Yangon revenue budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_revenue_budget_ygn_action_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_revenue_budget_ygn_view_tree"/>
+        <field name="act_window_id" ref="isy_revenue_budget_ygn_action"/>
+    </record>
+
+
+    <!-- Revenue YGN Menu -->
+    <menuitem id="isy_menu_revenue_budget_ygn" name="Revenue Budget (YGN - Current Year Based)" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="isy_revenue_budget_ygn_action" sequence="1"/>
+
+    <!-- Revenue YGN Tree View -->
+    <record id="isy_revenue_budget_ygn_view_tree_future" model="ir.ui.view">
+        <field name="name">isy_revenue.budget.ygn.tree</field>
+        <field name="model">revenue.budget.ygn</field>
+        <field name="arch" type="xml">
+            <tree string="Revenue Budget (YGN) Tree" editable="top">
+                <field name="budget_id" required="1"/>
+                <field name="current_year_student" string="19-20 Student" sum="Total"/>
+                <field name="current_year_fee" string="19-20 Fee"/>
+                <field name="current_year_total" string="19-20 Total" sum="Total"/>
+                <field name="percentage" string="%"/>
+                <field name="next_year_student" string="20-21 Student" sum="Total"/>
+                <field name="next_year_fee" string="20-21 Fee"/>
+                <field name="surcharge_amount" />
+                <field name="next_year_total" string="20-21 Total" sum="Total"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Revenue YGN Search View -->
+    <record id="isy_revenue_budget_ygn_view_search_future" model="ir.ui.view">
+        <field name="name">isy_revenue.budget.ygn.search</field>
+        <field name="model">revenue.budget.ygn</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="budget_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Revenue YGN View Action -->
+    <record id="isy_revenue_budget_ygn_action_future" model="ir.actions.act_window">
+        <field name="name">Revenue Budget (YGN - Future Year Based)</field>
+        <field name="res_model">revenue.budget.ygn</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', '3')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a Yangon revenue budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_revenue_budget_ygn_action_tree_future" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_revenue_budget_ygn_view_tree_future"/>
+        <field name="act_window_id" ref="isy_revenue_budget_ygn_action_future"/>
+    </record>
+
+
+    <!-- Revenue YGN Menu -->
+    <menuitem id="isy_menu_revenue_budget_ygn_future" name="Revenue Budget (YGN - Future Year Based)" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="isy_revenue_budget_ygn_action_future" sequence="2"/>
+
+    
+    <!-- Revenue YGN Tree View -->
+    <record id="isy_revenue_budget_ygn_view_tree_all" model="ir.ui.view">
+        <field name="name">isy_revenue.budget.ygn.tree</field>
+        <field name="model">revenue.budget.ygn</field>
+        <field name="arch" type="xml">
+            <tree string="Revenue Budget (YGN) Tree" editable="top">
+                <field name="budget_id" required="1"/>
+                <field name="current_year_student" string="Last Year Student" sum="Total"/>
+                <field name="current_year_fee" string="Last Year Fee"/>
+                <field name="current_year_total" string="Last Year Total" sum="Total"/>
+                <field name="percentage" string="%"/>
+                <field name="next_year_student" string="Current Year Student" sum="Total"/>
+                <field name="next_year_fee" string="Current Year Fee"/>
+                <field name="next_year_total" string="Current Year Total" sum="Total"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Revenue YGN Search View -->
+    <record id="isy_revenue_budget_ygn_view_search_all" model="ir.ui.view">
+        <field name="name">isy_revenue.budget.ygn.search</field>
+        <field name="model">revenue.budget.ygn</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="budget_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Revenue YGN View Action -->
+    <record id="isy_revenue_budget_ygn_action_all" model="ir.actions.act_window">
+        <field name="name">Revenue Budget (YGN - All Year)</field>
+        <field name="res_model">revenue.budget.ygn</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', '1')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create a Yangon revenue budget!</p>
+        </field>
+    </record>
+
+    <record id="isy_revenue_budget_ygn_action_tree_all" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="isy_revenue_budget_ygn_view_tree_all"/>
+        <field name="act_window_id" ref="isy_revenue_budget_ygn_action_all"/>
+    </record>
+
+
+    <!-- Revenue YGN Menu -->
+    <menuitem id="isy_menu_revenue_budget_ygn_all" name="Revenue Budget (YGN - All Years)" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="isy_revenue_budget_ygn_action_all" sequence="3"/>
+
+
+</odoo>

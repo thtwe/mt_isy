@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  	<data>
+        <record id="purchase_order_form_Inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.isy</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <button name="action_rfq_send" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </button>
+                <button name="print_quotation" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </button>
+                <button name="action_rfq_send" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </button>
+                <xpath expr="//button[@name='action_rfq_send'][2]" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_rfq_send'][3]" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='print_quotation'][2]" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_create_invoice'][1]" position='attributes'>
+                    <attribute name='groups'>isy_custom.group_create_bill</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_create_invoice'][2]" position='attributes'>
+                    <attribute name='groups'>isy_custom.group_create_bill</attribute>
+                </xpath>
+                <xpath expr="//button[@name='button_confirm'][1]" position='attributes'>
+                    <attribute name='groups'>isy_custom.group_order_confirmation</attribute>
+                </xpath>
+                <xpath expr="//button[@name='button_confirm'][2]" position='attributes'>
+                    <attribute name='groups'>isy_custom.group_order_confirmation</attribute>
+                </xpath>
+                <xpath expr="//button[@name='button_approve']" position='attributes'>
+                    <attribute name='groups'>purchase.group_purchase_manager</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_view_picking']" position='replace'>
+                </xpath>
+                <xpath expr="//button[@name='confirm_reminder_mail']" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_view_picking']" position='attributes'>
+                    
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+                <!-- Studio Purchase View -->
+
+                  <!-- <xpath expr="//field[@name='qty_invoiced']" position="replace"/> -->
+                  <xpath expr="//field[@name='qty_received']" position="replace"/>
+                  <xpath expr="//button[@name='button_cancel']" position="attributes">
+                    <attribute name="invisible">x_studio_reason_for_cancellation == False or state == 'cancel'</attribute>
+                  </xpath>
+                  <xpath expr="//button[@name='button_cancel']" position="after">
+                      <button name="button_cancel_greg" 
+                          type="object" 
+                          string="Cancel" 
+                          invisible="state not in ('draft','to approve','sent','purchase')"
+                          groups="mt_isy.group_po_cancel_user"/>
+                  </xpath>
+                  <!-- <xpath expr="//field[@name='picking_count']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath> -->
+
+                  <xpath expr="//field[@name='partner_id']" position="attributes">
+                    
+                    <attribute name="widget"/>
+                  </xpath>
+                  <xpath expr="//field[@name='partner_ref']" position="attributes">
+                    <attribute name="string">Vendor Invoice Number</attribute>
+                    <attribute name="groups">base.group_no_one</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="is_asset" string="Capital Asset" help="All school assets with an individual item cost exceeding or equivalent to USD 500/- in value will be captured on the fixed asset register and capitalized. Those under the value are directly charged to statement of comprehensive income."/>
+                    <field name="p_type" required="invoice_status == 'no'" readonly="invoice_status != 'no'"/>
+                    <field name="x_studio_attachment_name" string="Attachment Name" invisible="1"/>
+                    <field name="x_studio_attachment" filename="x_studio_attachment_name" string="Attachment" widget="binary"  required="1"/>
+                    <field name="x_studio_attachment_name2" string="Attachment Name 2" invisible="1"/>
+                    <field name="x_studio_attachment2" filename="x_studio_attachment_name2" string="Attachment 2" widget="binary" />
+                    <field name="x_studio_attachment_name3" string="Attachment Name 3" invisible="1"/>
+                    <field name="x_studio_attachment3" filename="x_studio_attachment_name3" string="Attachment 3" widget="binary" />
+                    <field invisible="1" name="x_studio_attachment_4_filename"/>
+                    <field filename="x_studio_attachment_4_filename" name="x_studio_attachment_4" string="Attachment 4"/>
+                    <field invisible="1" name="x_studio_attachment_5_filename"/>
+                    <field filename="x_studio_attachment_5_filename" name="x_studio_attachment_5" string="Attachment 5"/>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='currency_id']" position="after">
+                    <field name="x_studio_lub" string="LUB"  invisible="1"/>
+                  </xpath>
+                  <xpath expr="//field[@name='date_order']" position="attributes">
+                    <attribute name="readonly">state == 'draft'</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="x_studio_approver" string="Approver"  options="{'no_create':True}"/>
+                    <field name="x_studio_notes_1" string="Notes"  required="1"/>
+                    <field name="x_studio_pick_up_at_cashier" string="Vendor Pickup Payment"/>
+                    <field name="x_studio_reason_for_cancellation" string="Reason for Cancellation" nvisible="state == 'to approve'"/>
+                    <field name="x_studio_reimbursement" string="Reimbursement"  invisible="1"/>
+                    <field name="x_studio_field_YvZf6"  string="Purchaser" domain="[[&quot;x_studio_vendor_pickup&quot;,&quot;=&quot;,True]]" invisible="1"/>
+                    <field name="x_studio_field_fBSQI"  readonly="1" string="State" invisible="1"/>
+                    <field name="write_date"  invisible="1"/>
+                  </xpath>
+                  <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="readonly">state in ["purchase","done","cancel"]</attribute>
+                  </xpath>
+
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_id']" position="attributes">
+                    <attribute name="string">Account Code &amp; Description</attribute>
+                  </xpath>
+                  <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_id']" position="after"> -->
+                  <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='account_analytic_id']" position="move"/>
+                    <field name="x_studio_account_department" string="Account Department"  invisible="1"/>
+                  </xpath> -->
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='name']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='date_planned']" position="attributes">
+                    
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='date_planned']" position="after">
+                    <field name='company_currency_id' invisible='1'/>
+                    <field name="amount_difference" widget="monetary" options="{'currency_field':'company_currency_id'}" groups="isy_custom.group_order_confirmation,isy_custom.group_create_bill,purchase.group_purchase_manager"/>
+                    <field name="id"  invisible="1"/>
+                    <field name="create_uid"  invisible="1"/>
+                  </xpath>
+                  <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='company_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath> -->
+                  <!-- <xpath expr="//field[@name='analytic_tag_ids']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath> -->
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_qty']" position="attributes">
+                    <attribute name="readonly">state == 'purchase'</attribute>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_qty']" position="after">
+                    <field name='qty_to_invoice' invisible='1'/>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="attributes">
+                    <attribute name="readonly">state in ["purchase","done","cancel"]</attribute>
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">state == 'purchase'</attribute>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='taxes_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/control" position="replace">
+                    <control>
+                      <create name="add_product_control" string="Add a product"/>
+                    </control>
+                  </xpath>
+                  <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='account_analytic_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                    <attribute name="string">Cost Center</attribute>
+                  </xpath> -->
+
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_packaging_qty']" position="attributes">
+                    
+                    <attribute name='invisible'>1</attribute>
+                  </xpath>
+                  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='product_packaging_id']" position="attributes">
+                    
+                    <attribute name='invisible'>1</attribute>
+                  </xpath>
+
+                  <label for="date_approve" position='replace'/>
+                    <div name="date_approve" position='replace'/>
+                    <label for="date_planned" position='replace'/>
+                    <div name="date_planned_div" position='replace'/>
+                    <field name="picking_type_id" position='replace'/>
+                    <field name="dest_address_id" position='replace'/>
+
+                  <xpath expr="//field[@name='company_id']" position="after">
+                    <label for="date_approve" invisible="state not in ('purchase','done')"/>
+                    <div name="date_approve" invisible="state not in ('purchase','done')" class="o_row">
+                        <field name="date_approve"/>
+                        <field name="mail_reception_confirmed" invisible="1"/>
+                        <span class="text-muted" invisible="mail_reception_confirmed == False">(confirmed by vendor)</span>
+                    </div>
+                    <label for="date_planned"/>
+                    <div name="date_planned_div" class="o_row">
+                        <field name="date_planned" readonly="state not in ('draft', 'sent', 'to approve', 'purchase')"/>
+                        <field name="mail_reminder_confirmed" invisible="1"/>
+                        <span class="text-muted" invisible="mail_reminder_confirmed == False">(confirmed by vendor)</span>
+                    </div>
+                    <field name="picking_type_id" domain="[('code','=','incoming'), '|', ('warehouse_id', '=', False), ('warehouse_id.company_id', '=', company_id)]" options="{'no_create': True}" groups="stock.group_stock_multi_locations"/>
+                    <field name="dest_address_id" groups="stock.group_stock_multi_locations" invisible="default_location_dest_id_usage != 'customer'" required="default_location_dest_id_usage == 'customer'"/>
+                  </xpath>
+
+                  <field name='partner_id' position='attributes'>
+                    <attribute name='options'>{'no_create': True, 'no_create_edit': True, 'no_open':True}</attribute>
+                  </field>
+            </field>
+        </record>
+  	</data>
+ </odoo>

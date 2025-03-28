@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+
+    <!-- <report
+        id="report_payslip_adjustment_details"
+        model="hr.payslip"
+        string="Payslip with Adjustment Details"
+        report_type="qweb-pdf"
+        name="mt_isy.report_payslip_adjustment_details_view"
+        file="mt_isy.report_payslip_adjustment_details"
+        paperformat="mt_isy.paperformat_payslip_with_adjustment"
+      /> -->
+
+    <record id="report_payslip_adjustment_details" model="ir.actions.report">
+        <field name="name">Payslip with Adjustment Details</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mt_isy.report_payslip_adjustment_details_view</field>
+        <field name="report_file">mt_isy.report_payslip_adjustment_details</field>
+    </record>
+
+    <template id="report_payslip_adjustment_details_view">
+      <t t-call="web.html_container">
+        <t t-call="web.external_layout">
+          <t t-foreach="docs" t-as="o">
+            <div class="page" style="font-size:16px;">
+              <h2>Pay Slip</h2>
+              <!--<h3>Pay Slip</h3>-->
+                        <!-- <p t-field="o.name"/> -->
+                        <span t-esc="datetime.datetime.strftime(o.date_from,'%B %Y')"/>
+
+                       <table class="table table-sm table-bordered">
+                           <tr>
+                               <td><strong>Name</strong></td>
+                               <td><span t-field="o.employee_id"/></td>
+                               <td><strong>Designation</strong></td>
+                               <td><span t-field="o.employee_id.job_id"/></td>
+                           </tr>
+                           <tr>
+                               <td><strong>Address</strong></td>
+                               <td colspan="3">
+                                   <span>Yangon, Myanmar</span>
+                               </td>
+                           </tr>
+                           <tr>
+                               <td><strong>Email</strong></td>
+                               <td><span t-field="o.employee_id.work_email"/></td>
+                               <td><strong>Identification No</strong></td>
+                               <td><span t-field="o.employee_id.identification_id"/></td>
+                           </tr>
+                           <tr>
+                               <td><strong>Reference</strong></td>
+                               <td><span t-field="o.number"/></td>
+                               <td><strong>Bank Account</strong></td>
+                               <td><span t-field="o.employee_id.bank_account_id"/></td>
+                           </tr>
+                           <tr>
+                               <td><strong>Date From</strong></td>
+                               <td><span t-field="o.date_from"/></td>
+                               <td><strong>Date To</strong></td>
+                               <td><span t-field="o.date_to"/></td>
+                           </tr>
+                       </table>
+
+                       <table class="table table-sm table-bordered">
+                       <thead>
+                           <tr>
+
+                               <th><strong>Name</strong></th>
+                               <th class="text-right"><strong>Amount</strong></th>
+
+                           </tr>
+                       </thead>
+                       <tbody>
+                          <t t-set="old_code" t-value="''" />
+                          <t t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip and line.amount!=0)" t-as="line">
+                           <t t-if="('NET' not in line.code) and ('NET' in old_code)">
+                             <tr><td colspan='2'><b>Additional Details</b></td></tr>
+                           </t>
+                           <t t-elif="('NET' in line.code) and ('NET' not in old_code)">
+                             <tr ><td colspan='2'></td></tr>
+                           </t>
+                           
+                           <!-- <tr>
+                              <t t-if="'NET' in line.code">
+                                <td>
+                                  <b><span t-field="line.name"/></b>
+                                </td>
+                                <td class="text-right">
+                                  <b><span t-esc="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.company_id.currency_id}"/></b>
+                                </td>
+                              </t>
+                              
+                              <t t-else="">
+                                <td>
+                                  <span t-field="line.name"/>
+                                </td>
+                                <td class="text-right">
+                                  <span t-esc="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.company_id.currency_id}"/>
+                                 </td>
+                              </t>
+                            </tr> -->
+                            <tr>
+                              <t t-if="'NET' in line.code and 'PETTY' not in line.code">
+                                <td>
+                                  <b><span t-field="line.name"/></b>
+                                </td>
+                                <td class="text-right">
+                                  <t t-if="line.x_currency_id_to_show.name=='MMK'">
+                                    <b>MMK <span t-esc="'{0:,.2f}'.format(line.amount)" /></b>
+                                  </t>
+                                  <t t-else="">
+                                    <b><span t-esc="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: line.x_currency_id_to_show or o.company_id.currency_id}"/></b>
+                                  </t>
+                                </td>
+                              </t>
+                              
+                              <t t-else="">
+                                <td>
+                                  <span t-esc="line.name"/>
+                                </td>
+                                <td class="text-right">
+                                  <t t-if="line.x_currency_id_to_show.name=='MMK'">
+                                    MMK <span t-esc="'{0:,.2f}'.format(line.amount)"/>
+                                  </t>
+                                  <t t-else="">
+                                    <span t-esc="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: line.x_currency_id_to_show or o.company_id.currency_id}"/>
+                                  </t>
+                                 </td>
+                              </t>
+                            </tr>
+                           <t t-if="'NET' in line.code">
+                             <tr><td colspan='2'></td></tr>
+                           </t>
+                           <t t-set="old_code" t-value="line.code" />
+                          </t>
+                       </tbody>
+                   </table>
+
+                   <div class="col-4 pull-right">
+                     <p class="text-center"><img src="/mt_isy/static/src/img/sign.jpg" style="width:180px;height:130px;" /><br/>
+                     <strong>Authorized signature</strong><br/>
+                     <span style="text-align:center;" class="text-center"><strong>Steven Linn</strong></span><br/>
+                     <span style="text-align:center;" class="text-center">slinn@isyedu.org</span><br/>
+                     <span style="text-align:center;" class="text-center">Business Manager</span>
+                     </p>
+                   </div>
+
+
+                   <div t-if="len(o.input_line_ids.filtered(lambda x: x.amount!=0))>0" style="page-break-before: always;">
+                   <t>
+                     <br/><br/>
+                     <div style="text-decoration: underline">
+                       <h4>Adjustment Details</h4>
+                     </div>
+                      <table class="table table-sm table-bordered">
+                        <thead>
+                          <tr>
+                            <th>
+                              <strong>Adjustment</strong>
+                            </th>
+                            <th class="text-right">
+                              <strong>Amount</strong>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr t-foreach="o.input_line_ids.filtered(lambda x: x.amount!=0)" t-as="table_line">
+                            <td>
+                              <span t-field="table_line.display_name"/>
+                            </td>
+                            <td class="text-right">
+                              <span t-field="table_line.amount"/>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </t>
+
+                      <br />
+                    <t t-if="len(o.settlement_ids)>0">
+                      <div style="text-decoration: underline">
+                        <h4>Advanced and Reimbursement Details</h4>
+                      </div>
+
+                       <table class="table table-sm table-bordered">
+                         <thead>
+                           <tr>
+                             <th>
+                               <strong>Number</strong>
+                             </th>
+                             <th class="text-right">
+                               <strong>Requested Amount</strong>
+                             </th>
+                             <th class="text-center">
+                               <strong>Currency</strong>
+                             </th>
+                             <th class="text-center">
+                               <strong>Type</strong>
+                             </th>
+                             <th class="text-center">
+                               <strong>Requested Date</strong>
+                             </th>
+                             <th class="text-center">
+                               <strong>Note</strong>
+                             </th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           <tr t-foreach="o.settlement_ids" t-as="s_line">
+                             <td>
+                               <span t-field="s_line.label"/>
+                             </td>
+                             <td class="text-right">
+                               <span t-field="s_line.amount"/>
+                             </td>
+                             <td class="text-center">
+                               <span t-field="s_line.currency_id"/>
+                             </td>
+                             <td>
+                               <span t-field="s_line.type"/>
+                             </td>
+                             <td class="text-center">
+                               <span t-field="s_line.date"/>
+                             </td>
+                             <td>
+                               <span t-field="s_line.note"/>
+                             </td>
+                           </tr>
+                         </tbody>
+                       </table>
+                      </t>
+                   </div>
+            </div>
+          </t>
+        </t>
+      </t>
+    </template>
+
+  </data>
+</odoo>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- <report
+            id="report_account_move_custom"
+            model="account.move"
+            string="Journal Entry"
+            report_type="qweb-pdf"
+            name="mt_isy.report_account_move"
+            file="mt_isy.report_account_move"
+						print_report_name = "(object.name)"
+        /> -->
+
+		<record id="report_account_move_custom" model="ir.actions.report">
+            <field name="name">Journal Entry</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mt_isy.report_account_move</field>
+            <field name="report_file">mt_isy.report_account_move</field>
+        </record>
+
+        <template id="report_account_move">
+          <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+              <t t-foreach="docs" t-as="o">
+                <div class="page">
+
+									<div id="header">
+											<h3><span t-field="o.name" /></h3>
+									</div>
+
+									<br />
+
+									<div class="row">
+
+										<div class="col-2">
+											<strong>Date : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.date" />
+										</div>
+
+										<div class="col-2">
+											<strong>Journal : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.journal_id" />
+										</div>
+
+									</div>
+
+									<br />
+
+									<div class="row">
+
+										<div class="col-2">
+											<strong>Reference : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.ref" />
+										</div>
+
+									</div>
+
+									<br />
+
+									<table class="table table-sm table-bordered" name="move_lines" style="font-size: 15px;page-break-inside: auto;">
+										<thead>
+											<tr class="text-center" style="page-break-inside:avoid; page-break-after:auto;">
+												<th>Account</th>
+												<th>Partner</th>
+												<th>Label</th>
+												<th>Amount Currency</th>
+												<th>Currency</th>
+												<th>Debit</th>
+												<th>Credit</th>
+											</tr>
+										</thead>
+										<tbody>
+											<t t-foreach="o.line_ids" t-as="l">
+												<tr style="page-break-inside:avoid; page-break-after:auto;">
+                          <td><span t-field="l.account_id"/></td>
+                          <td><span t-field="l.partner_id"/></td>
+													<td><span t-field="l.name"/></td>
+                          <td class="text-right"><span t-field="l.amount_currency"/></td>
+                          <td class="text-center"><span t-field="l.currency_id"/></td>
+                          <td class="text-right"><span t-field="l.debit"/></td>
+													<td class="text-right"><span t-field="l.credit"/></td>
+                        </tr>
+											</t>
+										</tbody>
+									</table>
+
+									<br />
+
+									<div class="row">
+										<div class="col-2">
+											<strong>Note : </strong>
+										</div>
+										<div class="col-8">
+											<span t-field="o.narration" />
+										</div>
+									</div>
+
+
+								</div>
+              </t>
+            </t>
+          </t>
+        </template>
+
+        <template id="report_account_move_amn">
+          <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+              <t t-foreach="docs" t-as="o">
+                <div class="page">
+
+									<div id="header">
+											<h3><span t-field="o.name" /></h3>
+									</div>
+
+									<br />
+
+									<div class="row">
+										<div class="col-2">
+											<strong>Reference : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.ref" />
+										</div>
+
+										<div class="col-2">
+											<strong>Journal : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.journal_id" />
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-2">
+											<strong>Accounting Date : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.date" />
+										</div>
+										
+										<div class="col-2">
+											<strong>Currency : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.currency_id.name" />
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-2">
+											<strong></strong>
+										</div>
+										<div class="col-4">
+											<span />
+										</div>
+										<div class="col-2">
+											<strong>Source Document : </strong>
+										</div>
+										<div class="col-4">
+											<span t-field="o.origin" />
+										</div>
+									</div>
+
+									<br />
+
+									<table class="table table-sm table-bordered" name="move_lines" style="font-size: 15px;page-break-inside: auto;">
+										<thead>
+											<tr class="text-center" style="page-break-inside:avoid; page-break-after:auto;">
+												<th>Account</th>
+												<th>Partner</th>
+												<th>Label</th>
+												<th>Amount Currency</th>
+												<th>Currency</th>
+												<th>Debit</th>
+												<th>Credit</th>
+											</tr>
+										</thead>
+										<tbody>
+											<t t-foreach="o.line_ids" t-as="l">
+												<tr style="page-break-inside:avoid; page-break-after:auto;">
+                          <td><span t-field="l.account_id"/></td>
+                          <td><span t-field="l.partner_id"/></td>
+													<td><span t-field="l.name"/></td>
+                          <td class="text-right"><span t-field="l.amount_currency"/></td>
+                          <td class="text-center"><span t-field="l.currency_id"/></td>
+                          <td class="text-right"><span t-field="l.debit"/></td>
+													<td class="text-right"><span t-field="l.credit"/></td>
+                        </tr>
+											</t>
+										</tbody>
+									</table>
+
+									<br />
+
+									<div class="row">
+										<div class="col-2">
+											<strong>Note : </strong>
+										</div>
+										<div class="col-8">
+											<span t-field="o.narration" />
+										</div>
+									</div>
+
+
+								</div>
+								<p/>
+								<p/>
+								<div class="oe_chatter" style="background-color:#f6f7fa;padding:5px;">
+									<div style="background-color:white;padding:10px 10px 0px 10px;">
+										<t t-set='date' t-value='False'/>
+										<t t-foreach="o.sudo().message_ids" t-as='log'>
+											<t t-if="date!=log.date.date()">
+												<div style="width: 100%; height: 12px; border-bottom: 1px solid #C9CCD2; text-align: center">
+												  <span style="font-size: 12px; background-color: white; padding: 0 10px;">
+												    <t t-esc='log.date.strftime("%B %d, %Y")'/> <!--Padding is optional-->
+												  </span>
+												</div>
+											</t>
+											<t t-set='date' t-value='log.date.date()'/>
+											<p/>
+											<!-- <div  style="display:flex;align-items:center">
+												<hr style='border-color:#C9CCD2;width:auto;'/>
+												<span t-esc='o.date' style='font-weight:bold;'> </span>
+												<hr style='border-color:#C9CCD2;width:auto;'/>
+											</div>
+											 -->
+											<div style='width:100%;background-color:#f6f7fa;font-size: 12px;font-weight:400;color:#444B5A;'> 
+												<span style="font-weight:500;" t-esc='log.author_id.name'/> - <span style="color:#80848F;" t-esc='log.date.strftime("%I:%M%p")'/>
+												<br/>
+												<t t-if='log.message_type!="email"'>
+													<t t-if='log.subtype_id.description'><span t-esc='log.subtype_id.description'/></t>
+													<t t-if='log.body'><span t-esc='log.body'/></t>
+													<ul>
+														<t t-foreach="log.sudo().tracking_value_ids" t-as='track'>
+															<t t-set='old_value' t-value="track.old_value_char or track.old_value_datetime or track.old_value_integer or ''" />
+															<t t-set='new_value' t-value="track.new_value_char or track.new_value_datetime or track.new_value_integer or ''" />
+															<li>
+																<div>
+																	<span><t t-esc='track.field_desc'/>:</span> &#160;&#160;&#160;
+																	<span><t t-esc='old_value'/></span>
+																	<span class='fa fa-long-arrow-right'></span>
+																	<span><t t-esc='new_value'/></span>
+																</div>
+															</li>
+														</t>
+													</ul>
+												</t>
+												<t t-else=''>
+													<span style='font-style:italic;'>Subject: <t t-esc="log.subject"/></span>
+													<p t-esc='log.body'>
+													</p>
+												</t>
+											</div>
+										</t>
+									</div>
+									<!-- <span t-field="o.message_ids" widget="mail_thread"/> -->
+								</div>
+              </t>
+            </t>
+          </t>
+        </template>
+
+    <record id="report_account_move_amn_custom" model="ir.actions.report">
+            <field name="name">Audit Report - PDF</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mt_isy.report_account_move_amn</field>
+            <field name="report_file">mt_isy.report_account_move_amn</field>
+            <field name="print_report_name">"Audit Report - "+(object.name)</field>
+        </record>
+  </data>
+</odoo>

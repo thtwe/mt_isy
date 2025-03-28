@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  	<data>
+        <!-- Leave Form View -->
+  		<record id="leave_studio_inherit_form_view" model="ir.ui.view">
+            <field name="name">hr.leave.form</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='holiday_status_id']" position="before">
+                    <field name="sequence_id"/>
+                    <field name="employee_id" options="{'no_create': True, 'no_create_edit': True, 'no_open':True}"/>
+                    <field name="x_studio_department_2" string="Department" groups="base.group_erp_manager"  readonly="1"/>
+                </xpath>
+                <xpath expr="//field[@name='holiday_status_id']" position="attributes">
+                    <attribute name="context">{'employee_id':employee_id, 'default_date_from':date_from}</attribute>
+                    <attribute name="options">{"no_create": True, "no_create_edit": True}</attribute>
+                    <attribute name="string">Leave Type</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_from']" position="attributes">
+                    <attribute name="widget">False</attribute>
+                </xpath>
+                <xpath expr="//field[@name='request_date_from']" position="attributes">
+                    <attribute name="widget">False</attribute>
+                </xpath>
+                <xpath expr="//field[@name='request_date_to']" position="attributes">
+                    <attribute name="widget">False</attribute>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="readonly">state not in ["draft","confirm"]</attribute>
+                    <attribute name="required">1</attribute>
+                    <attribute name="string">Reason For Request</attribute>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="x_studio_justification" string="Justification"/>
+                    <field name="x_studio_approver_2" string="Approver" options="{'no_create': True, 'no_open': True}"  required="0" domain="[[&quot;x_studio_is_manager&quot;,&quot;=&quot;,True]]" readonly="1"/>
+                    <field name="current_personal_balance"/>
+                    <field name="x_studio_unpaid_accumulated_leave" readonly="1"/>
+                    <field name="x_studio_accumulated_leave" string="Accumulated Leave (P)"  readonly="1"/>
+                    <field invisible="1" name="x_studio_attachment_filename"/>
+                    <field filename="x_studio_attachment_filename" name="x_studio_attachment" string="Attachment"/>
+                    <field name="x_studio_reason_for_refusal" string="Reason for Refusal" invisible="state == 'confirm' or state !='validate1'"/>
+                    <field name="x_studio_status" string="Status"  invisible="1"/>
+                    <field name="x_studio_md_1" string="MD"  invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='employee_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                    <attribute name="readonly">state not in ["draft","confirm"]</attribute>
+                    <attribute name="groups">base.group_user</attribute>
+                    <attribute name="required">1</attribute>
+                </xpath>
+<!-- 
+                <xpath expr="//field[@name='department_id']" position="after">
+                    <field name="employee_id" options="{'no_create': True, 'no_create_edit': True, 'no_open':True}"/>
+                    <field name="x_studio_department_2" string="Department" groups="base.group_erp_manager"  readonly="1"/>
+                </xpath> -->
+
+                <button name='action_validate' position='attributes'>
+                    <attribute name='groups'>isy_custom.leave_validation</attribute>
+                </button>
+                <button name='action_approve' position='attributes'>
+                    <attribute name='groups'>hr_holidays.group_hr_holidays_manager</attribute>
+                </button>
+                <button name='action_refuse' position='attributes'>
+                    <attribute name='groups'>hr_holidays.group_hr_holidays_manager</attribute>
+                </button>
+            </field>
+        </record>
+
+        <record id="hr_holidays.action_hr_holidays_dashboard" model="ir.actions.act_window">
+            <field name="name">All Leave</field>
+            <field name="res_model">hr.leave.report.calendar</field>
+            <field name="view_mode">calendar</field>
+            <field name="search_view_id" ref="hr_holidays.hr_leave_report_calendar_view_search"/>
+            <field name="domain">[('employee_id.active','=',True)]</field>
+            <field name="context">{'hide_employee_name': 1, 'search_default_my_team': 1}</field>
+        </record>
+
+        <record id="hr_holidays.hr_leave_action_action_approve_department" model="ir.actions.act_window">
+            <field name="name">All Leaves</field>
+        </record>
+
+        <record id="hr_holidays.hr_leave_action_my" model="ir.actions.act_window">
+            <field name="name">My Leaves</field>
+        </record>
+
+        
+        <record id="hr_holidays.menu_hr_holidays_my_leaves" model="ir.ui.menu">
+            <field name="name">My Leaves</field>
+        </record>
+
+        <record id="hr_holidays.hr_holidays_status_menu_configuration" model="ir.ui.menu">
+            <field name="name">Leave Types</field>
+        </record>
+
+        <record id="hr_holidays.menu_open_department_leave_approve" model="ir.ui.menu">
+            <field name="name">Leaves</field>
+        </record>
+
+        <record id="hr_holidays.hr_leave_menu_my" model="ir.ui.menu">
+            <field name="name">My Leaves</field>
+        </record>
+        
+        <record id="hr_leave_tree_dashboard" model="ir.ui.view">
+            <field name="name">hr_leave_tree_dashboard</field>
+            <field name="model">hr.leave</field>
+            <field name="arch" type="xml">
+                <tree string="Time Off Requests" sample="1">
+                    <field name="employee_id" widget="many2one_avatar_employee" decoration-muted="not active_employee"/>
+                    <field name="holiday_status_id" class="font-weight-bold"/>
+                    <field name="name"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="number_of_days" sum="Total"/>
+                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state in ('confirm','validate1')" decoration-success="state == 'validate'"/>
+                    <field name="active_employee" invisible="1"/>
+                    <field name="category_id" invisible="1"/>
+                    <field name="user_id" invisible="1"/>
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="activity_exception_decoration" widget="activity_exception"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_holiday_status_normal_tree_mt_isy" model="ir.ui.view">
+            <field name="name">view_holiday_status_normal_tree</field>
+            <field name="model">hr.leave.type</field>
+            <field name="inherit_id" ref="hr_holidays.view_holiday_status_normal_tree"/>
+            <field name="arch" type="xml">
+                <field name='leave_validation_type' position='replace'>
+                    <field name='leave_validation_type'/>
+                </field>
+                <field name='allocation_validation_type' position='attributes'>
+                    <attribute name='invisible'>1</attribute>
+                </field>
+                <field name="employee_requests" position='attributes'>
+                    <attribute name='invisible'>1</attribute>
+                </field>
+                <field name="requires_allocation" position='attributes'>
+                    <attribute name='invisible'>1</attribute>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

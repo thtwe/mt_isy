@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <act_window
+                    id="action_stock_mass_transfer"
+                    name="Stock Transfer"
+                    binding_model="isy.stock.report"
+                    res_model="stock.mass.transfer"
+                    view_mode="form"
+                    target="new"
+                    />
+            
+            <record id="view_stock_mass_transfer" model="ir.ui.view">
+                <field name="name">stock.mass.transfer.form</field>
+                <field name="model">stock.mass.transfer</field>
+                <field name="type">form</field>
+                <field name="priority" eval="8"/>
+                <field name="arch" type="xml">
+                <form >
+                    <sheet>
+                        <group>
+                            <field name='location_from' readonly='1' options="{'no_create':True,'no_open':True}"/>
+                            <field name='location_to' options="{'no_create':True,'no_open':True}" />
+                            <field name='require_assign_person' invisible='1'/>
+                            <field name="assigned_type" required="require_assign_person == True" invisible="require_assign_person == False"/>
+                            <field name="assigned_person" required="assigned_type == 'employee'" invisible="assigned_type != 'employee'" options="{'no_create':True,'no_open':True}"/>
+                            <field name="assigned_student" required="assigned_type =='student'" invisible="assigned_type != 'student'" options="{'no_create':True,'no_open':True}"/>
+                        </group>
+                    </sheet>
+
+                    <footer>
+                        <button string="Transfer" type="object" name="transfer_multi_stock"/>
+                         Or 
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="internal_stock_transfer_list">
+            <field name="name">internal_stock_transfer list</field>
+            <field name="model">internal.stock.transfer</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="Transfer No."/>
+                    <field name="date_transfer"/>
+                    <field name="date_schedule"/>
+                    <field name="assigned_person"/>
+                    <field name="source_location"/>
+                    <field name="destination_location"/>
+                    <field name="remark"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="internal_stock_transfer_form">
+            <field name="name">internal_stock_transfer form</field>
+            <field name="model">internal.stock.transfer</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button string="Approve" type="object" class="oe_highlight " name="first_approve" invisible="state != 'firstapproval'"/>
+                        <button string="Approve" type="object" name="reserved_stock" class="oe_highlight" invisible="state != 'secondapproval'"/>
+                        <button string="Cancel" type="object" name="cancel_approve" class="oe_highlight" invisible="state not in ('draft', 'firstapproval', 'secondapproval')"/>
+
+                        <button string="Reserve" type="object" name="reserved_stock" class="oe_highlight" invisible="state != 'draft'"/>
+                        <button string="Transfer" type="object" name="transferred_stock" class="oe_highlight" invisible="state != 'reserved'"/>
+                        <!--This will create the statusbar, thanks to the widget. -->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,reserved,done"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <group col="4">
+                            <field name="date_transfer" string="Date Transferred" readonly="1"/>
+                            <field name="date_schedule" invisible="state != 'draft'"/>
+                            <field name="ist_type" required="1" invisible="state != 'draft'"/>
+                            <field name="is_grant_funded_transfer" invisible="1"/>
+                            <field name="source_location" required="1" force_save="1" invisible="ist_type == False" readonly="state != 'draft'" options="{'no_create':True,'no_open':True}"/>
+                            <field name="destination_location" required="1" invisible="ist_type == False" readonly="state != 'draft'" options="{'no_create':True,'no_open':True}"/>                          
+                            <field name="is_donation" invisible="1"/> <!-- Related Trigger Show Hide for donated_to field-->
+                            <field name="donated_to" options="{'no_create':True, 'no_open':True}" readonly="state != 'draft'" invisible="is_donation != True" required="is_donation == True" />
+                            <field name="barcode_scanned" default_focus="1" invisible="state != 'draft'"/>
+                            <field name="picking_id" invisible="1"/> 
+                             <field name="assigned_type" required="require_assign_person == True" readonly="state != 'draft'" invisible="require_assign_person == False"/>
+                            <field name="assigned_person" required="assigned_type == 'employee'" readonly="state != 'draft'" invisible="assigned_type != 'employee'" options="{'no_create':True,'no_open':True}"/>
+                            <field name="assigned_student" required="assigned_type == 'student'" readonly="state != 'draft'" invisible="assigned_type != 'student'" options="{'no_create':True,'no_open':True}"/>
+                            <field name="require_assign_person" invisible="1"/>
+                            <field name="picking_type_id" invisible="1" force_save="1"/>                        
+                        </group>
+                        <group string="Approval Information" col="4" invisible="first_approval == False or second_approval == False">
+                            <field name="first_approval" readonly="1" force_save="1"/>
+                            <field name="second_approval" readonly="1" force_save="1"/>
+                        </group>
+                        <group col="3">
+                                
+                                <field name="product_id" invisible="state != 'draft' or is_grant_funded_transfer == False" domain="[('type','=','product')]"/>
+                                <field name="purchase_id" invisible="state != 'draft' or is_grant_funded_transfer == False"/>
+                                <field name="inventory_category" invisible="state != 'draft' or is_grant_funded_transfer == False"/>
+                                <field name="assets_responsible_person" invisible="1" />
+                                <field name="assets_included" invisible="1"/>
+
+
+                                <button string="Add" class="oe_edit_only" type="object" name="add_grant_funded_item" invisible="state != 'draft' and is_grant_funded_transfer == False"/>
+                            </group>
+                        <group>
+                            <h2><field name="msg_validation" readonly="1" style="color:red ! important;"/></h2>
+
+                        </group>
+                        <notebook>
+                            <page string="Transfer Details">
+                                <field name="ist_details" invisible="state != 'draft'">
+                                    <tree editable="bottom" create="false">
+                                        <field name="serial_number" readonly="1" force_save="1"/>
+                                        <button string="Details" type="object" name="show_stock_report_by_serial_number" class="oe_highlight"/>
+                                        <field name="product_id" readonly="1" force_save="1"/>
+                                        <field name="qty" readonly="disable_qty == True"/>
+                                        <field name="disable_qty" invisible="1"/>
+                                        <field name="assigned_department"/>
+                                        <field name="date_schedule_return"/>
+                                        <field name="purchase_id"/>
+                                        <field name="inventory_category"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Remark">
+                                <field name="remark"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <!-- <div class="oe_chatter"> <field name="message_follower_ids" widget="mail_followers"/> <field name="message_ids" widget="mail_thread"/> </div> -->
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="menu_internal_stock_transfer_action">
+            <field name="name">Inventory Management</field>
+            <field name="res_model">internal.stock.transfer</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="context">{'default_type': 'planning'}</field> <field name="domain">[('key_type','=','planning')]</field> -->
+        </record>
+
+        <menuitem name="Inventory Management" id="menu_internal_stock_transfer_sub" parent="stock.menu_stock_root" sequence="1"/>
+        <menuitem name="Inventory Transfer" id="menu_internal_stock_transfer" parent="menu_internal_stock_transfer_sub" action="menu_internal_stock_transfer_action" sequence="0"/>
+
+        <record model="ir.ui.view" id="internal_stock_transfer_details_list">
+            <field name="name">internal_stock_transfer details list</field>
+            <field name="model">internal.stock.transfer.details</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="date_schedule_return and date_schedule_return &lt;= current_date" default_order="date_schedule_return aesc" create="false" edit="false">
+                    <field name="ist_id"/>
+                    <field name="serial_number"/>
+                    <field name="product_id"/>
+                    <field name="qty"/>
+                    <field name="source_location"/>
+                    <field name="destination_location"/>
+                    <field name="assigned_person"/>
+                    <field name="assigned_student"/>
+                    <field name="date_transfer"/>
+                    <field name="assigned_department"/>
+                    <field name="date_schedule_return"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="menu_internal_stock_transfer_details_action">
+            <field name="name">Schedule Return Lists</field>
+            <field name="res_model">internal.stock.transfer.details</field>
+            <field name="view_mode">tree</field>
+            <!-- <field name="context">{'default_type': 'planning'}</field> -->
+            <field name="domain">[('date_schedule_return','!=',False)]</field>
+        </record>
+
+        <menuitem name="Schedule Return Lists" id="menu_internal_stock_transfer_details" parent="menu_internal_stock_transfer_sub" action="menu_internal_stock_transfer_details_action" sequence="1"/>
+
+
+        <record id="view_product_category_form_view" model="ir.ui.view">
+            <field name="name">view_product_category_form_view</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <field name="parent_id" position="after">
+                    <field name="is_it" />
+                </field>
+            </field>
+        </record>
+
+        <record id="product_template_only_form_view_isy" model="ir.ui.view">
+            <field name="name">product_template_only_form_view_isy</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <field name="default_code" position="before">
+                    <field name="is_it" />
+                </field>
+            </field>
+        </record>
+
+        <record id="isy_stock_report_search_view" model="ir.ui.view">
+            <field name="name">isy.stock.report.search</field>
+            <field name="model">isy.stock.report</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <search string="Search Stock Report">
+                    <field name="serial_number" string="Serial Number (Barcode)"/>
+                    <field name="name"/>
+                    <field name="location_id"/>
+                    <field name="inventory_category"/>
+                    <field name="product_category"/>
+                    <field name="assigned_to"/>
+                    <field name="manufacturer"/>
+                    <field name='contact_reserved' />
+                    <filter name="internal" string="Internal Stock" domain="[('location_id.name','not in',('Scrap','Donate','Sell'))]" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="isy_stock_report_tree">
+            <field name="name">isy_stock_report tree</field>
+            <field name="model">isy.stock.report</field>
+            <field name="arch" type="xml">
+                <tree create="false">
+                    <field name="serial_number"/>
+                    <field name="product_category"/>
+                    <field name="name" invisible="1"/>
+                    <field name="product_id"/>
+                    <field name="location_id"/>
+                    <field name="inventory_category"/>
+                    <field name="assigned_department"/>
+                    <field name="purchase_id"/>
+                    <field name="purchase_date"/>
+                    <field name="acquisition_cost"/>
+                    <field name="assigned_type"/>
+                    <field name="assigned_to"/>
+                    <field name="manufacturer"/>
+                    <field name="model_number"/>
+                    <field name="it_serial_number"/>
+                    <field name="grant_funded_item"/>
+                    <field name="note"/>
+                    <field name="write_date" string="Last Updated Date"/>
+                    <field name='contact_reserved' />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="isy_stock_report_form">
+            <field name="name">isy_stock_report form</field>
+            <field name="model">isy.stock.report</field>
+            <field name="arch" type="xml">
+                <form create="false">
+                    <sheet>
+                        <group cols="4">
+                            <field name="product_id" readonly="1"/>
+                            <field name="serial_number" readonly="1"/>
+                            <field name="location_id" readonly="1"/>
+                            <field name="inventory_category" />
+                            <field name="assigned_department"/>
+                            <field name="product_category" readonly="1"/>
+                            <field name="purchase_id" readonly="1"/>
+                            <field name="purchase_date" />
+                            <field name="acquisition_cost" readonly="1"/>
+                            <field name="assigned_type" readonly="1"/>
+                            <field name="assigned_to" readonly="1"/>
+                            <field name="manufacturer" />
+                            <field name="model_number" />
+                            <field name="it_serial_number"/>
+                            <field name="grant_funded_item"/>
+                            <field name="write_date" string="Last Updated Date" readonly="1"/>
+                            <field name='contact_reserved' />
+                            <field name='user_email' groups="base.group_no_one" />
+                        </group>
+                        <notebook>
+                            <page string="Note">
+                                <field name="note"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="isy_stock_report_form_show_details">
+            <field name="name">isy_stock_report form</field>
+            <field name="model">isy.stock.report</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                    <sheet>
+                        <group cols="4">
+                            <field name="product_id" readonly="1"/>
+                            <field name="serial_number" readonly="1"/>
+                            <field name="location_id" readonly="1"/>
+                            <field name="inventory_category" readonly="1"/>
+                            <field name="assigned_department" readonly="1"/>
+                            <field name="product_category" readonly="1"/>
+                            <field name="purchase_id" readonly="1"/>
+                            <field name="purchase_date" readonly="1"/>
+                            <field name="acquisition_cost" readonly="1"/>
+                            <field name="assigned_type" readonly="1"/>
+                            <field name="assigned_to" readonly="1"/>
+                            <field name="manufacturer" readonly="1"/>
+                            <field name="model_number" readonly="1"/>
+                            <field name="it_serial_number" readonly="1"/>
+                            <field name="grant_funded_item" readonly="1"/>
+                            <field name="write_date" string="Last Updated Date" readonly="1"/>
+                            <field name='contact_reserved' />
+                            <field name='user_email' groups="base.group_no_one" />
+                        </group>
+                        <notebook>
+                            <page string="Note">
+                                <field name="note" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <footer></footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_isy_stock_report">
+            <field name="name">Stock Report</field>
+            <field name="res_model">isy.stock.report</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_internal': 1}</field>
+            <!-- <field name="domain">[('location_id.name','not in',('Scrap','Donate','Sell'))]</field> -->
+            <!-- <field name="context">{'default_type': 'planning'}</field> <field name="domain">[('key_type','=','planning')]</field> -->
+        </record>
+
+        <menuitem name="Stock Report" id="menu_isy_stock_report" parent="menu_internal_stock_transfer_sub" action="action_isy_stock_report" sequence="2"/>
+
+        <record id="view_stock_move_line_operation_tree_isy" model="ir.ui.view">
+            <field name="name">stock.move.line.tree</field>
+            <field name="model">stock.move.line</field>
+            <field name="inherit_id" ref="stock.view_stock_move_line_operation_tree"/>
+            <field name="arch" type="xml">
+                <field name="lot_name" position="after">
+                    <field name="manufacturer"/>
+                    <field name="model"/>
+                    <field name="it_serial_number"/>
+                    <field name="assigned_department"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="stock.stock_picking_type_action" model="ir.actions.act_window">
+            <field name="domain">[('code','!=','internal')]</field>
+        </record>
+
+        <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
+            <field name="domain">[('picking_type_id.code','!=','internal')]</field>
+        </record>
+
+
+        <record id="isy_stock_report_form_readonly" model="ir.ui.view">
+            <field name="name">isy.stock.report.form</field>
+            <field name="model">isy.stock.report</field>
+            <field name="inherit_id" ref="mt_isy.isy_stock_report_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='acquisition_cost']" position="attributes">
+                    <attribute name="readonly">False</attribute>
+                </xpath>
+                <!-- Apply 'groups' to restrict access to the field to a specific group -->
+                <xpath expr="//field[@name='acquisition_cost']" position="attributes">
+                    <attribute name="groups">mt_isy.group_stock_report_special</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="different_stock_list">
+            <field name="name">stock_auditing_different_stock list</field>
+            <field name="model">stock.auditing.different.stock</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="product_id"/>
+                    <field name="product_category"/>
+                    <field name="inventory_category"/>
+                    <field name="location_id"/>
+                    <field name="assigned_type"/>
+                    <field name="assigned_to"/>
+                    <field name="assigned_department"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="act_different_stock" model="ir.actions.act_window">
+            <field name="name">Missing Stocks</field>
+            <field name="res_model">stock.auditing.different.stock</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{}</field>
+            <field name="domain">[('stock_auditing_different_id','=', context.get('active_id', False))]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                   Missing Stock Lists
+                </p>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="stock_auditing_list">
+            <field name="name">stock_auditing list</field>
+            <field name="model">stock.auditing</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="Ref No."/>
+                    <field name="audit_date"/>
+                    <field name="employee_id"/>
+                    <field name="closing_stock_count"/>
+                    <field name="isy_stock_report_count"/>
+                    <field name="missing_stock_count"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="stock_auditing_form">
+            <field name="name">stock_auditing form</field>
+            <field name="model">stock.auditing</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button string="Upload" type="object" class="oe_highlight " name="generate_closign_stock_by_upload_attachment" invisible="state != 'draft'"/>
+                        <button string="RequestForApproval" type="object" class="oe_highlight " name="request_approval" invisible="state != 'draft'"/>
+                        <button string="Approve" type="object" class="oe_highlight " name="request_second_approval" invisible="state != 'firstapproval'"/>
+                        <button string="Approve" type="object" class="oe_highlight " name="process_done" invisible="state != 'secondapproval'"/>
+                        <button string="Cancel" type="object" class="oe_highlight " name="cancel_process" invisible="state == 'done'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,firstapproval,secondapproval,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="%(mt_isy.act_different_stock)d" type="action" string="Missing Stocks"  icon="fa-cubes">
+                                <!-- <field string="Purchases" name="purchase_order_count" widget="statinfo"/> -->
+                            </button>
+                        </div>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <group col="4">
+                            <field name="audit_date" readonly="state != 'draft'"/>
+                            <field name="fiscal_year" readonly="state != 'draft'" widget="selection"/>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="closing_stock_count" readonly="1"/>
+                            <field name="isy_stock_report_count" readonly="1"/>
+                            <field name="missing_stock_count" readonly="1"/>                            
+                        </group>
+                        
+                        <group col="3">
+                            <field name="closing_stock_attachment_label" invisible="1"/>
+                            <field name="closing_stock_attachment" filename="closing_stock_attachment_label" readonly="state != 'draft'"/>
+                            
+                        </group>
+                        
+                        <group col="4">
+                            <field name="first_approval" readonly="1"/>
+                            <field name="second_approval" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Closing Stock Details">
+                                <field name="closing_stock_details" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="product_id"/>
+                                        <field name="product_category"/>                                        
+                                        <field name="inventory_category"/>
+                                        <field name="location_id"/>
+                                        <field name="assigned_type"/>
+                                        <field name="assigned_to"/>
+                                        <field name="assigned_department"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Remark">
+                                <field name="remark" readonly="state != 'draft'"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_stock_auditing">
+            <field name="name">Stock Auditing</field>
+            <field name="res_model">stock.auditing</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="context">{'default_type': 'planning'}</field> <field name="domain">[('key_type','=','planning')]</field> -->
+        </record>
+
+        <menuitem name="Stock Auditing Closing Entry" id="menu_stock_auditing" parent="menu_internal_stock_transfer_sub" action="action_stock_auditing" groups="stock.group_stock_manager" sequence="2"/>
+
+
+        <record model="ir.ui.view" id="donation_view">
+            <field name="name">Donation List</field>
+            <field name="model">isy.donated.to</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_donation">
+            <field name="name">Donation List</field>
+            <field name="res_model">isy.donated.to</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="context">{'default_type': 'planning'}</field> <field name="domain">[('key_type','=','planning')]</field> -->
+        </record>
+
+        <menuitem name="ISY Donation List" id="menu_donation_list" parent="stock.menu_warehouse_config" action="action_donation" groups="stock.group_stock_manager" sequence="3"/>
+
+
+
+    </data>
+</odoo>

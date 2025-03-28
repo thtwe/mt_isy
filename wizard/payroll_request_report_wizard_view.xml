@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_payroll_request_report" model="ir.ui.view">
+            <field name="name">Payroll Request Report</field>
+            <field name="model">payroll.request.report</field>
+            <field name="arch" type="xml">
+                <form string="Payroll Request Report">
+                    <group>
+                        <group>
+                           <field name="date_from"/>
+                           <field name="date_to"/>
+                           <field name="by_employee_type"/>
+                           <field name="cash_allocation_type"/>
+                           <field name="adjustment_type"/>
+
+                        </group>
+                    </group>
+                    <notebook invisible="by_employee_type != 'custom'">
+                        <page string="Employee Details">
+                            <field name="payroll_request_employee_details" required="by_employee_type == 'custom'">
+                                <tree editable="bottom">
+                                    <field name="name" options="{'no_create_edit': True}"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="print_report_payroll_request" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_view_payroll_request_report" model="ir.actions.act_window">
+            <field name="name">Payroll Request Report</field>
+            <field name="res_model">payroll.request.report</field>
+            <field name="view_id" ref="view_payroll_request_report"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_view_payroll_request_report" name="Payroll Request Report" parent="mt_isy.menu_hr_payroll_process_sub_reporting_root" action="action_view_payroll_request_report" sequence="4"/>
+
+    </data>
+</odoo>

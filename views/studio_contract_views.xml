@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  	<data>
+  		<record id="hr_contract_view_form_inherit_studio" model="ir.ui.view">
+          <field name="name">hr_contract_view_form_inherit_studio</field>
+          <field name="model">hr.contract</field>
+          <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+          <field name="arch" type="xml">
+              <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="x_studio_department" string="Department" readonly="1"/>
+                <field name="x_studio_job_title" string="Job Title" readonly="1" invisible="1"/>
+                <field name="x_studio_job_title_1" string="Job Title"/>
+              </xpath>
+              <xpath expr="//field[@name='department_id']" position="attributes">
+                
+                <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='job_id']" position="attributes">
+                
+                <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//group[@name='salary_info']" position="after">
+                <group name="studio_group_hFqLs">
+                  <group name="studio_group_hFqLs_left">
+                    <field name="x_studio_to_calculate" string="To Calculate"/>
+                    <field name="x_studio_local_annual_retirement_1" string="Local Annual Retirement 1" />
+                    <field name="x_studio_local_monthly_retirement_1" string="Local Monthly Retirement 1"/>
+                    <field name="x_studio_monthly_salary_1" string="Monthly Salary 1"/>
+                    <field name="x_studio_annual_retirement" string="Annual Retirement"/>
+                    <field name="x_studio_monthly_salary" string="Monthly Salary"/>
+                    <field name="x_studio_monthly_retirement" string="Monthly Retirement"/>
+                    <!-- <field name="x_studio_monthly_wage" string="Monthly Wage" readonly="1" invisible="1"/> -->
+                    <field name="x_studio_spouse_allowance" string="Spouse Allowance"/>
+                    <field name="x_studio_registered_child" string="Registered Child"/>
+                    <field name="x_studio_registered_parent" string="Registered Parent"/>
+                  </group>
+                  <group name="studio_group_hFqLs_right">
+                    <field name="allowance_utility" />
+                    <field name="x_studio_health_allowance" string="Health Allowance"/>
+                    <field name="x_studio_transportation_allowance" string="Transportation Allowance"/>
+                    <field name="x_studio_meal_and_uniform_allowance" string="Meal and Uniform Allowance"/>
+                    <field name="x_studio_income_tax" string="Income Tax (MMK)" invisible='1'/>
+                    <field name="x_studio_loan" string="Loan"/>
+                    <field name="x_studio_loan_interest" string="Loan Interest"/>
+                    <field name="x_studio_phone_allowance_1" string="Phone Allowance"/>
+                  </group>
+                </group>
+                <group name="studio_group_dtVLO">
+                  <group name="studio_group_dtVLO_left">
+                    <field name="cash_usd"/>
+                    <field name="x_studio_uob_bank" string="UOB Bank"/>
+                    <field name="x_studio_local_bank" string="Deposit into Local Bank (USD account)"/>
+                    <field name="local_bank_mmk" string="Amount in USD to be deposited into Kyat bank account"/>
+                    <field name="x_studio_local_bank_k" string="Amount in USD to be converted in Kyat cash"/>
+                    <field name="x_studio_petty_cash" string="Petty Cash"/>
+                    <field name="x_studio_401k" string="401K"/>
+                    <field name="x_studio_overseas_bank" string="Overseas Bank"/>
+                  </group>
+                  <group name="studio_group_dtVLO_right">
+                    <field name="x_studio_expatriate_annual_retirement" string="Expatriate Annual Retirement" />
+                    <field name="x_studio_expatriate_monthly_retirement" string="Expatriate Monthly Retirement"/>
+                    <field name="x_studio_greg_annual_retirement" string="Greg Annual Retirement"/>
+                    <field name="x_studio_greg_monthly_retirerment" string="Greg Monthly Retirerment"/>
+                  </group>
+                </group>
+              </xpath>
+          </field>
+      </record>
+
+    </data>
+</odoo>

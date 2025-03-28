@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  	<data>
+  		<record id="employee_studio_inherit_form_view" model="ir.ui.view">
+            <field name="name">hr.employee.studio.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='bank_account_id']" position="replace">
+                    <field name="x_studio_passport_expiration_date" string="Passport Expiration Date"/>
+                    <field name="x_studio_field_doyUi" string="Bank 1"/>
+                    <field name="x_studio_bank_2" string="Bank 2"/>
+                    <field name="x_studio_bank_3" string="Bank 3"/>
+                    <field name="x_studio_social_security_number" string="Social Security Number"/>
+                  </xpath>
+                  <field name="category_ids" position="before">
+                    <group name="studio_group_QiSTl">
+                      <group name="studio_group_QiSTl_left">
+                        <field name="x_studio_preferred_name" string="Preferred Name"/>
+                      </group>
+                      <group name="studio_group_QiSTl_right">
+                        <field name="x_studio_t" string="t"  invisible="1"/>
+                      </group>
+                    </group>
+                  </field>
+                  <xpath expr="//field[@name='dcid']" position="attributes">
+                    
+                    <attribute name="readonly"/>
+                  </xpath>
+                  <xpath expr="//field[@name='address_id']" position="before">
+                    <field name="x_studio_private_address" string="Private Address"  invisible="1"/>
+                    <field name="x_studio_private_email" string="Private Email"/>
+                    <field name="x_studio_private_phone" string="Private Phone"/>
+                  </xpath>
+                  <xpath expr="//field[@name='work_phone']" position="after">
+                    <field name="x_studio_employee_staff_id" string="Employee Staff ID"/>
+                    <field name="x_studio_field_T5qmH"/>
+                  </xpath>
+                  <xpath expr="//field[@name='department_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='job_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='rank_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='job_title']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="x_studio_is_manager" string="Is Manager"/>
+                    <field name="is_scholarship_staff" />
+                  </xpath>
+                  <xpath expr="//field[@name='coach_id']" position="attributes">
+                    
+                    <attribute name="invisible">1</attribute>
+                  </xpath>
+                  <xpath expr="//field[@name='tz']" position="after">
+                    <field name="x_studio_joining_date" string="Joining Date"  invisible="1"/>
+                  </xpath>
+                  <xpath expr="//field[@name='emergency_contact']" position="after">
+                    <field name="x_studio_emergency_email" string="Emergency Email"/>
+                  </xpath>
+                  <xpath expr="//field[@name='km_home_work']" position="after">
+                    <field name="x_studio_field_SGtKq"/>
+                  </xpath>
+                  <xpath expr="//field[@name='marital']" position="after">
+                    <field name="x_studio_spouse_has_taxable_income" string="Spouse has taxable income"/>
+                  </xpath>
+                  <xpath expr="//field[@name='children']" position="after">
+                    <field name="x_studio_spouse_income" string="Spouse Income"/>
+                    <field name="x_studio_registered_child" string="Registered Child"/>
+                    <field name="x_studio_registered_parent" string="Registered Parent"/>
+                  </xpath>
+                  <xpath expr="//field[@name='visa_expire']" position="after">
+                    <field name="x_studio_parent_name" string="Parent Name"/>
+                    <field name="x_studio_mailing_address" string="Mailing Address"/>
+                    <field name="x_studio_personnel_tax_id" string="Personnel tax ID"/>
+                  </xpath>
+                  <xpath expr="//field[@name='study_school']" position="after">
+                    <field name="x_studio_teaching_certificatelicense" string="Teaching Certificate/License"/>
+                    <field name="x_studio_teaching_certificatelicense_expiry_date" string="Teaching Certificate/License Expiry Date"/>
+                    <field name="x_studio_field_uyJCD"/>
+                  </xpath>
+                  <xpath expr="//field[@name='accumulated_leave']" position="attributes">
+                    <attribute name="string">Paid Accumulated leave(PAL)</attribute>
+                  </xpath>
+                  <!-- <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/div[1]/notebook[1]/page[@name='personal_information']/group[1]" position="after">
+                    <group name="studio_group_dqXJx">
+                      </group>
+                  </xpath> -->
+                  <xpath expr="//field[@name='expense_manager_id']" position="after">
+                    <field name="x_studio_vendor_pickup"  string="To Pay"/>
+                  </xpath>
+                  <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="x_studio_termination_date" string="Termination Date"/>
+                    <field name="x_studio_status_of_the_contract" string="Status of the contract"/>
+                  </xpath>
+                  <!-- <xpath expr="//field[@name='vehicle']" position="after">
+                    <field name="x_studio_current_salary_structure" string="Current Salary Structure"/>
+                    <field name="contract_id"/>
+                    <field name="x_currency_id"  invisible="1"/>
+                    <field name="x_studio_wage" string="Wage"  invisible="1"/>
+                  </xpath> -->
+                  <xpath expr="//notebook" position="inside">
+                    <page name="studio_page_msin3" string="Employee Report">
+                      <group name="studio_group_msin3">
+                        <group name="studio_group_msin3_left">
+                          <field name="x_studio_date" string="Date" widget="date"/>
+                        </group>
+                        <group name="studio_group_msin3_right"/>
+                      </group>
+                    </page>
+                  </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="account_asset_asset_form_inherit1" model="ir.ui.view">
+            <field name="name">account.asset.asset.form.inherit1</field>
+            <field name="model">account.asset</field>
+            <field name="inherit_id" ref="account_asset.view_account_asset_form"/>
+            <field name="arch" type="xml">
+                <field name="value_residual" position="after">
+                    <field name='posted_count' />
+                </field>
+            </field>
+        </record>
+
+        <record id="view_account_form_inherit1" model="ir.ui.view">
+            <field name="name">view_account_form_inherit1</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+                <!-- <field name="internal_type" position='attributes'>
+                    <attribute name='invisible'>0</attribute>
+                </field> -->
+                <field name="internal_group" position='attributes'>
+                    <attribute name='invisible'>0</attribute>
+                </field>
+                <field name='account_type' position='after'>
+                    <field name='savings_for_education'/>
+                    <field name='no_budget'/>
+                </field>
+                <field name='group_id' position='after'>
+                    <field name='extra_group_id' widget="many2many_tags"/>
+                </field>
+            </field>
+        </record>
+
+
+        <record id="account_group_extra_tree_inherit1" model="ir.ui.view">
+            <field name="name">account.group.extra.tree.inherit1</field>
+            <field name="model">account.group.extra</field>
+            <field name="arch" type="xml">
+                <tree editable='top'>
+                    <field name='name' />
+                    <field name='company_id'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_depreciation_move_tree" model="ir.ui.view">
+            <field name="name">account.asset.depreciation.tree</field>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="reversal_move_id" widget="deprec_lines_reversed"/>
+                    <field name="date" string="Depreciation Date"/>
+                    <field name="amount_total" widget="monetary" string="Depreciation" options="{'currency_field': 'currency_id'}" readonly="state =='posted'"/>
+                    <field name="asset_depreciated_value" readonly="1" force_save="1" options="{'currency_field': 'currency_id'}"/>
+                    <field name="asset_remaining_value" readonly="1" widget="monetary" force_save="1" options="{'currency_field': 'currency_id'}"/>
+                    <field name="name" readonly="1" string="Journal Entry"/>
+                    <field name="state" invisible="1"/>
+                    <!--<field name="asset_manually_modified" invisible="1"/>-->
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="menu_account_asset_lines_action">
+            <field name="name">Account Asset Lines</field>
+            <field name="res_model">account.asset</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem name="Asset Lines" id="menu_account_asset_lines" parent="account.account_account_menu" sequence="50"/>
+
+        <record model="ir.actions.act_window" id="menu_account_group_extra_action">
+            <field name="name">Account Group Extra</field>
+            <field name="res_model">account.group.extra</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="Account Group Extra" id="menu_account_group_extra" parent="account.account_account_menu" sequence="10" action="mt_isy.menu_account_group_extra_action"/>
+
+    </data>
+</odoo>

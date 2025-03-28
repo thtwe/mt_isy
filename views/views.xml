@@ -1,0 +1,1042 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_isy_budget_display_wizard" model="ir.ui.view">
+            <field name="name">CCM Budget</field>
+            <field name="model">budget.display.cost.manager.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Budget">
+                    <group>
+                        <group>
+                            <field name="user_id" widget="selection" groups="mt_isy.group_budget_ccm_user_selection"/>
+                            <field name="name" required="1" domain="[('ccm_budget','=',1)]"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="generate_budget_list" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_view_isy_budget_display_wizard" model="ir.actions.act_window">
+            <field name="name">CCM Budget</field>
+            <field name="res_model">budget.display.cost.manager.wizard</field>
+            <field name="view_id" ref="view_isy_budget_display_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_isy_budget_display_result_dummy" model="ir.ui.view">
+            <field name="name">CCM Budget</field>
+            <field name="model">budget.display.cost.manager.dummy</field>
+            <field name="arch" type="xml">
+                <tree string="Budget" create="false"></tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="view_isy_budget_display_result_menu_action">
+            <field name="name">Budget</field>
+            <field name="res_model">budget.display.cost.manager.dummy</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="mt_isy.view_isy_budget_display_result_dummy"/>
+        </record>
+
+        <menuitem id="main_menu_action_view_isy_budget_display_wizard" name="CCM Budget" sequence="17" action="view_isy_budget_display_result_menu_action"/>
+        <!-- <menuitem id="view_isy_budget_display_result_menu" name="CCM Budget"  parent="mt_isy.main_menu_action_view_isy_budget_display_wizard" sequence="1"/> -->
+        <menuitem id="menu_action_view_isy_budget_display_wizard" name="CCM Budget (Opex)" action="action_view_isy_budget_display_wizard" parent="mt_isy.main_menu_action_view_isy_budget_display_wizard" sequence="2"/>
+
+        <record id="view_isy_budget_display_result" model="ir.ui.view">
+            <field name="name">CCM Budget</field>
+            <field name="model">budget.display.cost.manager.result</field>
+            <field name="arch" type="xml">
+                <tree string="Budget" create="false" decoration-danger="remaining &lt; 0" default_order="name">
+                    <field name="name"/>
+                    <field name="user_id" groups="base.group_no_one"/>
+                    <field name="budget_id" invisible='1'/>
+                    <field name="group_id" invisible='1'/>
+                    <field name="budget" sum='Total'/>
+                    <field name="actual" sum='Total'/>
+                    <field name="remaining" sum='Total'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_isy_budget_display_consolidated_wizard" model="ir.ui.view">
+            <field name="name"></field>
+            <field name="model">budget.display.consolidated.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Budget">
+                    <group>
+                        <field name="user_id" widget="selection" groups="mt_isy.group_budget_ccm_user_selection"/>
+                        <field name="name" required="1" domain="[('ccm_budget','=',1)]"/>
+                    </group>
+                    <footer>
+                        <button name="generate_budget_list" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_view_isy_budget_display_consolidated_wizard" model="ir.actions.act_window">
+            <field name="name">Consolidated Budget</field>
+            <field name="res_model">budget.display.consolidated.wizard</field>
+            <field name="view_id" ref="view_isy_budget_display_consolidated_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_isy_budget_display_consolidated_result" model="ir.ui.view">
+            <field name="name">Consolidated Budget</field>
+            <field name="model">budget.display.consolidated.result</field>
+            <field name="arch" type="xml">
+                <tree string="Budget" create="false" decoration-danger="remaining &#60; 0" default_order="name">
+                    <field name="name"/>
+                    <field name="user_id" groups="base.group_no_one"/>
+                    <field name="budget_id" invisible='1'/>
+                    <field name="group_id"  invisible='1'/>
+                    <field name="budget_100" sum='Total'/>
+                    <field name="budget" sum='Total'/>
+                    <field name="actual" sum='Total'/>
+                    <field name="remaining_100" sum='Total'/>
+                    <field name="remaining" sum='Total'/>
+                </tree>
+            </field>
+        </record>
+
+        <menuitem id="main_menu_isy_budget_display_consolidated_wizard" name="Consolidated Budget" sequence="17" groups="group_budget_cosolidated_user" action="view_isy_budget_display_result_menu_action"/>
+        <menuitem id="view_isy_budget_display_consolidated_result_menu" name="Consolidated Budget (Opex)" action="action_view_isy_budget_display_consolidated_wizard" parent="mt_isy.main_menu_isy_budget_display_consolidated_wizard" sequence="1"/>
+
+        <record id="view_isy_budget_display_ccm_wizard_capex" model="ir.ui.view">
+            <field name="name">CCM Budget</field>
+            <field name="model">budget.display.ccm.wizard.capex</field>
+            <field name="arch" type="xml">
+                <form string="Budget">
+                    <group>
+                        <field name="user_id" widget="selection" groups="mt_isy.group_budget_cosolidated_user"/>
+                        <field name="name" required="1" domain="[('ccm_budget','=',1)]"/>
+                    </group>
+                    <footer>
+                        <button name="generate_budget_list" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_view_isy_budget_display_ccm_wizard_capex" model="ir.actions.act_window">
+            <field name="name">CCM Budget</field>
+            <field name="res_model">budget.display.ccm.wizard.capex</field>
+            <field name="view_id" ref="view_isy_budget_display_ccm_wizard_capex"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_isy_budget_display_ccm_result_capex" model="ir.ui.view">
+            <field name="name">CCM Budget</field>
+            <field name="model">budget.display.ccm.result.capex</field>
+            <field name="arch" type="xml">
+                <tree string="Budget" create="false" decoration-danger="remaining &#60; 0" default_order="sequence">
+                    <field name='sequence' invisible='1'/>
+                    <field name="name"/>
+                    <field name="budget_id" groups="base.group_no_one"/>
+                    <field name="budget" sum='Total'/>
+                    <field name="actual" sum='Total'/>
+                    <field name="remaining" sum='Total'/>
+                </tree>
+            </field>
+        </record>
+
+        <menuitem id="view_isy_budget_display_ccm_result_capex_menu" name="CCM Budget (Capex)" action="action_view_isy_budget_display_ccm_wizard_capex" parent="mt_isy.main_menu_action_view_isy_budget_display_wizard" sequence="3" groups='mt_isy.group_budget_ccm_user_capex'/>
+
+        <record id="view_isy_budget_display_consolidated_wizard_capex" model="ir.ui.view">
+            <field name="name">Consolidated Budget</field>
+            <field name="model">budget.display.consolidated.wizard.capex</field>
+            <field name="arch" type="xml">
+                <form string="Budget">
+                    <group>
+                        <field name="user_id" widget="selection" groups="mt_isy.group_budget_cosolidated_user"/>
+                        <field name="name" required="1" domain="[('ccm_budget','=',1)]"/>
+                    </group>
+                    <footer>
+                        <button name="generate_budget_list" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_view_isy_budget_display_consolidated_wizard_capex" model="ir.actions.act_window">
+            <field name="name">Consolidated Budget</field>
+            <field name="res_model">budget.display.consolidated.wizard.capex</field>
+            <field name="view_id" ref="view_isy_budget_display_consolidated_wizard_capex"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_isy_budget_display_consolidated_result_capex" model="ir.ui.view">
+            <field name="name">Consolidated Budget</field>
+            <field name="model">budget.display.consolidated.result.capex</field>
+            <field name="arch" type="xml">
+                <tree string="Budget" create="false" decoration-danger="remaining &#60; 0" default_order="sequence">
+                    <field name='sequence' invisible='1'/>
+                    <field name="name"/>
+                    <field name="budget_id" groups="base.group_no_one"/>
+                    <field name="budget_100" sum='Total'/>
+                    <field name="budget" sum='Total'/>
+                    <field name="actual" sum='Total'/>
+                    <field name="remaining_100" sum='Total'/>
+                    <field name="remaining" sum='Total'/>
+                </tree>
+            </field>
+        </record>
+
+        <menuitem id="view_isy_budget_display_consolidated_result_capex_menu" name="Consolidated Budget (Capex)" action="action_view_isy_budget_display_consolidated_wizard_capex" parent="mt_isy.main_menu_isy_budget_display_consolidated_wizard" sequence="2" groups='mt_isy.group_budget_cosolidated_user'/>
+
+        <record id="view_hr_expense_sheet_form_inherit_advance_expense_mt_isy" model="ir.ui.view">
+            <field name="name">employee.advance.expense.form.view</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="inherit_id" ref="employee_expense_advance.employee_advance_expense_form_view"/>
+            <field name="arch" type="xml">
+                <button name="get_done" position="after">
+                    <button string="Make Clearance" class="oe_highlight" name="make_clearance" type="object" invisible="adv_exp_type == 'expense' or state not in ('done','partial')"/>
+                    <button
+                        string="Make Settlement"
+                        class="oe_highlight"
+                        name="make_settlement"
+                        type="object"
+                        invisible ="
+                        adv_exp_type == 'advance'
+                        or (salary_advance == True and state == 'payable')
+                        or (state != 'payable' and salary_advance == True)
+                        or (state != 'payable' and salary_advance == False)
+                        "/>
+                </button>
+                <field name="state" position="replace">
+                    <field name="state" invisible="1"/>
+                    <field name="state_exp" widget="statusbar" invisible="adv_exp_type != 'expense'" statusbar_visible="draft,confirm,approved_hr_manager,payable,paid,cleared" colspan="2"/>
+                    <field name="state_adv" widget="statusbar" invisible="adv_exp_type != 'advance'" statusbar_visible="draft,confirm,approved_hr_manager,partial,paid,done,cleared" colspan="2"/>
+
+                </field>
+
+                <page name="advance" position="replace">
+                    <page name="advance" string="Advance Expense Lines">
+                        <field name="advance_expense_line_ids" context="{'adv_exp_type':adv_exp_type}" readonly="state not in ['draft']">
+                            <tree>
+                                <field name="adv_exp_type"/>
+                                <field name="product_id" options="{'no_create':True,'no_open':True}" readonly="adv_exp_type == 'advance'"/>
+                                <field name="description"/>
+                                <field name="company_currency_id" groups="studio_customization.no_one_52f94e0e-8622-497d-b0f2-d9c5ac7d0194"/>
+                                <field name="amount_difference" widget="monetary" options="{'currency_field':'company_currency_id'}"  groups="isy_custom.group_order_confirmation,isy_custom.group_create_bill,purchase.group_purchase_manager"/>
+                                <field name="unit_amount" required="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="quantity"/>
+                                <!-- <field name="product_uom_id" string="Unit of Measure" readonly="1"/> -->
+                                 <!-- groups="product.group_uom"  -->
+                                <field name="currency_id"/>
+                                <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                        <group string="Reason for Advance">
+                            <field name="reason_for_advance" readonly="state in ['done','paid','confirm','approved_hr_manager']" nolabel="1" placeholder="Reason for Advance............." colspan="2"/>
+                        </group>
+                        <group string="Comment">
+                            <field name="comment" readonly="state in ['done','paid']" nolabel="1" placeholder="Add Comment" colspan="2"/>
+                        </group>
+                    </page>
+               
+                    <page name="clearance" string="Advance Clearance Lines" invisible="adv_exp_type == 'expense'">
+                        <group cols="4">
+                            <field name="salary_advance" invisible="1"/>
+                            <field name="cash_cleared_amount" readonly="salary_advance == True or state not in ['done','partial']"/>
+                            <field name="cash_clearance_date" required="salary_advance == False and state == 'done'" readonly="salary_advance == True or state not in ['done','partial']"/>
+                            <field name="adv_exp_type" invisible="1"/>
+                        </group>
+                        <field name="advance_expense_clearance_line_ids" readonly="salary_advance == True or state not in ['done','partial']">
+                            <tree editable='bottom'>
+                                <field name="product_id"/>
+                                <field name="description"/>
+                                <field name="unit_amount" required="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="quantity"/>
+                                
+                                <field name="currency_id"/>
+                                <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="cls_move_id"/>
+                            </tree>
+                        </field>
+                    </page>
+                </page>
+
+                <field name="is_paid" position="after">
+                    <field name="cls_journal_id" required="state == 'done' and adv_exp_type == 'advance'" invisible="adv_exp_type == 'expense'"/>
+                    <field name="account_clearance_date" invisible="adv_exp_type == 'expense'"/>
+                    <field name="clearnce_account_by_id" invisible="adv_exp_type == 'expense'"/>
+                    <field name="settlement_date" invisible="adv_exp_type == 'advance'"/>
+                    <field name="settlement_account_by_id" invisible="adv_exp_type == 'advance'"/>
+                    <field name="settlement_move_id" invisible="adv_exp_type == 'advance'"/>
+                    <field name="both_approval" force_save="1" readonly="1"/>
+
+                </field>
+                <field name="journal_id" position="replace">
+                    <field name="journal_id" invisible="adv_exp_type == 'expense'"/>
+                    <field name="exp_journal_id" invisible="adv_exp_type == 'advance'"/>
+                </field>
+            </field>
+        </record>
+
+
+        <record id="hr_leave_view_form_mt_inherit" model="ir.ui.view">
+            <field name="name">hr.leave.view.form</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+            <field name="arch" type="xml">
+                <!-- <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/label[2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath> -->
+                <xpath expr="//field[@name='request_date_from']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='request_date_to']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <label for="request_date_from" position="before">
+                    <label for="leave_balance" string="Leave Balance"/>
+                    <div>
+                        <div>
+                            <field name="leave_balance" nolabel="1" class="oe_inline" readonly="1" force_save='1'/>
+                            <span class="ml8">Days</span>
+                        </div>
+                    </div>
+                    <label for="number_of_days" string="Duration" invisible="request_unit_half == True and leave_type_request_unit != 'hour'"/>
+                    <div name="duration_display">
+                        <div class="o_row">
+                            <div groups="!hr_holidays.group_hr_holidays_manager" invisible="request_unit_half == True or request_unit_hours == True" class="o_row">
+                                <field name="number_of_days_display" nolabel="1" readonly="1" class="oe_inline"/>
+                                <span>Days</span>
+                            </div>
+                            <div groups="hr_holidays.group_hr_holidays_manager" class="o_row" invisible="request_unit_half == True or request_unit_hours == True">
+                                <field name="number_of_days" nolabel="1" readonly="1" class="oe_inline"/>
+                                <span>Days</span>
+                            </div>
+                            <div invisible="leave_type_request_unit != 'hour'" class="o_row">
+                                <field name="number_of_hours_text" nolabel="1" class="oe_inline"/>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                
+            </field>
+        </record>
+
+        <record model="ir.ui.menu" id="employee_expense_advance.menu_advance_expense_employee">
+            <field name="name">Cash Advances</field>
+        </record>
+
+        <menuitem name="Employee Reimbursement" id="menu_reimbursement_expense_employee" parent="hr_expense.menu_hr_expense_root" sequence="2" groups="base.group_user"/>
+
+        <record model="ir.actions.act_window" id="action_employee_advance">
+            <field name="name">Advance Requests</field>
+            <field name="res_model">employee.advance.expense</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_adv_exp_type': 'advance'}</field>
+            <field name="domain">[('adv_exp_type', '=', 'advance')]</field>
+        </record>
+        <menuitem name="Advance Requests" id="employee_expense_advance.menu_advance_expense_request" action="mt_isy.action_employee_advance" parent="employee_expense_advance.menu_advance_expense_employee" sequence="12"/>
+
+        <record model="ir.actions.act_window" id="action_employee_expense">
+            <field name="name">Reimbursement Requests</field>
+            <field name="res_model">employee.advance.expense</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_adv_exp_type': 'expense'}</field>
+            <field name="domain">[('adv_exp_type', '=', 'expense')]</field>
+        </record>
+        <menuitem name="Reimbursement Requests" id="menu_expense_request" action="action_employee_expense" parent="menu_reimbursement_expense_employee" sequence="12"/>
+
+        <record id="view_isy_expense_settlement" model="ir.ui.view">
+            <field name="name">Settlement Form</field>
+            <field name="model">expense.settlement</field>
+            <field name="arch" type="xml">
+                <form string="Settlement">
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount" required="1" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="make_expense_settlement" string="Settle" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_payroll_adjustment_details_tree" model="ir.ui.view">
+            <field name="name">hr.payslip.settlement.tree</field>
+            <field name="model">hr.payslip.settlement</field>
+            <field name="arch" type="xml">
+                <tree string="Adjustment Details" editable="top">
+                    <field name="label" string="Number"/>
+                    <field name="amount" string="Requested Amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="type"/>
+                    <field name="note"/>
+                    <field name="date" string="Requested Date"/>
+                    <field name="currency_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_payroll_adjustment_details">
+            <field name="name">Adjustment Details</field>
+            <field name="res_model">hr.payslip.settlement</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="Adjustment Details" id="mt_isy.menu_payroll_adjustment_details" action="mt_isy.action_payroll_adjustment_details" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence="10"/>
+
+
+        <record id="employee_advance_expense_form_view_inherit" model="ir.ui.view">
+            <field name="name">employee.advance.expense.form.view</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="inherit_id" ref="employee_expense_advance.employee_advance_expense_form_view"/>
+            <field name="arch" type="xml">
+                <button name="exit_cancel" position="replace">
+                    <button string="Cancel" name="exit_cancel" type="object" invisible="state not in ('paid','draft')" groups='isy_custom.group_order_confirmation'/>
+                </button>
+                <field name="account_validate_date" position="before">
+                    <field name="hr_done_date"/>
+                </field>
+                <field name="user_id" position="before">
+                    <field name="is_asset"/>
+                    <field name="p_type" required="state in ('draft','confirm','approved_hr_manager') and adv_exp_type == 'advance'" readonly="state not in ('draft','confirm','approved_hr_manager')" invisible="adv_exp_type != 'advance'"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="res_user_form_view_mt_isy">
+            <field name="name">res.users.form</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='access_rights']/group[1]" position="after">
+                        <group string="Portal Inventory">
+                                <!-- Portal Requestor -->
+                                <field name="portal_inventory_user"/>
+                                <field name="portal_inventory_own"/>
+                                <field name="portal_payslip_process_request_user"/>
+                        </group>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="hr_payroll_structure_type_view_form_inherit">
+            <field name="name">hr.payroll.structure.type.form</field>
+            <field name="model">hr.payroll.structure.type</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payroll_structure_type_view_form"/>
+            <field name="arch" type="xml">
+                <field name="country_id" position='after'>
+                    <field name="company_id" />
+                </field>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="hr_payroll_structure_type_view_form_inherit">
+            <field name="name">hr.payroll.structure.type.form</field>
+            <field name="model">hr.payroll.structure.type</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payroll_structure_type_view_form"/>
+            <field name="arch" type="xml">
+                <field name="country_id" position='after'>
+                    <field name="company_id" />
+                </field>
+            </field>
+        </record>
+
+        <record id="action_website_inventory_portal" model="ir.actions.act_url">
+            <field name="name">Inventory Transfer</field>
+            <field name="type">ir.actions.act_url</field>
+            <field name="target">self</field>
+            <field name="url">/my/home</field>
+        </record>
+
+        <menuitem action="action_website_inventory_portal" name="Inventory Transfer" id="menu_inventory_portal" groups="base.group_portal" sequence="2"/>
+
+        <record id="action_website_inventory_schedule_return_portal" model="ir.actions.act_url">
+            <field name="name">Schedule Return List</field>
+            <field name="type">ir.actions.act_url</field>
+            <field name="target">self</field>
+            <field name="url">/my/home</field>
+        </record>
+
+        <menuitem action="action_website_inventory_schedule_return_portal" name="Schedule Return List" id="menu_inventory_schedule_return_list_portal" groups="base.group_portal" sequence="2"/>
+
+        <record id="action_portal_stock_report" model="ir.actions.act_url">
+            <field name="name">Stock Report</field>
+            <field name="type">ir.actions.act_url</field>
+            <field name="target">self</field>
+            <field name="url">/my/home</field>
+        </record>
+
+        <menuitem action="action_portal_stock_report" name="Stock Report" id="menu_portal_stock_report" groups="base.group_portal" sequence="2"/>
+        
+        
+        <record id="view_hr_payslip_approval_generation_wizard" model="ir.ui.view">
+            <field name="name">Generate HR payslip Approval Request</field>
+            <field name="model">hr.payslip.approval.generation</field>
+            <field name="arch" type="xml">
+                <form string="Generate HR Payslip Approval Request">
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="date_from" required="1"/>
+                            <field name="date_to" required="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="generate_approval_request" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_view_hr_payslip_approval_generation_wizard" model="ir.actions.act_window">
+            <field name="name">Generate HR Payslip Approval Request</field>
+            <field name="res_model">hr.payslip.approval.generation</field>
+            <field name="view_id" ref="view_hr_payslip_approval_generation_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_hr_pre_payslip" name="Pre Payslip Process" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" sequence='3'/>
+        <menuitem id="menu_action_view_hr_payslip_approval_generation_wizard" name="Payslip Approval Request" action="action_view_hr_payslip_approval_generation_wizard" parent="mt_isy.menu_hr_pre_payslip" sequence="10"/>
+        
+        <record id="view_hr_payslip_approval_search" model="ir.ui.view">
+            <field name="name">hr.payslip.approval.search</field>
+            <field name="model">hr.payslip.approval</field>
+            <field name="arch" type="xml">
+                <search string="Payslip Approval">
+                    <field name="name" string="Reference Number"/>
+                    <field name="first_approval" string="First Approval Person"/>
+                    <field name="second_approval" string="Second Approval Person"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_hr_payslip_approval_tree" model="ir.ui.view">
+            <field name="name">hr.payslip.approval.tree</field>
+            <field name="model">hr.payslip.approval</field>
+            <field name="arch" type="xml">
+                <tree string="Payslip Approval List" create='0'>
+                    <field name="name"/>
+                    <field name="request_employee_id"/>                    
+                    <field name="first_approval"/>
+                    <field name="second_approval"/>
+                    <field name="amount_for_expat" string="Total Monthly Salary For Expat(40%)"/>
+                    <field name="amount_for_expat_60" string="Total Monthly Salary For Expat(60%)"/>
+                    <field name="amount_for_local" string="Total Monthly Salary For Local"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_payslip_approval_form" model="ir.ui.view">
+            <field name="name">hr.payslip.approval.form</field>
+            <field name="model">hr.payslip.approval</field>
+            <field name="arch" type="xml">
+                <form string="Payslip Approval Form">
+                    <header>
+                        <button string="RequestForApproval" type="object" class="oe_highlight " name="request_for_first_approval" groups="mt_isy.group_isy_hrpayslip_approval_checker" invisible="state != 'draft'"/>
+                        <button string="Approve" type="object" class="oe_highlight " name="request_for_second_approval" invisible="state != 'waitingforfirstapproval'"/>
+                        <button string="Approve" type="object" class="oe_highlight " name="second_approved" invisible="state != 'waitingforsecondapproval'"/>
+                        <button string="Cancel" type="object" name="cancel_approve" class="oe_highlight" invisible="state in ('done','cancelled')"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,waitingforfirstapproval,done,cancelled"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <group>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="request_employee_id" readonly="1"/>                    
+                            <field name="first_approval" readonly="1"/>
+                            <field name="second_approval" invisible="1"/>
+                            <group>
+                                <field name="all_total"/>
+                            </group>
+                            <group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="expatriate_total"/>
+                                    <field name="expatriate_retirement_total"/>
+                                    <field name="total_extra_duty_allowance"/>
+                                    <field name="expatriate_total_60"/>
+                                    <field name="expatriate_retirement_total_60"/>
+                                    <field name="total_extra_duty_allowance_60"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="local_total"/>
+                                    <field name="local_retirement_total"/>
+                                </group>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Details">
+                                <field name="hr_payslip_approval_details" readonly="state != 'draft'">
+                                    <tree editable="bottom" default_order="name">
+                                        <field name="name"/>
+                                        <field name="job_title"/>
+                                        <field name="employee_type"/>
+                                        <field name="contract_type"/>
+                                        <field name="wage"/>
+                                        <field name="monthly_salary"/>
+                                        <field name="annual_retirement"/>
+                                        <field name="monthly_retirement"/>
+                                        <field name="extra_duty_percent"/>
+                                        <field name="monthly_extra_duty_amount" readonly="1" force_save="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+
+        
+
+        <record model="ir.actions.act_window" id="action_view_hr_payslip_approval_tree">
+            <field name="name">Payslip Approval</field>
+            <field name="res_model">hr.payslip.approval</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem id="menu_action_view_hr_payslip_approval_tree" name="Payslip Approval" action="action_view_hr_payslip_approval_tree" parent="mt_isy.menu_hr_pre_payslip" sequence="12"/>
+
+        <menuitem id="menu_hr_payroll_process_root" name="Payroll Request" sequence="7" groups="base.group_user" web_icon="hr_payroll,static/description/icon.png"/>
+
+        <menuitem id="menu_hr_payroll_process_sub_root" name="Payroll Request" parent="mt_isy.menu_hr_payroll_process_root" sequence="1"/>
+
+
+        <record id="view_hr_payslip_process_request_search" model="ir.ui.view">
+            <field name="name">hr.payslip.process.request.search</field>
+            <field name="model">hr.payslip.process.request</field>
+            <field name="arch" type="xml">
+                <search string="Payslip Approval">
+                    <field name="name" string="Reference Number"/>
+                    <field name="approval_person" string="Approval Person"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_hr_payslip_process_request_tree" model="ir.ui.view">
+            <field name="name">hr.payslip.process.request.tree</field>
+            <field name="model">hr.payslip.process.request</field>
+            <field name="arch" type="xml">
+                <tree string="Payslip Process Request List" default_order="requested_date desc">
+                    <field name="name"/>
+                    <field name="request_employee_id"/>
+                    <field name="requested_date"/>
+                    <field name="approval_person"/>
+                    <field name="monthly_salary"/>
+                    <field name="is_expat" invisible='1'/>
+                    <field name="retirement_salary" />
+                    <field name="total_salary"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_payslip_process_request_form" model="ir.ui.view">
+            <field name="name">hr.payslip.process.request.form</field>
+            <field name="model">hr.payslip.process.request</field>
+            <field name="arch" type="xml">
+                <form string="Payslip Process Request Form">
+                    <header>
+                        <button string="Approve" type="object" class="oe_highlight " name="process_approved" invisible="state != 'waitingforapproval'"/>
+                        <button string="Cancel" type="object" name="cancel_approve" class="oe_highlight" invisible="state in ['draft', 'cancelled','done']"/>
+                        <button string="Reset to Draft" type="object" name="reset_draft" class="btn-danger" invisible="state not in ['done']"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,waitingforapproval,done,cancelled"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <field name="is_expat" invisible="1"/>
+                        <field name="is_donation" invisible='1'/>
+                        <group>
+                            <group>
+                                <field name="request_employee_id" readonly="state != 'draft'" force_save="1" options="{'no_open':True,'no_create':True}"/>
+                                <field name="approval_person" readonly="1" force_save="1" options="{'no_open':True,'no_create':True}"/>
+                            </group>
+                            <group>
+                                <field name="requested_date" readonly="1" force_save="1"/>
+                                <field name="total_salary" readonly="1" force_save="1" invisible="is_expat == False"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Monthly Salary">
+                                <field name="monthly_salary_gty" readonly="1" force_save="1" invisible="is_expat == False"/>
+                                <field name="monthly_salary_isya" readonly="1" force_save="1" invisible="is_expat == False"/>
+                                <field name="monthly_salary" readonly="1" force_save="1"/>
+                                <field name="allowance_utility" invisible="allowance_utility == 0" readonly="1" force_save="1"/>
+                                <field name="total_car" string="Accumulated College Saving" invisible="is_expat ==True"/>
+                                <field name="net_salary" invisible="is_expat ==True"/>
+                            </group>
+                            <group string="Monthly Retirement" invisible="is_expat == False">
+                                <field name="retirement_salary_gty" readonly="1" force_save="1" invisible="is_expat == False"/>
+                                <field name="retirement_salary_isya" readonly="1" force_save="1" invisible="is_expat == False"/>
+                                <field name="retirement_salary" readonly="1" force_save="1"/>
+                            </group>
+                        </group>
+                        <group col="4" invisible="is_expat == False">
+                                <field name="total_school_trip_adjustment" readonly="1" force_save="1"/>
+                                <field name="total_other_adjustment" readonly="1" force_save="1"/>
+                                <field name="total_tuition_fee_adjustment" readonly="1" force_save="1"/>
+                        </group>
+                        <field name='is_after_lastday' invisible='1'/>
+                        <group>
+                            <h2><field name="msg_validation" readonly="1" style="color:red ! important;"/></h2>
+
+                        </group>
+                        <notebook>
+                            <page string="Cash Allocation Requests">
+                                <p invisible="is_expat == False"><b>
+                                    Cash Allocations and Donation to Chinthe Fund - Service Learning Organizations: <u><a target="_blank" href="https://isyedu.org/support-isy/isy-partner-projects/">ISY Partner Projects</a></u>
+                                </b></p>
+                                <field name="cash_allocation_requests" >
+                                    <tree editable="bottom" create="false">
+                                        <field name="name" readonly="1" force_save="1" invisible='1' />
+                                        <field name="name_url" widget='html' width="30%"/>
+                                        <field name="amount" width="10%" readonly="parent.state != 'draft'"/>
+                                        <field name="note" width="15%"/>
+                                        <field name="attachmet_1_name" invisible="1" />
+                                        <field name="attachment_1" widget="binary" filename="attachmet_1_name" width="10%"/>
+                                        <field name="attachmet_2_name" invisible="1" />
+                                        <field name="attachment_2" widget="binary" filename="attachmet_2_name" width="10%"/>
+                                    </tree>
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="name_url" />
+                                                <field name="amount"/>
+                                                <field name="note"/>
+                                            </group>
+                                            <group>
+                                                <field name="attachmet_1_name" invisible="1"/>
+                                                <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
+                                                <field name="attachmet_2_name" invisible="1"/>
+                                                <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
+                                           </group>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Adjustment Request" invisible="is_expat == False">
+                                <field name="deduction_details" readonly="state != 'draft'">
+                                    <tree editable="bottom" create="false">
+                                        <field name="employee_id"/>
+                                        <field name="deduction_type"/>
+                                        <field name="amount"/>
+                                        <field name="attachmet_1_name" invisible="1"/>
+                                        <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
+                                        <field name="attachmet_2_name" invisible="1"/>
+                                        <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
+                                    </tree>
+                                </field>
+
+                               <group string="Note">
+                                <field name="note" nolabel="1"/>
+                               </group>
+                            </page>
+                            <page string="Bank Details" invisible="is_expat == False">
+                                <field name="bank_details" widget="one2many" colspan="4" nolabel="1" readonly="state != 'draft'">
+                                    <tree>
+                                        <field name="account_type"/>
+                                        <field name="behalf_of"/>
+                                        <field name="name"/>
+                                        <field name="account_number"/>
+                                        <field name="bank_name"/>
+                                        <field name="routing"/>
+                                        <field name="name_address"/>
+                                        <field name="name_bank_address"/>
+                                        <field name="special_instruction"/>
+                                        <field name="other"/>
+                                        <field name="notes"/>
+                                        <field name="attachmet_1_name" invisible="1"/>
+                                        <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
+                                        <field name="attachmet_2_name" invisible="1"/>
+                                        <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
+                                    </tree>
+                                    <form>
+                                        <group cols="2">
+                                            <field name="account_type"/>
+                                            <field name="behalf_of"/>
+                                            <field name="name"/>
+                                            <field name="account_number"/>
+                                            <field name="bank_name"/>
+                                            <field name="routing"/>
+                                            <field name="name_address"/>
+                                            <field name="name_bank_address"/>
+                                            <field name="special_instruction"/>
+                                            <field name="other"/>
+                                            <field name="notes"/>
+                                            <field name="attachmet_1_name" invisible="1"/>
+                                            <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
+                                            <field name="attachmet_2_name" invisible="1"/>
+                                            <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_payslip_process_request_form_readonly_inherit" model="ir.ui.view">
+            <field name="name">hr.payslip.process.request.tree</field>
+            <field name="model">hr.payslip.process.request</field>
+            <field name="inherit_id" ref="mt_isy.view_hr_payslip_process_request_form" />
+            <field name="arch" type="xml">
+                <field name="request_employee_id" position="attributes">
+                    <attribute name="readonly">False</attribute>
+                </field>
+                <!-- <xpath expr="//field[@name='request_employee_id']" position="attributes">
+                    <attribute name="groups">mt_isy.group_isy_payslip_process_modify_requestor</attribute>
+                </xpath> -->
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_view_hr_payslip_process_request_tree">
+            <field name="name">Payroll Adjustments</field>
+            <field name="res_model">hr.payslip.process.request</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_hr_payslip_process_request" action="mt_isy.action_view_hr_payslip_process_request_tree" name="Payroll Adjustments" parent="mt_isy.menu_hr_payroll_process_sub_root"/>
+
+        <record id="action_website_payslip_process_request_portal" model="ir.actions.act_url">
+            <field name="name">Payslip Adjustments</field>
+            <field name="type">ir.actions.act_url</field>
+            <field name="target">self</field>
+            <field name="url">/my/home</field>
+        </record>
+
+        <menuitem action="action_website_payslip_process_request_portal" name="Payroll Adjustments" id="menu_payslip_process_request_portal" groups="base.group_portal" sequence="2"/>
+
+
+        <record id="view_hr_employee_bank_report_tree_search" model="ir.ui.view">
+            <field name="name">hr.employee.bank.report.tree</field>
+            <field name="model">hr.employee.bank.report</field>
+            <field name="arch" type="xml">
+                <search string="Employee Bank Report">
+                    <field name="employee_id" string="Employee"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_hr_employee_bank_report_tree" model="ir.ui.view">
+            <field name="name">hr.employee.bank.report.tree</field>
+            <field name="model">hr.employee.bank.report</field>
+            <field name="arch" type="xml">
+                <tree create="false" string="Employee Bank Report" default_order='time_of_entry desc'>
+                    <field name="employee_id"/>
+                    <field name="account_type"/>
+                    <field name="behalf_of"/>
+                    <field name="name"/>
+                    <field name="account_number"/>
+                    <field name="bank_name"/>
+                    <field name="routing"/>
+                    <field name="name_address"/>
+                    <field name="name_bank_address"/>
+                    <field name="special_instruction"/>
+                    <field name="other"/>
+                    <field name="notes"/>
+                    <field name="time_of_entry"/>
+                    <field name="attachmet_1_name" invisible="1"/>
+                    <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
+                    <field name="attachmet_2_name" invisible="1"/>
+                    <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_employee_bank_report_form" model="ir.ui.view">
+            <field name="name">hr.employee.bank.report.form</field>
+            <field name="model">hr.employee.bank.report</field>
+            <field name="arch" type="xml">
+                <form create="false" >
+                    <sheet>
+                        <group cols="2">
+                            <field name="account_type"/>
+                            <field name="behalf_of"/>
+                            <field name="name"/>
+                            <field name="account_number"/>
+                            <field name="bank_name"/>
+                            <field name="routing"/>
+                            <field name="name_address"/>
+                            <field name="name_bank_address"/>
+                            <field name="special_instruction"/>
+                            <field name="other"/>
+                            <field name="notes"/>
+                            <field name="attachmet_1_name" invisible="1"/>
+                            <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
+                            <field name="attachmet_2_name" invisible="1"/>
+                            <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_view_hr_employee_bank_report_tree">
+            <field name="name">Employee Bank Report</field>
+            <field name="res_model">hr.employee.bank.report</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_hr_payroll_process_sub_reporting_root" name="Reporting" parent="mt_isy.menu_hr_payroll_process_root" groups="hr_payroll.group_hr_payroll_manager" sequence="2"/>
+
+        <menuitem id="menu_action_view_hr_employee_bank_report_tree" action="mt_isy.action_view_hr_employee_bank_report_tree" name="Employee Bank Report" parent="mt_isy.menu_hr_payroll_process_sub_reporting_root"/>
+
+        <record id="mt_isy_hr_contract_view_form_inherit" model="ir.ui.view">
+            <field name="name">HR Contract</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='wage']" position="replace">
+                    <field name="wage" force_save="1" readonly="1"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='information']" position="inside">
+                    <group>
+                        <group name="tax_calc" string="Tax Calculation">
+                            <field name="home_allw" class='oe_inline' />
+                            <field name="other_allw" class='oe_inline' />
+                            <field name="total_allw" class='oe_inline' readonly='1' />
+                            <field name="basic_relief" class="oe_inline" readonly='1'/>
+                            <field name="pension_allw" class='oe_inline' />
+                            <field name="lifeinsurance_allw" class='oe_inline' />
+                            <field name="otherlaw_allw" class='oe_inline' />
+                            <field name="total_relief" class="oe_inline" readonly='1'/>
+                            <field name="taxable_amount" class="oe_inline" readonly='1' />
+                            <field name="yearly_income_tax" class='oe_inline' readonly='1' />
+                            <field name="x_studio_income_tax" class='oe_inline' readonly='1' />
+                            <field name="remark_fortax" class='oe_inline' />
+                        </group>
+                        <group name="payroll_approval" string="Payslip Approval">
+                            <field name="extra_duty_allw" class='oe_inline' />
+                            <field name="unpaid_retirement" class='oe_inline' />
+                        </group>
+                        <group name='isy_donation' string='Donation To'>
+                            <field name='donation_uws'/>
+                            <field name='donation_yas'/>
+                            <field name='donation_clc'/>
+                            <field name='donation_chinthe'/>
+                            <field name='gala_usd'/>
+                        </group>
+                        <group name="isy_savings" string="Savings">
+                            <field name="savings_for_education"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mt_isy_hr_contract_view_form_inherit_non_readonly" model="ir.ui.view">
+            <field name="name">hr.contract.readonly.false</field>
+            <field name="model">hr.contract</field>
+            <!-- <field name='sequence'>17</field> -->
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+            <field name="arch" type="xml">
+                <field name="wage" position="attributes">
+                    <attribute name="readonly">False</attribute>
+                </field>
+                <field name="wage" position="attributes">
+                    <attribute name="groups">mt_isy.group_isy_annual_salary_modify</attribute>
+                </field>
+            </field>
+        </record>
+
+        <!-- <record id="mt_isy_hr_contract_view_form_studio_inherit1" model="ir.ui.view">
+            <field name="name">HR Contract Studio Inherit</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="studio_customization.odoo_studio_hr_contr_976839b4-672d-468c-a12a-2cd7b805ba09"/>
+            <field name="arch" type="xml">
+                <field name="x_studio_overseas_bank" position="after">
+                    <field name="usd_cash" />
+                </field>
+            </field>
+        </record> -->
+
+        <record id="hr_payroll_structure_type_view_form_inherit" model="ir.ui.view">
+            <field name="name">hr_payroll_structure_type_view_form_inherit</field>
+            <field name="model">hr.payroll.structure.type</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payroll_structure_type_view_form"/>
+            <field name="arch" type="xml">
+                <field name="default_struct_id" position="replace">
+                    <field name="default_struct_id" domain="[('id', 'in', struct_ids_topay)]"/>
+                </field>
+                <xpath expr="//group" position="after">
+                    <notebook>
+                        <page string='Salary Structure To Pay'>
+                            <field name='struct_ids_topay'>
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="rule_ids_topay"/>
+                                  </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+                <div name="button_box" position='attributes'>
+                <attribute name='invisible'>1</attribute> 
+                </div>
+            </field>
+        </record>
+
+        <record id="hr_payroll_structure_view_form_inherit" model="ir.ui.view">
+            <field name="name">hr_payroll_structure_view_form_inherit</field>
+            <field name="model">hr.payroll.structure</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_employee_grade_form"/>
+            <field name="arch" type="xml">
+                <page name="salary_rules" position='before'>
+                    <page name='salary_rules_topay' string="Salary Rules To Pay">
+                        <field name="rule_ids_topay" readonly="id == False">
+                         <tree>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="category_id"/>
+                            <field name="sequence" invisible="1"/>
+                            <field name="partner_id"/>
+                         </tree>
+                      </field>
+                    </page>
+                </page>
+            </field>
+        </record>
+    </data>
+</odoo>

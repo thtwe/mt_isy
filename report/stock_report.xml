@@ -1,0 +1,127 @@
+<odoo>
+
+    <record model="report.paperformat" id="paperformat_isy_stock_report_pdf">
+        <field name="name">paperformat.isy.stock.report</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_width">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">30</field>
+        <field name="margin_right">5</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- <report id="isy_stock_report_pdf"
+            model="isy.stock.report"
+            string="Stock Report - PDF"
+            report_type="qweb-pdf"
+            name="mt_isy.isy_stock_report_pdf_view"
+            paperformat="mt_isy.paperformat_isy_stock_report_pdf"
+            menu="True"/> -->
+
+    <record id="isy_stock_report_pdf" model="ir.actions.report">
+        <field name="name">Stock Report - PDF</field>
+        <field name="model">isy.stock.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mt_isy.isy_stock_report_pdf_view</field>
+        <field name="report_file">mt_isy.isy_stock_report_pdf_view</field>
+    </record>
+
+    <template id="isy_stock_report_pdf_view">
+        <t t-call="web.html_container">
+            <div class="header" style="border-bottom: 2px solid black">
+                <h3 class="text-center">Stock Report</h3>
+            </div>
+            
+            <div class="article">
+                <table class="table table-condensed table-bordered" style="width: 100%">
+                    <thead>
+                        <th class="text-left" style="width: 3%">#</th>
+                        <th class="text-left" style="width: 10%">Barcode Number</th>
+                        <th class="text-left" style="width: 10%">Product Type</th>
+                        <th class="text-left" style="width: 10%">Product Description</th>
+                        <th class="text-left" style="width: 10%">Location</th>
+                        <th class="text-left" style="width: 7%">Inventory Category</th>
+                        <th class="text-left" style="width: 6%">Assigned Department</th>
+                        <th class="text-left" style="width: 4%">Assigned Type</th>
+                        <th class="text-left" style="width: 10%">Assigned Person</th>
+                        <th class="text-left" style="width: 8%">Manufacturer</th>
+                        <th class="text-left" style="width: 7%">Model</th>
+                        <th class="text-left" style="width: 7%">Serial Number</th>
+                        <th class="text-left" style="width: 8%">Last Updated Date</th>
+                    </thead>
+                    <tbody>
+                        <t t-set="values" t-value="dict([('asset', 'Asset'), ('non-asset', 'Non-Asset'),('employee','Employee'),('student','Student'),('','')])"/> 
+                        <t t-set="number" t-value="1"/>
+                        <t t-foreach="docs" t-as="doc">
+                            <tr>
+                                <td class="text-left">
+                                    <span t-esc="number"/>
+                                    <t t-set="number" t-value="number+1"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['serial_number']"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['product_category'].display_name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['product_id'].name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['location_id'].display_name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="values[doc['inventory_category'] or '']"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['assigned_department'].name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="values[doc['assigned_type'] or '']"/>
+                                </td>
+                                 <td class="text-left">
+                                    <span t-esc="doc['assigned_to'].name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['manufacturer']"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['model_number']"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['it_serial_number']"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="doc['write_date']"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer">
+                <div class="row text-left" style="border-top: 1px solid black;">
+                    <div class="col col-3 offset-9 text-right">
+                        <ul class="list-inline mt-2">
+                            <li class="list-inline-item">Page:</li>
+                            <li class="list-inline-item">
+                                <span class="page"/>
+                            </li>
+                            <li class="list-inline-item">/</li>
+                            <li class="list-inline-item">
+                                <span class="topage"/>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

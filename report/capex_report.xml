@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- <report
+                id="report_x_capex"
+                model="x_capex"
+                string="Capex Export"
+                name="mt_isy.report_x_capex_view"
+                file="mt_isy.report_x_capex"
+                report_type="qweb-pdf"
+                paperformat="mt_isy.paperformat_headerspacing"
+                /> -->
+
+        <record id="report_x_capex" model="ir.actions.report">
+            <field name="name">Capex Export</field>
+            <field name="model">x_capex</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mt_isy.report_x_capex_view</field>
+            <field name="report_file">mt_isy.report_x_capex</field>
+        </record>
+
+        <template id="report_x_capex_view">
+            <t t-call="web.html_container">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-size: 9px;">
+                        <strong>The International School Yangon</strong>
+                        <div class="row">
+                            <div class="col-11 pull-left">
+                                <strong>Capex Report</strong>
+                            </div>
+                            <div class="col-11 pull-right">
+                                <strong>(In Thousand)</strong>
+                            </div>
+                        </div>
+                        <br/>
+                        <table class="table table-sm table-bordered" >
+                            <thead style="background-color: #292929; color: #fff">
+                                <tr>
+                                    <th style="width:25%;">Name</th>
+                                    <th class="text-center" style="width:4%;">JUL</th>
+                                    <th class="text-center" style="width:4%;">AUG</th>
+                                    <th class="text-center" style="width:4%;">SEP</th>
+                                    <th class="text-center" style="width:4%;">OCT</th>
+                                    <th class="text-center" style="width:4%;">NOV</th>
+                                    <th class="text-center" style="width:4%;">DEC</th>
+                                    <th class="text-center" style="width:4%;">JAN</th>
+                                    <th class="text-center" style="width:4%;">FEB</th>
+                                    <th class="text-center" style="width:4%;">MAR</th>
+                                    <th class="text-center" style="width:4%;">APR</th>
+                                    <th class="text-center" style="width:4%;">MAY</th>
+                                    <th class="text-center" style="width:4%;">JUN</th>
+                                    <th class="text-center" style="width:6%;">Total</th>
+                                    <th class="text-center" style="width:6%;">Budget</th>
+                                    <th class="text-center" style="width:6%;">YTD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="capex_type" t-value="[]" />
+
+                                <t t-foreach="docs" t-as="o">
+                                    <t t-set="capex_type" t-value="capex_type+[o.x_capex_type]" />
+                                </t>
+                                <!-- <t t-foreach="set(capex_type)" t-as="type"> -->
+                                <t t-foreach="sorted(list(set(capex_type)),key=lambda x:x.x_sequence)" t-as="type">
+                                    <tr>
+                                        <!-- <t t-foreach="type.sorted(key=lambda x:x.x_sequence)" t-as="t"> -->
+                                            <td t-esc="type.x_name"  style="font-weight: bold" />
+                                        <!-- </t> -->
+
+                                    </tr>
+
+                                    <t t-set="jul_subtotal" t-value="0" />
+                                    <t t-set="aug_subtotal" t-value="0" />
+                                    <t t-set="sep_subtotal" t-value="0" />
+                                    <t t-set="oct_subtotal" t-value="0" />
+                                    <t t-set="nov_subtotal" t-value="0" />
+                                    <t t-set="dec_subtotal" t-value="0" />
+                                    <t t-set="jan_subtotal" t-value="0" />
+                                    <t t-set="feb_subtotal" t-value="0" />
+                                    <t t-set="mar_subtotal" t-value="0" />
+                                    <t t-set="apr_subtotal" t-value="0" />
+                                    <t t-set="may_subtotal" t-value="0" />
+                                    <t t-set="jun_subtotal" t-value="0" />
+                                    <t t-set="total_subtotal" t-value="0" />
+                                    <t t-set="budget_subtotal" t-value="0" />
+
+                                    <t t-foreach="docs.filtered(lambda x: x.x_capex_type.id==type.id)" t-as="o">
+                                        <!-- <t t-if="type.id==o..id"> -->
+                                        <t>
+                                            <t t-set="jul_subtotal" t-value="jul_subtotal+o.x_jul" />
+                                            <t t-set="aug_subtotal" t-value="aug_subtotal+o.x_aug" />
+                                            <t t-set="sep_subtotal" t-value="sep_subtotal+o.x_sep" />
+                                            <t t-set="oct_subtotal" t-value="oct_subtotal+o.x_oct" />
+                                            <t t-set="nov_subtotal" t-value="nov_subtotal+o.x_nov" />
+                                            <t t-set="dec_subtotal" t-value="dec_subtotal+o.x_dec" />
+                                            <t t-set="jan_subtotal" t-value="jan_subtotal+o.x_jan" />
+                                            <t t-set="feb_subtotal" t-value="feb_subtotal+o.x_feb" />
+                                            <t t-set="mar_subtotal" t-value="mar_subtotal+o.x_mar" />
+                                            <t t-set="apr_subtotal" t-value="apr_subtotal+o.x_apr" />
+                                            <t t-set="may_subtotal" t-value="may_subtotal+o.x_may" />
+                                            <t t-set="jun_subtotal" t-value="jun_subtotal+o.x_jun" />
+                                            <t t-set="total_subtotal" t-value="total_subtotal+o.x_total" />
+                                            <t t-set="budget_subtotal" t-value="budget_subtotal+o.x_budget_total" />
+
+                                            <tr>
+                                                <td><span t-field="o.x_name" /></td>
+                                                <td class="text-right"><span t-field="o.x_jul"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_aug"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_sep"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_oct"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_nov"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_dec"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_jan"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_feb"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_mar"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_apr"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_may"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_jun"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_total"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><span t-field="o.x_budget_total"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-right"><t t-esc="'{0:,.0f}%'.format(int(o.x_percentage))" /></td>
+                                            </tr>
+
+                                        </t>
+
+                                    </t>
+                                    <tr style="background-color: #ebe8e8;">
+                                        <td>Subtotal</td>
+                                        <td class="text-right"><span t-esc="jul_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="aug_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="sep_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="oct_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="nov_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="dec_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="jan_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="feb_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="mar_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="apr_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="may_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="jun_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="total_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-right"><span t-esc="budget_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                    </tr>
+
+                                </t>
+
+                                <t t-set="jul_total" t-value="0"/>
+                                <t t-set="aug_total" t-value="0"/>
+                                <t t-set="sep_total" t-value="0"/>
+                                <t t-set="oct_total" t-value="0"/>
+                                <t t-set="nov_total" t-value="0"/>
+                                <t t-set="dec_total" t-value="0"/>
+                                <t t-set="jan_total" t-value="0"/>
+                                <t t-set="feb_total" t-value="0"/>
+                                <t t-set="mar_total" t-value="0"/>
+                                <t t-set="apr_total" t-value="0"/>
+                                <t t-set="may_total" t-value="0"/>
+                                <t t-set="jun_total" t-value="0"/>
+                                <t t-set="total_total" t-value="0" />
+                                <t t-set="budget_total" t-value="0"/>
+
+                                <t t-foreach="docs" t-as="o">
+                                    <t t-set="jul_total" t-value="jul_total+o.x_jul"/>
+                                    <t t-set="aug_total" t-value="aug_total+o.x_aug"/>
+                                    <t t-set="sep_total" t-value="sep_total+o.x_sep"/>
+                                    <t t-set="oct_total" t-value="oct_total+o.x_oct"/>
+                                    <t t-set="nov_total" t-value="nov_total+o.x_nov"/>
+                                    <t t-set="dec_total" t-value="dec_total+o.x_dec"/>
+                                    <t t-set="jan_total" t-value="jan_total+o.x_jan"/>
+                                    <t t-set="feb_total" t-value="feb_total+o.x_feb"/>
+                                    <t t-set="mar_total" t-value="mar_total+o.x_mar"/>
+                                    <t t-set="apr_total" t-value="apr_total+o.x_apr"/>
+                                    <t t-set="may_total" t-value="may_total+o.x_may"/>
+                                    <t t-set="jun_total" t-value="jun_total+o.x_jun"/>
+                                    <t t-set="total_total" t-value="total_total+o.x_total"/>
+                                    <t t-set="budget_total" t-value="budget_total+o.x_budget_total"/>
+                                </t>
+                                <tr style="background-color: #292929;color: #fff;">
+                                    <td><strong>Total</strong></td>
+                                    <td class="text-right" t-esc="jul_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="aug_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="sep_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="oct_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="nov_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="dec_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="jan_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="feb_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="mar_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="apr_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="may_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="jun_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="total_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-right" t-esc="budget_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,73 @@
+<odoo>
+    <data>
+
+        <template id="schedule_return_list" name="Portal layout : inventory menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+            <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+                <li t-if="page_name == 'schedule_return_list' or schedule_return_list" t-attf-class="breadcrumb-item #{'active ' if not schedule_return_list else ''}">
+                    <a t-if="schedule_return_lists" t-attf-href="/my/schedule_return_list?{{ keep_query() }}">Schedule Return List</a>
+                    <t t-else="">Schedule Return List</t>
+                </li>
+                <li t-if="schedule_return_list" class="breadcrumb-item active">
+                    <t t-esc="schedule_return_list.name"/>
+                </li>
+            </xpath>
+        </template>
+
+        <template id="portal_stock_inventory_transfer_details" name="Schedule Return Lists" inherit_id="portal.portal_my_home" priority="80">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-if="request.env.user.portal_inventory_user" t-call="isy_ticketing.portal_docs_entry">
+                    <t t-set="title">Schedule Return List</t>
+                    <t t-set="url" t-value="'/my/schedule_return_list'"/>
+                    <t t-set="count" t-value="schedule_return_lists_count"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_stock_inventory_transfer_details" name="Schedule Return List">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+                <t t-call="portal.portal_searchbar">
+                    <t t-set="title">Schedule Return List</t>
+                </t>
+                <hr/>
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Serial Number.</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Assign Person</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Schedule Return Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="schedule_return_lists" t-as="si">
+                            <tr>
+                                <td>
+                                    <t t-esc="si.serial_number" t-if="si.serial_number"/>
+                                </td>
+                               <td>
+                                    <t t-esc="si.product_id.name" t-if="si.product_id"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.qty" t-if="si.qty"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.assigned_person.name" t-if="si.assigned_person"/>
+                                </td>
+                                <td class='d-none d-md-table-cell'><span t-field="si.source_location.name"/></td>
+                                <td class='d-none d-md-table-cell'><span t-field="si.destination_location.name"/></td>
+                               <td>
+                                    <t t-esc="si.date_schedule_return" t-if="si.date_schedule_return"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

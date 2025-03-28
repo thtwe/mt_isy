@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+
+        <template id="stock_inventory" name="Portal layout : inventory menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+            <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+                <li t-if="page_name == 'stock_inventory' or stock_inventory" t-attf-class="breadcrumb-item #{'active ' if not stock_inventory else ''}">
+                    <a t-if="stock_inventories" t-attf-href="/my/stock_inventories?{{ keep_query() }}">Inventory Transfer</a>
+                    <t t-else="">Inventory Transfer</t>
+                </li>
+                <li t-if="stock_inventory" class="breadcrumb-item active">
+                    <t t-esc="stock_inventory.name"/>
+                </li>
+            </xpath>
+        </template>
+
+        <template id="portal_stock_inventory" name="Inventory Portal" inherit_id="portal.portal_my_home" priority="40">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-if="request.env.user.portal_inventory_user" t-call="portal.portal_docs_entry">
+                    <t t-set="title">Inventory Transfer</t>
+                    <t t-set="url" t-value="'/my/stock_inventories'"/>
+                    <t t-set="count" t-value="stock_inventories_count"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_stock_inventory" name="Stock Inventory">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+                <t t-call="portal.portal_searchbar">
+                    <t t-set="title">Inventory Transfer</t>
+                </t>
+                <hr/>
+                <div class="row">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <a t-attf-href="/web#view_type=form&amp;model=internal.stock.transfer&amp;&amp;action=mt_isy.menu_internal_stock_transfer_action" class="btn btn-info">New Stock Transfer</a>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr class="active">
+                            <th></th>
+                            <th>Transfer No.</th>
+                            <th>Transfer Date</th>
+                            <th>Schedule Date</th>
+                            <th>Assign Person</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Remark</th>
+                            <th class="text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="stock_inventories" t-as="si">
+                            <tr>
+                                <td>
+                                    <a class="btn btn-info" t-att-href="'/web#return_label=Website&amp;model=internal.stock.transfer&amp;id=%s&amp;view_type=form' % (si.id)">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <t t-esc="si.name" t-if="si.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.date_transfer" t-if="si.date_transfer"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.date_schedule" t-if="si.date_schedule"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.assigned_person.name" t-if="si.assigned_person"/>
+                                </td>
+                                <td class='d-none d-md-table-cell'><span t-field="si.source_location.name"/></td>
+                                <td class='d-none d-md-table-cell'><span t-field="si.destination_location.name"/></td>
+                                <td>
+                                    <t t-esc="si.remark" t-if="si.remark"/>
+                                </td>
+                                <td class="text-right"><span class="badge badge-pill badge-info" t-esc="dict(si._fields['state'].selection).get(si.state)"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

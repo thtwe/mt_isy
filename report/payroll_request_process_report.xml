@@ -1,0 +1,218 @@
+<odoo>
+
+    <record model="report.paperformat" id="paperformat_hr_payslip_process_request_report_pdf">
+        <field name="name">paperformat.hr.payslip.process.request</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_width">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">30</field>
+        <field name="margin_right">5</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- <report id="hr_payslip_process_request_report_pdf" model="hr.payslip.process.request" string="Payroll Request Process Report - PDF" report_type="qweb-pdf" 
+    name="mt_isy.hr_payslip_process_request_report_pdf_view" paperformat="mt_isy.paperformat_hr_payslip_process_request_report_pdf" menu="False"/> -->
+
+    <record id="hr_payslip_process_request_report_pdf" model="ir.actions.report">
+        <field name="name">Payroll Adjustment Report - PDF</field>
+        <field name="model">hr.payslip.process.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mt_isy.hr_payslip_process_request_report_pdf_view</field>
+        <field name="report_file">mt_isy.hr_payslip_process_request_report_pdf_view</field>
+    </record>
+
+    <template id="hr_payslip_process_request_report_pdf_view">
+        <t t-call="web.html_container">
+            <div class="header" style="border-bottom: 2px solid black">
+                <h2 class="text-center">Payroll Adjustment Report</h2>
+            </div>
+
+            <div class="article">
+                <t t-foreach="docs" t-as="doc">    
+
+                    <h3>
+                        <span t-esc="doc['name']"/>
+                    </h3>
+                    <table class="table table-condensed table-bordered" style="width: 100%">
+                        <tbody>
+                            <tr>
+                                <td>Requested By</td>
+                                <td>
+                                    <span t-esc="doc['request_employee_id'].name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Approval Person</td>
+                                <td>
+                                    <span t-esc="doc['approval_person'].name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Create Date</td>
+                                <td>
+                                    <span t-esc="doc['create_date']"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Additional Note</td>
+                                <td>
+                                    <span t-esc="doc['note']"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 class="text-center">Current Cash Allocation Requests</h4>                    
+                    <table class="table table-condensed table-bordered" style="width: 100%">
+                        <thead>
+                            <th class="text-left" style="width: 3%">#</th>
+                            <th class="text-left" style="width: 10%">Type</th>
+                            <th class="text-left" style="width: 10%">Amount</th>
+                            <th class="text-left" style="width: 10%">Note</th>
+                        </thead>
+                        <tbody>
+                            <t t-set="val" t-value="dict([('gala_usd','Amount in USD to pay for ISY Gala Ticket(s)'),('savings_for_education','College Education Saving Program Deduction'),('donation_chinthe','Donation to Chinthe Fund'),('donation_uws','United World Schools Project (UWS)'),('donation_clc','Care to the Least Center (CLC)'),('donation_yas','Yangon Animal Shelter'),('local_bank_$', 'Deposit into Local Bank (USD account)'), ('local_bank_mmk', 'Amount in USD to be deposited into Kyat bank account'), ('local_bank_ks', 'Amount in USD to be converted into Kyat cash'),('cash_usd', 'Amount in USD to be paid in USD cash'),('401_k', '401K Allocation'),('petty_cash_$', 'Petty Cash $'),('overseas_bank', 'Overseas Bank'),('','')])"/>
+                            <t t-set="number" t-value="1"/>
+                            <t t-foreach="doc['cash_allocation_requests']" t-as="doc_car">
+                                
+                                <tr>
+                                    <td class="text-left">
+                                        <span t-esc="number"/>
+                                        <t t-set="number" t-value="number+1"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="val[doc_car['name']]"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['amount']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['note']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <p style="page-break-before:always;"></p>
+                    <h4 class="text-center">Adjustment Request</h4>
+                    <table class="table table-condensed table-bordered" style="width: 100%">
+                        <thead>
+                            <th class="text-left" style="width: 3%">#</th>
+                            <th class="text-left" style="width: 10%">Type</th>
+                            <th class="text-left" style="width: 10%">Amount</th>
+                        </thead>
+                        <tbody>
+                            <t t-set="values" t-value="dict([('school_trip', 'School Trip'), ('tuition_fee', 'Tuition Fee'), ('other', 'Other'),('','')])"/>
+                            <t t-set="num" t-value="1"/>
+                            <t t-foreach="doc['deduction_details']" t-as="doc_car">
+                                
+                                <tr>
+                                    <td class="text-left">
+                                        <span t-esc="num"/>
+                                        <t t-set="num" t-value="num+1"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <t t-if="doc_car['deduction_type']">
+                                            <span t-esc="values[doc_car['deduction_type']] or ''"/>
+                                        </t>
+                                        <t t-if="not doc_car['deduction_type']">
+                                            <span t-esc="''"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['amount'] or ''"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <h4 class="text-center">Bank Details</h4>
+                    <table class="table table-condensed table-bordered" style="width: 100%">
+                        <thead>
+                            <th class="text-left" style="width: 3%">#</th>
+                            <th class="text-left" style="width: 10%">Account Type</th>
+                            <th class="text-left" style="width: 10%">Behalf of</th>
+                            <th class="text-left" style="width: 10%">Beneficiary Name</th>
+                            <th class="text-left" style="width: 10%">Account Number</th>
+                            <th class="text-left" style="width: 10%">Bank Name</th>
+                            <th class="text-left" style="width: 10%">Routing/SWIFT/BIC</th>
+                            <th class="text-left" style="width: 10%">Beneficiary address</th>
+                            <th class="text-left" style="width: 10%">Beneficiary Bank address</th>
+                            <th class="text-left" style="width: 10%">Special Instruction</th>
+                            <th class="text-left" style="width: 10%">Other</th>
+                            <th class="text-left" style="width: 10%">Notes and Instruction</th>
+                        </thead>
+                        <tbody>
+                            <t t-set="number" t-value="1"/>
+                            <t t-foreach="doc['bank_details']" t-as="doc_car">
+                                <tr>
+                                    <td class="text-left">
+                                        <span t-esc="number"/>
+                                        <t t-set="number" t-value="number+1"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['account_type']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['behalf_of']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['name']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['account_number']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['bank_name']"/>
+                                    </td>  
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['routing']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['name_address']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['name_bank_address']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['special_instruction']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['other']"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="doc_car['notes']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+                
+            </div>
+
+            <div class="footer">
+                <div class="row text-left" style="border-top: 1px solid black;">
+                    <div class="col col-3 offset-9 text-right">
+                        <ul class="list-inline mt-2">
+                            <li class="list-inline-item">Page:</li>
+                            <li class="list-inline-item">
+                                <span class="page"/>
+                            </li>
+                            <li class="list-inline-item">/</li>
+                            <li class="list-inline-item">
+                                <span class="topage"/>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

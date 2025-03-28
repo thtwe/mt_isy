@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- <report
+            id="report_employee_expense_reimbursement"
+            model="employee.advance.expense"
+            string="Expense Reimbursement"
+            report_type="qweb-pdf"
+            name="mt_isy.report_expense_reimbursement"
+            file="mt_isy.report_expense_reimbursement"
+        /> -->
+
+        <record id="report_employee_expense_reimbursement" model="ir.actions.report">
+            <field name="name">Expense Reimbursement</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mt_isy.report_expense_reimbursement</field>
+            <field name="report_file">mt_isy.report_expense_reimbursement</field>
+        </record>
+
+        <template id="report_expense_reimbursement">
+          <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+              <t t-foreach="docs" t-as="o">
+                <div class="page">
+
+                  <div id="header" style="text-decoration: underline" class="col-12 text-center">
+                    <h3>Expense Reimbursement</h3>
+                  </div>
+
+                  <div>
+                    <h5><span t-field="o.name" /></h5>
+                  </div>
+
+                  <br />
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Employee : </strong>
+                    </div>
+                    <div class="col-3 pull-right">
+                      <p t-field="o.employee_id"/>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Job Title : </strong>
+                    </div>
+                    <div class="col-3 pull-right">
+                      <p t-field="o.job_id"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Department : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.department_id" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Paid Amount : </strong>
+                    </div>
+                    <div class="col-3 pull-right">
+                      <p t-field="o.paid_amount"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Paid in Currency : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.paid_in_currency" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Settlement Date : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.settlement_date"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Make Settlement By : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.settlement_account_by_id"/>
+                    </div>
+                  </div>
+
+                  <br />
+
+                  <table class="table table-sm table-bordered" name="advance_expense_lines">
+                    <thead>
+                      <tr>
+                        <th>Description</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Quantity</th>
+                        <th>Currency</th>
+                        <th class="text-right">Subtotal</th>
+                        <th>State</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="o.advance_expense_line_ids" t-as="l">
+                        <tr>
+                          <td><span t-field="l.description"/></td>
+                          <td class="text-right"><span t-field="l.unit_amount"/></td>
+                          <td class="text-right"><span t-field="l.quantity"/></td>
+                          <td><span t-field="l.currency_id"/></td>
+                          <td class="text-right"><span t-field="l.total_amount"/></td>
+                          <td><span t-field="l.state"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+
+                  <br />
+                  <br />
+                  <br />
+                  <br />
+                  <br />
+
+                  <div class="row">
+                    <div class="col-6 text-center">
+                      <p>--------------------------------</p>
+                    </div>
+                    <div class="col-6 text-center">
+
+                    </div>
+                  </div>
+
+
+                </div>
+              </t>
+            </t>
+          </t>
+        </template>
+
+  </data>
+</odoo>

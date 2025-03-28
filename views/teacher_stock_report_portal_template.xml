@@ -1,0 +1,126 @@
+<odoo>
+    <data>
+
+        <template id="isy_stock_report_teacher" name="Portal layout : inventory menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+            <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+                <li t-if="page_name == 'isy_stock_report_teacher' or isy_stock_report_teacher" t-attf-class="breadcrumb-item #{'active ' if not isy_stock_report_teacher_data else ''}">
+                    <a t-if="isy_stock_report_teacher_data" t-attf-href="/my/isy_stock_report_teacher?{{ keep_query() }}">Inventory Report</a>
+                    <t t-else="">Inventory Report</t>
+                </li>
+                <li t-if="isy_stock_report_teacher" class="breadcrumb-item active">
+                    <t t-esc="isy_stock_report_teacher.name"/>
+                </li>
+            </xpath>
+        </template>
+
+        <template id="portal_isy_stock_report_teacher" name="Inventory Report" inherit_id="portal.portal_my_home" priority="40">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-if="request.env.user.portal_inventory_own" t-call="isy_ticketing.portal_docs_entry">
+                    <t t-set="title">Inventory Report</t>
+                    <t t-set="url" t-value="'/my/isy_stock_report_teacher'"/>
+                    <t t-set="count" t-value="stock_reports_lists_count"/>
+                </t>
+            </xpath>
+        </template>
+                <template id="portal_isy_stock_report_teacher" name="Inventory Report" inherit_id="portal.portal_my_home" priority="40">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-call="isy_ticketing.portal_docs_entry">
+                    <t t-set="title">Odoo Tutorials</t>
+                    <t t-set="url" t-value="'/my/odoo-tutorials'"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_isy_stock_report_teacher" name="Inventory Report">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+                <t t-call="portal.portal_searchbar">
+                    <t t-set="title">Inventory Report</t>
+                </t>
+                <hr/>
+                <!-- <div class="row">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <a t-attf-href="/web?#action=mt_isy.action_isy_stock_report_teacher&amp;model=isy.stock.report&amp;view_type=list&amp;menu_id=mt_isy.menu_isy_stock_report_teacher" class="btn btn-info">Go to Inventory Report</a>
+
+                        </div>
+                    </div>
+                </div> -->
+                <hr/>
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Serial Number</th>
+                            <th>Product Type</th>
+                            <th>Product Description</th>
+                            <th>Location</th>
+                            <th>Inventory Category</th>
+                            <th>Assigned Department</th>
+                            <th>Purchase Order</th>
+                            <th>Purchase Date</th>
+                            <th>Acquisition Cost(USD)</th>
+                            <th>Assigned Person</th>
+                            <th>Manufacturer</th>
+                            <th>Model Number</th>
+                            <th>Grant Funded Item</th>
+                            <th style="width: 400px">Note</th>
+                            <th>Last Updated Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="isy_stock_report_teacher_data" t-as="si">
+                            <tr>
+                                <td class="text-left">
+                                    <t t-esc="si.serial_number" t-if="si.serial_number"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.product_category.display_name" t-if="si.product_category"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.product_id.name" t-if="si.product_id"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.location_id.display_name" t-if="si.location_id"/>
+                                </td>
+                                <td class="text-left">
+                                    <span class="badge badge-pill badge-info" t-esc="dict(si._fields['inventory_category'].selection).get(si.inventory_category)"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.assigned_department.name" t-if="si.assigned_department"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.purchase_id.name" t-if="si.purchase_id"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.purchase_date" t-if="si.purchase_date"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.acquisition_cost" t-if="si.acquisition_cost"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.assigned_to.name" t-if="si.assigned_to"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.manufacturer" t-if="si.manufacturer"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.model_number" t-if="si.model_number"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.grant_funded_item" t-if="si.grant_funded_item"/>
+                                </td>
+                                <td class="text-left" style="word-break: break-all;">
+                                    <t t-esc="si.note" t-if="si.note"/>
+                                </td>
+                                <td class="text-left">
+                                    <t t-esc="si.write_date" t-if="si.write_date"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

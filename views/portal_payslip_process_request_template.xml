@@ -1,0 +1,98 @@
+<odoo>
+    <data>
+
+        <template id="payslip_process_request" name="Portal layout : payslip process rquest menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+            <xpath expr="//ol[contains(@class, 'o_portal_submenu')]" position="inside">
+                <li t-if="page_name == 'payslip_process_request' or payslip_process_request" t-attf-class="breadcrumb-item #{'active ' if not payslip_process_request else ''}">
+                    <a t-if="payslip_process_requests" t-attf-href="/my/payslip_process_requests?{{ keep_query() }}">Payslip Adjustments</a>
+                    <t t-else="">Payroll Adjustments</t>
+                </li>
+                <li t-if="payslip_process_request" class="breadcrumb-item active">
+                    <t t-esc="payslip_process_request.name"/>
+                </li>
+            </xpath>
+        </template>
+        
+        <template id="portal_payslip_process_request" name="Payslip Process Request Portal" inherit_id="portal.portal_my_home" priority="60">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-if="request.env.user.portal_payslip_process_request_user" t-call="isy_ticketing.portal_docs_entry">
+                    <t t-set="title">Payroll Adjustments</t>
+                    <t t-set="url" t-value="'/my/payslip_process_requests'"/>
+                    <t t-set="count" t-value="payslip_process_requests_count"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_payslip_process_requests" name="Payslip Process Request">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <t t-call="portal.portal_searchbar">
+                    <t t-set="title">Payroll Adjustments</t>
+                </t>
+                <hr/>
+                <div class="row">
+                    <div class="form-group">
+                        <div class="col-sm-12 d-flex justify-content-between align-items-center">
+                            <a t-attf-href="/web#view_type=form&amp;model=hr.payslip.process.request&amp;&amp;action=mt_isy.action_view_hr_payslip_process_request_tree" class="btn btn-info">New Request</a>
+                            <!-- Display total_car_amt value -->
+                            <!--<span class="text-end">Total Accumulated Saving Amount: <t t-esc="total_car_amt" /></span>-->
+                            <t t-if="total_car_amt and total_car_amt > 0">
+                                <span class="text-end">
+                                    Total Accumulated Saving Amount: 
+                                    <t t-esc="'{:,.2f}'.format(total_car_amt)" />
+                                </span>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr class="active">
+                            <th></th>
+                            <th>Reference No.</th>
+                            <th>Request By</th>
+                            <th>Approval Person</th>
+                            <th>Monthly Salary</th>
+                            <th>Retirement Salary</th>
+                            <th>Total Salary</th>
+                            <th class="text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="payslip_process_requests" t-as="si">
+                            <tr>
+                                <td>
+                                    <a class="btn btn-info" t-att-href="'/web#return_label=Website&amp;model=hr.payslip.process.request&amp;id=%s&amp;view_type=form' % (si.id)">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <t t-esc="si.name" t-if="si.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.request_employee_id.name" t-if="si.request_employee_id"/>
+                                </td>
+                                <td>
+                                    <t t-esc="si.approval_person.name" t-if="si.approval_person"/>
+                                </td>
+                                <td>
+                                    <t t-esc="round(si.monthly_salary,2)" t-if="si.monthly_salary"/>
+                                </td>
+                                <td>
+                                    <t t-esc="round(si.retirement_salary,2)" t-if="si.retirement_salary"/>
+                                </td>
+                                <td>
+                                    <t t-esc="round(si.total_salary,2)" t-if="si.total_salary"/>
+                                </td>                               
+                                <td class="text-right">
+                                    <span class="badge badge-pill badge-info" t-esc="dict(si._fields['state'].selection).get(si.state)"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="0">
+
+		<!-- Multi-Company Rules are not working well -->
+		<record id="hr.hr_employee_public_comp_rule" model="ir.rule">
+            <field name="domain_force">[] #['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="hr.hr_employee_comp_rule" model="ir.rule">
+            <field name="domain_force">[] #['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+        <!-- Multi-Company Rules are not working well -->
+
+		<record id="group_budget_ccm_user_selection" model="res.groups">
+	        <field name="name">Budget CCM User Selection Access</field>
+    	</record>
+
+    	<record id="group_budget_ccm_user" model="res.groups">
+	        <field name="name">Budget CCM User [OPEX]</field>
+    	</record>
+
+    	<record id="group_budget_ccm_user_capex" model="res.groups">
+	        <field name="name">Budget CCM User [CAPEX]</field>
+    	</record>
+
+    	<record id="group_budget_cosolidated_user" model="res.groups">
+	        <field name="name">Consolidated Budget User[OPEX+CAPEX]</field>
+    	</record>
+
+		<record id="group_stock_report_special" model="res.groups">
+			<field name="name">Stock Report Special Access</field>
+		</record>
+
+		<record id="group_isy_hrpayslip_approval_checker" model="res.groups">
+			<field name="name">Payslip Approval Checker</field>
+		</record>
+
+		<record id="group_isy_payslip_process_requestor" model="res.groups">
+			<field name="name">Payroll Process Requestor</field>
+		</record>
+
+		<record id="group_isy_payslip_process_modify_requestor" model="res.groups">
+			<field name="name">Payroll Process Modify Requestor</field>
+		</record>
+
+		<record id="group_isy_annual_salary_modify" model="res.groups">
+			<field name="name">Annual Salary Modificaton</field>
+		</record>
+
+		<record id="group_isy_annual_salary_modify_reminder" model="res.groups">
+			<field name="name">Annual Salary Reminder Recipients</field>
+		</record>
+
+		<record id="group_po_cancel_user" model="res.groups">
+	        <field name="name">PO and Advanced Expenses Cancel</field>
+    	</record>
+
+		<record model="ir.rule" id="group_isy_payslip_process_requestor_rule">
+			<field name="name">Requestor see own records.</field>
+			<field name="model_id" ref="mt_isy.model_hr_payslip_process_request"/>
+			<field name="domain_force">[('request_employee_id.user_id','=', user.id)]</field>
+			<field name="groups" eval="[(4, ref('mt_isy.group_isy_payslip_process_requestor'))]"/>
+		</record>
+
+		<record model="ir.rule" id="group_isy_payslip_process_requestor_rule_portal">
+			<field name="name">Portal Requestor see own records.</field>
+			<field name="model_id" ref="mt_isy.model_hr_payslip_process_request"/>
+			<field name="domain_force">[('request_employee_id.user_id','=', user.id)]</field>
+			<field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+		</record>
+
+		<record model="ir.rule" id="all_payslip_process_request">
+			<field name="name">Manager see all records.</field>
+			<field name="model_id" ref="mt_isy.model_hr_payslip_process_request"/>
+			<field name="domain_force">[(1,'=',1)]</field>
+			<field name="groups" eval="[(4, ref('hr_payroll.group_hr_payroll_manager'))]"/>
+		</record>
+
+
+		<!-- <record model="ir.rule" id="group_stock_manager_fiscal_year">
+			<field name="name">Fiscal Year Stock Manager.</field>
+			<field name="model_id" ref="mt_isy.model_account_fiscal_year"/>
+			<field name="domain_force">[('company_id','=',user.company_id.id)]</field>
+			<field name="groups" eval="[(4, ref('stock.group_stock_manager'))]"/>
+		</record> -->
+
+		<record model="ir.rule" id="group_user_res_currency_rate_functional">
+			<field name="name">Functional Rate</field>
+			<field name="model_id" ref="mt_isy.model_res_currency_rate_functional"/>
+			<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+			<field name="groups" eval="[(4, ref('base.group_user'))]"/>
+		</record>
+
+		<record model="ir.rule" id="group_user_account_fiscal_year">
+			<field name="name">account_fiscal_year</field>
+			<field name="model_id" ref="mt_isy.model_account_fiscal_year"/>
+			<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+			<field name="groups" eval="[(4, ref('base.group_user'))]"/>
+		</record>
+
+		<record model="ir.rule" id="group_user_account_group_extra">
+			<field name="name">account_group_extra</field>
+			<field name="model_id" ref="mt_isy.model_account_group_extra"/>
+			<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+			<field name="groups" eval="[(4, ref('base.group_user'))]"/>
+		</record>
+    </data>
+</odoo>

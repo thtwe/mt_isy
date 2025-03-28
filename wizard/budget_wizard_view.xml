@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!--
+        Extended Budget Opening ENtry Wizard
+    -->
+        <record id="view_isy_opening_entry_extended_budget" model="ir.ui.view">
+            <field name="name">Extended Budget Opening Entry</field>
+            <field name="model">extended.budget.opening.entry</field>
+            <field name="arch" type="xml">
+                <form string="Extended Budget Opening Entry">
+                    <group>
+                        <group>
+                           <field name="name" domain="[('ccm_budget','=',True)]" widget="selection"/>
+                           <field name="name_for" domain="[('ccm_budget','=',True)]" widget="selection"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Extended Budget Lists For Opening Entry">
+                            <field name="entry_details">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="name" />
+                                    <field name="account_id" />
+                                    <field name="tax_currency_rate"/>
+                                    <field name="x_studio_type"/>
+                                    <field name="x_studio_group"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="generate_extended_budget_opening_entry" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_isy_opening_entry_extended_budget" model="ir.actions.act_window">
+            <field name="name">Extended Budget Opening Entry</field>
+            <field name="res_model">extended.budget.opening.entry</field>
+            <field name="view_id" ref="view_isy_opening_entry_extended_budget"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_isy_opening_entry_extended_budget" name="Extended Budget Opening Entry" parent="mt_isy.isy_menu_budget_template_sub_root" action="action_isy_opening_entry_extended_budget" sequence="4"/>
+        <!--
+            Payroll Budget Opening Entry
+        -->
+
+        <record id="view_isy_opening_entry_payroll_budget" model="ir.ui.view">
+            <field name="name">payroll Budget Opening Entry</field>
+            <field name="model">payroll.budget.opening.entry</field>
+            <field name="arch" type="xml">
+                <form string="Payroll Budget Opening Entry">
+                    <group>
+                        <group>
+                            <field name="name" domain="[('ccm_budget','=',True)]" widget="selection"/>
+                            <field name="name_for" domain="[('ccm_budget','=',True)]" widget="selection"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payroll Budget Lists For Opening Entry">
+                            <field name="payroll_entry_details">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="name" />
+                                    <field name="budget_id" />
+                                    <field name="retirement_budget_id" />
+                                    <field name="provident_fund_budget_id" />
+                                    <field name="severance_allowance_budget_id" />
+                                    <field name="contingency_percentage"/>
+
+
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="generate_payroll_budget_opening_entry" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_isy_opening_entry_payroll_budget" model="ir.actions.act_window">
+            <field name="name">Payroll Budget Opening Entry</field>
+            <field name="res_model">payroll.budget.opening.entry</field>
+            <field name="view_id" ref="view_isy_opening_entry_payroll_budget"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_isy_opening_entry_payroll_budget" name="Payroll Budget Opening Entry" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="action_isy_opening_entry_payroll_budget" sequence="3"/>
+
+
+        <record id="view_isy_opening_entry_rental_budget" model="ir.ui.view">
+            <field name="name">Rental Budget Opening Entry</field>
+            <field name="model">rental.budget.opening.entry</field>
+            <field name="arch" type="xml">
+                <form string="Rental Budget Opening Entry">
+                    <group>
+                        <group>
+                            <field name="name" domain="[('ccm_budget','=',True)]" widget="selection"/>
+                            <field name="name_for" domain="[('ccm_budget','=',True)]" widget="selection"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Rental Budget Lists For Opening Entry">
+                            <field name="entry_details">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="generate_rental_budget_opening_entry" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_isy_opening_entry_rental_budget" model="ir.actions.act_window">
+            <field name="name">Rental Budget Opening Entry</field>
+            <field name="res_model">rental.budget.opening.entry</field>
+            <field name="view_id" ref="view_isy_opening_entry_rental_budget"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_isy_opening_entry_rental_budget" name="Rental Budget Opening Entry" parent="mt_isy.isy_menu_budget_template_sub_rental_budget" action="action_isy_opening_entry_rental_budget" sequence="4"/>
+
+
+        <record id="view_isy_opening_entry_capital_budget" model="ir.ui.view">
+            <field name="name">Capital Budget Opening Entry</field>
+            <field name="model">capital.budget.opening.entry</field>
+            <field name="arch" type="xml">
+                <form string="Capital Budget Opening Entry">
+                    <group>
+                        <group>
+                            <field name="name" domain="[('ccm_budget','=',True)]" widget="selection"/>
+                            <field name="name_for" domain="[('ccm_budget','=',True)]" widget="selection"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Capital Budget Lists For Opening Entry">
+                            <field name="entry_details">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="generate_capital_budget_opening_entry" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_isy_opening_entry_capital_budget" model="ir.actions.act_window">
+            <field name="name">capital Budget Opening Entry</field>
+            <field name="res_model">capital.budget.opening.entry</field>
+            <field name="view_id" ref="view_isy_opening_entry_capital_budget"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_isy_opening_entry_capital_budget" name="Capital Budget Opening Entry" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="action_isy_opening_entry_capital_budget" sequence="6"/>
+
+
+        <record id="view_isy_opening_entry_revenue_budget_ygn" model="ir.ui.view">
+            <field name="name">Revenue Budget YGN Opening Entry</field>
+            <field name="model">revenue.budget.ygn.opening.entry</field>
+            <field name="arch" type="xml">
+                <form string="Revenue Budget YGN Opening Entry">
+                    <group>
+                        <group>
+                            <field name="name" domain="[('ccm_budget','=',True)]" widget="selection"/>
+                            <field name="name_for" domain="[('ccm_budget','=',True)]" widget="selection"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Revenue Budget YGN Lists For Opening Entry">
+                            <field name="entry_details">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="generate_revenue_budget_ygn_opening_entry" string="Generate" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_isy_opening_entry_revenue_budget_ygn" model="ir.actions.act_window">
+            <field name="name">Revenue Budget YGN Opening Entry</field>
+            <field name="res_model">revenue.budget.ygn.opening.entry</field>
+            <field name="view_id" ref="view_isy_opening_entry_revenue_budget_ygn"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_isy_opening_entry_revenue_budget_ygn" name="Revenue Budget YGN Opening Entry" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="action_isy_opening_entry_revenue_budget_ygn" sequence="5"/>
+
+    </data>
+</odoo>

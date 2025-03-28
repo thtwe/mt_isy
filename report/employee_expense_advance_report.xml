@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- <report
+            id="report_employee_advance_expense"
+            model="employee.advance.expense"
+            string="Advance Expense"
+            report_type="qweb-pdf"
+            name="mt_isy.report_expense_advance"
+            file="mt_isy.report_expense_advance"
+        /> -->
+
+        <record id="report_employee_advance_expense" model="ir.actions.report">
+            <field name="name">Advance Expense</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mt_isy.report_expense_advance</field>
+            <field name="report_file">mt_isy.report_expense_advance</field>
+        </record>
+      
+        <template id="report_expense_advance">
+          <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+              <t t-foreach="docs" t-as="o">
+                <div class="page">
+
+                  <div id="header" style="text-decoration: underline" class="col-12 text-center">
+                    <h3>Advance Expense</h3>
+                  </div> 
+
+                  <div>
+                    <h5><span t-field="o.name" /></h5>
+                  </div>
+
+                  <br />
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Employee : </strong>
+                    </div>
+                    <div class="col-3 pull-right">
+                      <p t-field="o.employee_id"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Requested Date : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.request_date" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Job Title : </strong>
+                    </div>
+                    <div class="col-3 pull-right">
+                      <p t-field="o.job_id"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Department : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.department_id" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Requested Amount : </strong>
+                    </div>
+                    <div class="col-3 pull-right">
+                      <p t-field="o.total_amount_expense"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Currency : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.currency_id" />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-3">
+                      <strong>Paid Date : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.account_validate_date"/>
+                    </div>
+                    <div class="col-3">
+                      <strong>Reason for Advance : </strong>
+                    </div>
+                    <div class="col-3">
+                      <p t-field="o.reason_for_advance"/>
+                    </div>
+                  </div>
+
+                  <br />
+
+                  <table class="table table-sm table-bordered" name="advance_expense_lines">
+                    <thead>
+                      <tr>
+                        <th>Expense</th>
+                        <th>Description</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Quantity</th>
+                        <th>Currency</th>
+                        <th class="text-right">Subtotal</th>
+                        <th>State</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="o.advance_expense_line_ids" t-as="l">
+                        <tr>
+                          <td><span t-field="l.product_id"/></td>
+                          <td><span t-field="l.description"/></td>
+                          <td class="text-right"><span t-field="l.unit_amount"/></td>
+                          <td class="text-right"><span t-field="l.quantity"/></td>
+                          <td><span t-field="l.currency_id"/></td>
+                          <td class="text-right"><span t-field="l.total_amount"/></td>
+                          <td><span t-field="l.state"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+
+                  <br /> 
+                  <div id="clearance" t-if="o.advance_expense_clearance_line_ids">
+                    <h5>Advance Clearance</h5>
+
+                    <table class="table table-sm table-bordered" name="advance_expense_clearance_lines">
+                      <thead>
+                      <tr>
+                        <th>Expense</th>
+                        <th>Description</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Quantity</th>
+                        <th>Currency</th>
+                        <th class="text-right">Subtotal</th>
+                        <th>Cls JE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="o.advance_expense_clearance_line_ids" t-as="c">
+                        <tr>
+                          <td><span t-field="c.product_id"/></td>
+                          <td><span t-field="c.description"/></td>
+                          <td class="text-right"><span t-field="c.unit_amount"/></td>
+                          <td class="text-right"><span t-field="c.quantity"/></td>
+                          <td><span t-field="c.currency_id"/></td>
+                          <td class="text-right"><span t-field="c.total_amount"/></td>
+                          <td><span t-field="c.cls_move_id"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                    </table>
+
+                     <div class="row">
+                      <div class="col-4">
+                        <strong>Cash Clearance Amount : </strong>
+                      </div>
+                      <div class="col-8">
+                        <span t-field="o.cash_cleared_amount" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+
+                <div class="row">
+                  <div class="col-6 text-center">
+                    <p>--------------------------------</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    
+                  </div>
+                </div>
+              </t>
+            </t>
+          </t>
+        </template> 
+        
+  </data>
+</odoo>

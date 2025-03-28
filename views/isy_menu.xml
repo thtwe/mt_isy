@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.menu" id="hr_expense.menu_hr_expense_my_expenses">
+        <field name="parent_id" ref='hr_expense.menu_hr_expense_configuration'/>
+    </record>
+    <record model="ir.ui.menu" id="hr_expense.menu_hr_expense_report">
+        <field name="parent_id" ref='hr_expense.menu_hr_expense_configuration'/>
+    </record>
+    <record model="ir.ui.menu" id="hr_expense.menu_hr_expense_reports">
+        <field name="parent_id" ref='hr_expense.menu_hr_expense_configuration'/>
+    </record>
+    <record model="ir.ui.menu" id="employee_expense_advance.menu_advance_expense_employee">
+        <field name="sequence">1</field>
+    </record>
+
+    <record model="ir.ui.menu" id="hr_payroll.menu_hr_payroll_payslips">
+        <field name="sequence">1</field>
+    </record>
+    <record model="ir.ui.menu" id="hr_payroll.menu_hr_payroll_work_entries_root">
+        <field name="groups_id" eval="[(6,0,[ref('base.group_no_one')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="hr_payroll.menu_hr_payslip_run">
+        <field name="name">Payslip Batches</field>
+        <field name="sequence">2</field>
+        <field name="parent_id" ref="hr_work_entry_contract_enterprise.menu_hr_payroll_root"/>
+    </record>
+
+
+    <record model="ir.ui.menu" id="account_accountant.menu_accounting">
+        <field name="sequence">1</field>
+    </record>
+    <record model="ir.ui.menu" id="purchase.menu_purchase_root">
+        <field name="sequence">2</field>
+    </record>
+    <record model="ir.ui.menu" id="hr_expense.menu_hr_expense_root">
+        <field name="sequence">4</field>
+    </record>
+    <record model="ir.ui.menu" id="hr_work_entry_contract_enterprise.menu_hr_payroll_root">
+        <field name="sequence">6</field>
+    </record>
+    <record model="ir.ui.menu" id="mt_isy.menu_hr_payroll_process_root">
+        <field name="sequence">8</field>
+    </record>
+    <record model="ir.ui.menu" id="stock.menu_stock_root">
+        <field name="sequence">10</field>
+    </record>
+    <record model="ir.ui.menu" id="website.menu_website_configuration">
+        <field name="sequence">12</field>
+        <field name="name">My Portal</field>
+    </record>
+    <record model="ir.ui.menu" id="isy_ticketing.menu_isy_ticketing_root">
+        <field name="sequence">14</field>
+    </record> 
+    <record model="ir.ui.menu" id="hr_holidays.menu_hr_holidays_root">
+        <field name="sequence">16</field>
+        <field name='name'>Leaves</field>
+    </record>
+    <record model="ir.ui.menu" id="mt_isy.main_menu_action_view_isy_budget_display_wizard">
+        <field name="sequence">17</field>
+    </record>
+    <record model="ir.ui.menu" id="contacts.menu_contacts">
+        <field name="sequence">18</field>
+    </record>
+    <record model="ir.ui.menu" id="hr.menu_hr_root">
+        <field name="sequence">20</field>
+    </record>
+    <record model="ir.ui.menu" id="mt_isy.menu_isy_approval_root">
+        <field name="sequence">22</field>
+    </record>
+    <record model="ir.ui.menu" id="sale.sale_menu_root">
+        <field name="sequence">24</field>
+    </record>
+    <record model="ir.ui.menu" id="mail.menu_root_discuss">
+        <field name="sequence">26</field>
+    </record>
+    <record model="ir.ui.menu" id="calendar.mail_menu_calendar">
+        <field name="sequence">28</field>
+    </record>
+    <record model="ir.ui.menu" id="point_of_sale.menu_point_root">
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- <record model="ir.ui.menu" id="pos_sync.pos_sync_menu_root">
+        <field name="sequence">36</field>
+    </record> -->
+    <record model="ir.ui.menu" id="stock_barcode.stock_barcode_menu">
+        <field name="sequence">38</field>
+    </record>
+    <record model="ir.ui.menu" id="hr_attendance.menu_hr_attendance_root">
+        <field name="sequence">42</field>
+    </record>
+    <record model="ir.ui.menu" id="fleet.menu_root">
+        <field name="sequence">44</field>   
+    </record>
+    <!-- <record model="ir.ui.menu" id="base.menu_board_root">
+        <field name="sequence">46</field>
+    </record> -->
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'account'), ('name', '=', 'menu_action_move_journal_line_form')]"/>
+        </function>
+        <value eval="{'noupdate': False}" />
+    </function>
+    <record model="ir.ui.menu" id="account.menu_action_move_journal_line_form">
+        <field name="parent_id" ref="account.menu_finance_entries_accounting_miscellaneous"/>
+    </record>
+
+</odoo>

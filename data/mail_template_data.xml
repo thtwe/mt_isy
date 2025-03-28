@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="clearance_reminder" model="mail.template">
+          <field name="name">Clearance Reminder</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Reminder : To clear advance - [ {{object.name}} ]</field>
+          <field name="email_to">{{object.partner_id.email}}</field>
+          <field name="email_cc">cjanzen@isyedu.org,slinn@isyedu.org</field>
+          <field name="lang"></field>
+          <field name="model_id" ref="mt_isy.model_employee_advance_expense"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+              <![CDATA[
+                <p>
+              
+                Dear <t t-out="object.partner_id.name"/>,
+
+                </p><p>Petty cash advances are to be settled as soon as possible and at the latest within 30 days from the date the cash is withdrawn. 
+                </p><p>Please be advised that it is over 30 days so take care of this as soon as possible.</p>
+                
+                <p></p>
+                ]]>
+          </field>
+        </record>
+
+        <record id="assets_reminder_inventory_opening" model="mail.template">
+          <field name="name">New Assets Entry Reminder</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Reminder : To check new assets in stock opening- [ {{object.name}} ]</field>
+          <field name="email_to">slinn@isyedu.org</field>
+          <field name="email_cc"></field>
+          <field name="model_id" ref="mt_isy.model_internal_stock_transfer"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear <t t-out="object.assets_responsible_person.name"/>,</p>
+
+                <p>New asset items are registered in stock report by <t t-out="object.create_uid.name"/>.</p>
+                <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&amp;action=1174&amp;model=internal.stock.transfer&amp;view_type=form&amp;menu_id=424" class="btn btn-beta">Go to record</a>
+                <br>
+                <p></p>
+                <p>
+                <br></p>
+                <p>Sincerely,</p>
+                <p>Odoo Administrator<br></p>
+
+                ]]>
+          </field>
+        </record>
+
+        <record id="automatic_reminder_for_schedule_return_employee" model="mail.template">
+          <field name="name">Automatic Reminder For Schedule Return Employee</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Stock Return Reminder</field>
+          <field name="email_to">{{object.assigned_person.work_email}}</field>
+          <field name="email_cc"></field>
+          <field name="reply_to">noreply@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_internal_stock_transfer_details"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear <t t-out="object.assigned_person.name"/>,</p>
+                <br/>
+                <p>Please return your inventory items to <t t-out="object.assigned_department.name"/> as the return date was <t t-out='object.date_schedule_return'/>.</p>
+                <br/>
+                <p>Please contact <t t-out='object.assigned_department.name'/> if you have any questions regarding this notification. </p>
+                <p>
+                <br></p>
+                <p>Sincerely,</p>
+                <p>Odoo Admin<br></p>
+
+                ]]>
+          </field>
+        </record>
+
+        <record id="automatic_reminder_for_schedule_return_student" model="mail.template">
+          <field name="name">Automatic Reminder For Schedule Return Student</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Stock Return Reminder</field>
+          <field name="email_to">{{object.assigned_student.email}}</field>
+          <field name="email_cc"></field>
+          <field name="reply_to">noreply@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_internal_stock_transfer_details"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear <t t-out='object.assigned_student.display_name'/>,</p>
+                <br/>
+                <p>Please return your inventory items to <t t-out="object.assigned_department.name"/> as the return date was <t t-out="object.date_schedule_return"/>.</p>
+                <br/>
+                <p>Please contact <t t-out="object.assigned_department.name"/> if you have any questions regarding this notification. </p>
+                <p>
+                <br></p>
+                <p>Sincerely,</p>
+                <p>Odoo Admin<br></p>
+
+                ]]>
+          </field>
+        </record>
+
+
+
+        <record id="manual_reminder_for_schedule_return_" model="mail.template">
+          <field name="name">Manual Reminder For Schedule Return</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Stock Return Reminder</field>
+          <field name="email_to">{{object.assigned_to.email}}</field>
+          <field name="email_cc"></field>
+          <field name="reply_to">noreply@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_isy_stock_report"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear <t t-out="object.assigned_to.display_name"/>,</p>
+                <br/>
+                <p>Please return your inventory items to <t t-out="object.assigned_department.name"/> as it is due.</p>
+                <br/>
+                <p>Please contact <t t-out="object.assigned_department.name"/> if you have any questions regarding this notification. </p>
+                <p>
+                <br></p>
+                <p>Sincerely,</p>
+                <p>Odoo Admin<br></p>
+
+                ]]>
+          </field>
+        </record>
+
+
+        <record id="group_isy_annual_salary_modify_reminder_mail_template" model="mail.template">
+          <field name="name">Annual Salary Modification Reminder</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Annual Salary Modification Reminder</field>
+          <field name="email_to">{{object.get_emails_list('annual_salary')}}</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="hr_contract.model_hr_contract"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[
+                Dear All,
+                <p>
+                <t t-out="object.employee_id.name"/> annual salary has became <t t-out="object.wage"/> and
+                <br/>
+                changed by <t t-out="object.write_uid.partner_id.name"/>.
+                </p>
+                <br/>
+                <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&action=363&model=hr.contract&view_type=form&menu_id=165" class="btn btn-beta" style="border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;" data-original-title="" title="" aria-describedby="tooltip108011">Go to Request</a>
+                ]]>
+          </field>
+        </record>
+
+        <!--<record id="scholarship_acc_for_eom_mail_template" model="mail.template">
+          <field name="name">Community Deposit Balance Noti Monthly</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Community Deposit Balance</field>
+          <field name="email_to">amnaing@isyedu.org</field>
+          <field name="email_cc">slinn@isyedu.org,osoe@isyedu.org</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="mt_isy.model_account_move_line"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+<p>Dear Aung Myint Naing,</p>
+<p>
+This email is sent monthly for the Community Deposit Balance from Odoo system.
+</p>
+<p></p>
+<p>Sincerely,</p>
+<p>Odoo Administrator<br></p>
+                ]]>
+          </field>
+        </record>-->
+
+        <record id="stock_reserve_inventory_user_noti" model="mail.template">
+          <field name="name">Stock Reserve from PS</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">IT Stock Reserved by {{object.contact_reserved.name}}</field>
+          <field name="email_to">zphtet@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_isy_stock_report"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+<p>Dear Zar Ni Phyo Htet,</p>
+<p>
+<t t-out="object.product_id.name"/> : <t t-out="object.serial_number"/> has been reserved by <t t-out="object.contact_reserved.name"/> &lt;<t t-out="object.user_email"/>&gt;. Please make that product checkout.
+</p>
+<p></p>
+<p>
+                <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&amp;action=1176&amp;model=isy.stock.report&amp;view_type=form&amp;menu_id=424" class="btn btn-beta" style="border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;" data-original-title="" title="" aria-describedby="tooltip108011">Go to Stock Report</a>
+                
+          </p>
+<p>Sincerely,</p>
+<p>Odoo Administrator<br></p>
+                ]]>
+          </field>
+        </record>
+
+        <record id="stock_cancel_inventory_user_noti" model="mail.template">
+          <field name="name">Stock Cancel from PS</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">IT Stock Cancelled by {{object.contact_reserved.name}}</field>
+          <field name="email_to">zphtet@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_isy_stock_report"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+<p>Dear Zar Ni Phyo Htet,</p>
+<p>
+<t t-out="object.product_id.name"/> : <t t-out="object.serial_number"/> has been cancelled by <t t-out="object.contact_reserved.name"/> &lt;<t t-out="object.user_email"/>&gt;.
+</p>
+<p></p>
+<p>
+                <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&amp;action=1176&amp;model=isy.stock.report&amp;view_type=form&amp;menu_id=424" class="btn btn-beta" style="border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;" data-original-title="" title="" aria-describedby="tooltip108011">Go to Stock Report</a>
+                
+          </p>
+
+<p>Sincerely,</p>
+<p>Odoo Administrator<br></p>
+                ]]>
+          </field>
+        </record>
+
+        <record id="stock_cancel_inventory_user_noti_tocheckin" model="mail.template">
+          <field name="name">Stock Cancel from PS to checkin</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">IT Stock Cancelled by {{object.contact_reserved.name}}</field>
+          <field name="email_to">zphtet@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_isy_stock_report"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+<p>Dear Zar Ni Phyo Htet,</p>
+<p>
+<t t-out="object.product_id.name"/> : <t t-out="object.serial_number"/> has been cancelled by <t t-out="object.contact_reserved.name"/> &lt;<t t-out="object.user_email"/>&gt;. Please make <t t-out="object.product_id.name"/> checkin.
+</p>
+<p></p>
+<p>
+                <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&amp;action=1176&amp;model=isy.stock.report&amp;view_type=form&amp;menu_id=424" class="btn btn-beta" style="border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;" data-original-title="" title="" aria-describedby="tooltip108011">Go to Stock Report</a>
+                
+          </p>
+
+<p>Sincerely,</p>
+<p>Odoo Administrator<br></p>
+                ]]>
+          </field>
+        </record>
+
+        <record id="inventory_item_incoming_alert" model="mail.template">
+          <field name="name">Inventory Item Incoming Alert - Advanced</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Inventory Item Incoming Reminder</field>
+          <field name="email_to">kko@isyedu.org</field>
+          <!-- <field name="email_cc">slinn@isyedu.org,osoe@isyedu.org</field> -->
+          <field name="reply_to">noreply@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="mt_isy.model_employee_advance_expense"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear Kaung Kyaw Ko,</p>
+                <p>Inventory Item has been purchased so please record at inventory management and barcode accordingly.</p>
+                <p>Record number: <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&amp;action=1103&model=employee.advance.expense&view_type=form&menu_id=489" ><t t-out="object.name"/></a></p>
+                <p>Sincerely,</p>
+                <p><t t-out="object.create_uid.name"/><br></p>
+
+                ]]>
+          </field>
+        </record>
+
+        <record id="inventory_item_incoming_alert_PO" model="mail.template">
+          <field name="name">Inventory Item Incoming Alert - PO</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">Inventory Item Incoming Reminder</field>
+          <field name="email_to">kko@isyedu.org</field>
+          <!-- <field name="email_cc">slinn@isyedu.org,osoe@isyedu.org</field> -->
+          <field name="reply_to">noreply@isyedu.org</field>
+          <!-- <field name="lang">${object.lang}</field> -->
+          <field name="model_id" ref="isy_ticketing.model_purchase_order"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear Kaung Kyaw Ko,</p>
+                <p>Inventory Item has been purchased so please record at inventory management and barcode accordingly.</p>
+                <p>Record number: <a t-attf-href="https://sas.isyedu.org/web#id={{object.id}}&amp;action=355&model=purchase.order&view_type=form&menu_id=234" ><t t-out="object.name"/></a></p>
+                <p>Sincerely,</p>
+                <p><t t-out="object.create_uid.name"/><br></p>
+
+                ]]>
+          </field>
+        </record>
+
+        <record id="inventory_item_assigned" model="mail.template">
+          <field name="name">Inventory Item - Personal Assigned</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">[{{object.name}}] Inventory Item assigned to {{object.assigned_person.name or object.assigned_student.name}}</field>
+          <field name="email_to">{{object.assigned_person.work_email or object.assigned_student.email}}</field>
+          <field name="email_cc">{{object.create_uid.email}}</field>
+          <field name="reply_to">noreply@isyedu.org</field>
+          <field name="model_id" ref="mt_isy.model_internal_stock_transfer"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear <t t-if="object.assigned_type=='employee'"><t t-out="object.assigned_person.name"/></t><t t-if="object.assigned_type=='student'"><t t-out="object.assigned_student.name"/></t>,</p>
+                <p>You have checked out the following items from the IT Department:</p>
+                <p><b>Newly Checked-Out Item(s):</b></p>
+                <ol>
+                  <t t-foreach='object.ist_details' t-as='item'>
+                    <li><t t-out='item.product_id.name'/> [<t t-out='item.serial_number'/>] </li>
+                  </t>
+                </ol>
+                <t t-if="ctx.get('products')">
+                  <p>After this checkout, the following items are currently assigned to you:</p>
+                  <p><b>All Assigned Item(s):</b></p>
+                  <ol>
+                    <t t-foreach="ctx.get('products')" t-as='item'>
+                      <li><t t-out='item.product_id.name'/> [<t t-out='item.serial_number'/>] </li>
+                    </t>
+                  </ol>
+                </t>
+                <p>If you have any questions or need assistance, please contact <i>TechSupport</i>.</p>
+                
+                <p>Sincerely,<br/>
+                <t t-out="object.create_uid.name"/><br></p>
+
+                ]]>
+          </field>
+        </record>
+
+
+        <record id="inventory_item_checkout" model="mail.template">
+          <field name="name">Inventory Item - Personal Checkout</field>
+          <field name="email_from">odooadmin@isyedu.org</field>
+          <field name="subject">[{{object.name}}] Inventory Item Returned from {{ctx.get('owner').name}}</field>
+          <field name="email_to">{{ctx.get('owner').email}}</field>
+          <field name="email_cc">{{object.create_uid.email}}</field>
+          <field name="reply_to">noreply@isyedu.org</field>
+          <field name="model_id" ref="mt_isy.model_internal_stock_transfer"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+            <![CDATA[              
+                <p>Dear <t t-out="ctx.get('owner').name"/>,</p>
+                <p>The following items have been successfully returned and checked back into our inventory:</p>
+                <p><b>Returned Item(s):</b></p>
+                <ol>
+                  <t t-foreach="ctx.get('checkout_items')" t-as='item'>
+                    <li><t t-out='item'/> </li>
+                  </t>
+                </ol>
+
+                <t t-if="ctx.get('products')">
+                  <p>The following items are still assigned to you:</p>
+                  <p><b>Currently Assigned Item(s):</b></p>
+                  <ol>
+                    <t t-foreach="ctx.get('products')" t-as='item'>
+                      <li><t t-out='item.product_id.name'/> [<t t-out='item.serial_number'/>] </li>
+                    </t>
+                  </ol>
+                </t>
+
+                <p>c <i>TechSupport</i>.</p>
+                
+                <p>Sincerely,<br/>
+                <t t-out="object.create_uid.name"/><br></p>
+
+                ]]>
+          </field>
+        </record>
+
+    </data>
+</odoo>

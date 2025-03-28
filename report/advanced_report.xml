@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_advanced_withlog">
+          <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+              <t t-foreach="docs" t-as="o">
+                <div class="page">
+                	<div class="oe_title">
+                      <h3>
+                          <span t-field="o.name" />
+                      </h3>
+                  </div>
+                  <!-- body -->
+                  <table class='table table-sm table-borderless'>
+                  	<tr>
+                  		<td width='20%'><strong>Employee : </strong></td>
+                  		<td width='30%'><span t-field="o.employee_id" /></td>
+                  		<td width='20%'><strong>To Approve : </strong></td>
+                  		<td width='30%'><span t-field="o.x_studio_to_approve" /></td>
+                  	</tr>
+
+                  	<tr>
+                  		<td><strong>Requested Amount : </strong></td>
+                  		<td><span t-field="o.total_amount_expense" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>	
+                  		<td><strong>Is Asset(?) : </strong></td>
+                  		<td>
+                  			<t t-if="o.is_asset==True">
+                  				<input type='checkbox' checked='checked' class='fa fa-check' />
+                  			</t>
+                  			<t t-else="">
+                  				<input type='checkbox' />
+                  			</t>
+                  		</td>
+                  	</tr>
+
+                  	<tr>
+                  		<td><strong>Currency : </strong></td>
+                  		<td><span t-field="o.currency_id" /></td>
+                  		<t t-if="o.adv_exp_type=='advance'">
+	                  		<td><strong>Type : </strong></td>
+                  			<td><span t-field="o.p_type" /></td>
+                  		</t>
+                  	</tr>
+
+                  	<tr>
+                  		<td><strong>Attachment : </strong></td>
+                  		<td><span t-field="o.x_studio_attachment_filename" /></td>
+                  		<td><strong>Requested User : </strong></td>
+                  		<td><span t-field="o.user_id" /></td>
+                  	</tr>
+
+                  	<tr>
+                  		<td>
+                  			<t t-if="o.adv_exp_type=='advance'">
+                  				<strong>Salary Advance : </strong>
+                  			</t>
+                  			<t t-else="">
+                  				<strong>Salary Reimbursement : </strong>
+                  			</t>
+                  		</td>
+                  		<td><t t-if="o.salary_advance==True">
+                  				<input type='checkbox' checked='checked' class='fa fa-check' />
+                  			</t>
+                  			<t t-else="">
+                  				<input type='checkbox' />
+                  			</t>
+                  		</td>
+                  		<t t-if="o.adv_exp_type=='advance'">
+	                  		<td><strong>Anticipated Account Code :</strong></td>
+	                  		<td><span t-field="o.x_studio_anticipated_account_code" /></td>
+	                  	</t>
+	                  	<t t-if="o.adv_exp_type=='expense'">
+	                  		<td><strong>Advanced Recipient : </strong></td>
+	                  		<td><span t-field="o.partner_id" /></td>
+	                  	</t>
+                  	</tr>
+
+                  	<tr>
+                  		<td><strong>Note : </strong></td>
+                  		<td><span t-field="o.x_studio_note" /></td>
+                  		<t t-if="o.adv_exp_type=='advance'">
+	                  		<td><strong>Advanced Recipient : </strong></td>
+	                  		<td><span t-field="o.partner_id" /></td>
+	                  	</t>
+                  	</tr>
+                  </table>
+
+									<br />
+
+									<table class="table table-sm o_main_table">
+                <thead>
+                    <tr>
+                        <th name="th_description">
+                        	<t t-if="o.adv_exp_type=='advance'">
+	                        	<strong>Account Code &amp; Description</strong>
+	                        </t>
+	                        <t t-else="">
+	                        	<strong>Anticipated Account Code</strong>
+	                        </t>
+                        </th>
+                        <th name="th_quantity" class="text-right"><strong>Quantity</strong></th>
+                        <th name="th_price_unit" class="text-right"><strong>Unit Price</strong></th>
+                        <th name="th_amount" class="text-right"><strong>Subtotal</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="o.advance_expense_line_ids" t-as="line">
+                        <tr>
+                          <td>
+                              <span t-field="line.product_id"/>
+                          </td>
+                          <td class="text-right">
+                              <span t-field="line.quantity"/>
+                          </td>
+                          <td class="text-right">
+                              <span t-field="line.unit_amount"/>
+                          </td>
+                          <td class="text-right">
+                              <span t-field="line.total_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                          </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+									<div class="row">
+										<div class="col-8">
+											<span t-field="o.reason_for_advance" />
+										</div>
+										<div class="col-2">
+										</div>
+									</div> 
+									<div class="row">
+										<div class="col-8">
+											<span t-field="o.comment" />
+										</div>
+										<div class="col-2">
+										</div>
+									</div> 
+
+
+								</div>
+								<p/>
+								<p/>
+								<br/>
+								<div class="oe_chatter" style="background-color:#f6f7fa;padding:5px;">
+									<div style="background-color:white;padding:10px 10px 0px 10px;">
+										<t t-set='date' t-value='False'/>
+										<t t-foreach="o.sudo().message_ids" t-as='log' style="page-break-inside:avoid;page-break-after:auto;">
+											<t t-if="date!=log.date.date()">
+												<div style="width: 100%; height: 12px; border-bottom: 1px solid #C9CCD2; text-align: center">
+												  <span style="font-size: 12px; background-color: white; padding: 0 10px;">
+												    <t t-esc='log.date.strftime("%B %d, %Y")'/> <!--Padding is optional-->
+												  </span>
+												</div>
+											</t>
+											<t t-set='date' t-value='log.date.date()'/>
+											<p/>
+											<!-- <div  style="display:flex;align-items:center">
+												<hr style='border-color:#C9CCD2;width:auto;'/>
+												<span t-esc='o.date' style='font-weight:bold;'> </span>
+												<hr style='border-color:#C9CCD2;width:auto;'/>
+											</div>
+											 -->
+											<div style='width:100%;background-color:#f6f7fa;font-size: 12px;font-weight:400;color:#444B5A;padding-top:5px;'> 
+												<span style="font-weight:500;" t-esc='log.author_id.name'/> - <span style="color:#80848F;" t-esc='log.date.strftime("%I:%M%p")'/>
+												<br/>
+												<t t-if='log.message_type!="email"'>
+													<t t-if='log.subtype_id.description'><span t-esc='log.subtype_id.description'/></t>
+													<t t-if='log.body'><span t-esc='log.body'/></t>
+													<ul>
+														<t t-foreach="log.sudo().tracking_value_ids" t-as='track'>
+															<t t-set='old_value' t-value="track.old_value_char or track.old_value_datetime or track.old_value_integer or ''" />
+															<t t-set='new_value' t-value="track.new_value_char or track.new_value_datetime or track.new_value_integer or ''" />
+															<li>
+																<div>
+																	<span><t t-esc='track.field_desc'/>:</span> &#160;&#160;&#160;
+																	<span><t t-esc='old_value'/></span>
+																	<span class='fa fa-long-arrow-right'></span>
+																	<span><t t-esc='new_value'/></span>
+																</div>
+															</li>
+														</t>
+													</ul>
+												</t>
+												<t t-else=''>
+													<span style='font-style:italic;'>Subject: <t t-esc="log.subject"/></span>
+													<p t-esc='log.body'>
+													</p>
+												</t>
+											</div>
+										</t>
+									</div>
+									<!-- <span t-field="o.message_ids" widget="mail_thread"/> -->
+								</div>
+              </t>
+            </t>
+          </t>
+        </template>
+
+    <record id="report_advanced_withlog_action" model="ir.actions.report">
+            <field name="name">Audit Report - PDF</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="binding_type">report</field>
+            <field name="binding_model_id" eval="ref('mt_isy.model_employee_advance_expense')" />
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mt_isy.report_advanced_withlog</field>
+            <field name="report_file">mt_isy.report_advanced_withlog</field>
+            <field name="print_report_name">"Audit Report - "+(object.name)</field>
+        </record>
+  </data>
+</odoo>

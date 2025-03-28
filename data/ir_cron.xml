@@ -1,0 +1,27 @@
+<odoo noupdate="0">
+    <record id="ir_cron_scheduler_scholarship_fund_noti" model="ir.cron">
+        <field name="name">Scholarship Fund Noti Scheduler</field>
+        <field eval="True" name="active" />
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="numbercall">-1</field>
+        <!-- <field name="nextcall" eval="((datetime(datetime.now().year+int(datetime.now().month/12),(datetime.now().month%12+1),1))-timedelta(days=1)).strftime('%Y-%m-%d 16:00:00')"/> -->
+        <field name="model_id" ref="model_account_move_line" />
+        <field name="state">code</field>
+        <field name="code">model._cron_sending_scholarship_fund_noti()</field>
+    </record>
+
+    <record id="ir_cron_payroll_process_request_update" model="ir.cron">
+        <field name="name">Payroll Process Request Update</field>
+        <field eval="True" name="active" />
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="numbercall">-1</field>
+        <!-- <field name="nextcall" eval="((datetime(datetime.now().year+int(datetime.now().month/12),(datetime.now().month%12+1),1))-timedelta(days=1)).strftime('%Y-%m-%d 17:25:00')"/> -->
+        <field name="model_id" ref="model_hr_payslip_process_request" />
+        <field name="state">code</field>
+        <field name="code">model.cron_process_approved()</field>
+    </record>
+</odoo>
