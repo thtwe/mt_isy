@@ -22,7 +22,7 @@
                 </t>
             </xpath>
         </template>
-                <template id="portal_isy_stock_report_teacher" name="Inventory Report" inherit_id="portal.portal_my_home" priority="40">
+            <template id="portal_isy_stock_report_teacher" name="Inventory Report" inherit_id="portal.portal_my_home" priority="10">
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
                 <t t-call="isy_ticketing.portal_docs_entry">
                     <t t-set="title">Odoo Tutorials</t>
