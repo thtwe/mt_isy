@@ -957,6 +957,7 @@
                             <field name='donation_clc'/>
                             <field name='donation_chinthe'/>
                             <field name='gala_usd'/>
+                            <field name='earthquake'/>
                         </group>
                         <group name="isy_savings" string="Savings">
                             <field name="savings_for_education"/>

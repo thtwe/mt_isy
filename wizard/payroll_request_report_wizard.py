@@ -32,6 +32,8 @@ CASH_ALLOCATION_TYPE = [
     ('donation_chinthe','Donation to Chinthe Fund'),
     ('savings_for_education','College Education Saving Program Deduction'),
     ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each'),
+    ('earthquake','Donations for Earthquake Relief')
+
 ]
 ADJ_TYPE = [('all','All'),('school_trip', 'School Trip'), ('tuition_fee', 'Tuition Fee'), ('other', 'Other')]
 
@@ -52,6 +54,7 @@ ALL_TYPE = [
     ('donation_chinthe','Donation to Chinthe Fund'),
     ('savings_for_education','College Education Saving Program Deduction'),
     ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each'),
+    ('earthquake','Donations for Earthquake Relief')
 ]
 class PayrollRequestReport(models.TransientModel):
     _name = "payroll.request.report"
@@ -147,7 +150,7 @@ class PayrollRequestReport(models.TransientModel):
             val_filter_allocation_type = str(
                 tuple(filter_allocation_type))[0:-2] + ")"
         else:
-            filter_allocation_type = ['local_bank_$','local_bank_mmk', 'local_bank_ks','cash_usd', '401_k', 'overseas_bank','donation_uws','donation_yas','donation_clc','donation_chinthe','savings_for_education','gala_usd']        
+            filter_allocation_type = ['local_bank_$','local_bank_mmk', 'local_bank_ks','cash_usd', '401_k', 'overseas_bank','donation_uws','donation_yas','donation_clc','donation_chinthe','savings_for_education','gala_usd', 'earthquake']        
             val_filter_allocation_type = str(tuple(filter_allocation_type))
         for lrl in last_record_lists:
             query = """

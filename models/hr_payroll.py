@@ -38,7 +38,8 @@ CASH_ALLOCATION_TYPE = [
     ('donation_clc','Donation to Care to the Least Center - CLC Family'),
     ('donation_chinthe','Donation to Chinthe Fund'),
     ('savings_for_education','College Education Saving Program Deduction'),
-    ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each')
+    ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each'),
+    ('earthquake','Donations for Earthquake Relief')
 ]
 
 
@@ -1710,6 +1711,7 @@ class HrPayslipProcessRequest(models.Model):
             obj_contract_gty = obj_contracts.get('gty')
             obj_contract_isya = obj_contracts.get('isya')
             for car in rec.cash_allocation_requests:
+                import pdb;pdb.set_trace()
                 if car.name == 'local_bank_$':
                     if employee_type == 'local':
                         obj_contract_gty.x_studio_local_bank = car.amount * -1
@@ -1742,7 +1744,13 @@ class HrPayslipProcessRequest(models.Model):
                 elif car.name == 'savings_for_education': # GTY
                     obj_contract_gty.savings_for_education = car.amount * -1
                     obj_contract_isya.savings_for_education = 0
-
+                elif car.name == "earthquake":
+                    if employee_type == 'local':
+                        obj_contract_gty.earthquake = car.amount * -1
+                        obj_contract_isya.earthquake = 0
+                    else:
+                        obj_contract_isya.earthquake = car.amount * -1
+                        obj_contract_gty.earthquake = 0
             # these donations are not used anymore.
             obj_contract_isya.donation_uws = 0
             obj_contract_isya.donation_clc = 0
@@ -1869,12 +1877,13 @@ class HrPayslipProcessRequest(models.Model):
                 obj_contract_gty = obj_contracts.get('gty')
                 obj_contract_isya = obj_contracts.get('isya')
                 functional_rate = self.env['res.currency'].search([('name','=','MMK')]).functional_rate
+                import pdb;pdb.set_trace()
                 monthly_salary_gty = obj_contract_gty.x_studio_monthly_salary - (obj_contract_gty.x_studio_income_tax/functional_rate)
                 #monthly_retirement_gty = obj_contract_gty.x_studio_local_monthly_retirement_1
                 monthly_retirement_gty = 0
                 monthly_retirement_isya = 0
                 for key, val in CASH_ALLOCATION_TYPE:
-                    if key in ('local_bank_$','petty_cash_$'):
+                    if key in ('earthquake', 'local_bank_$','petty_cash_$'):
                         if key == 'local_bank_$':
                             amount = obj_contract_gty.x_studio_local_bank * -1
                             continue
@@ -1882,6 +1891,8 @@ class HrPayslipProcessRequest(models.Model):
                             amount = obj_contract_gty.x_studio_petty_cash * -1
                         # elif key == 'overseas_bank':
                         #     amount = obj_contract.x_studio_overseas_bank  * -1
+                        elif key == 'earthquake':
+                            amount = obj_contract_gty.earthquake * -1
                         result = (0, 0, {
                             'name': key,
                             'amount': amount,
@@ -1895,7 +1906,9 @@ class HrPayslipProcessRequest(models.Model):
                 monthly_retirement_isya = obj_contract_isya.x_studio_expatriate_monthly_retirement
                 for key, val in CASH_ALLOCATION_TYPE:
                     # if key in ('gala_usd','donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
-                     if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
+                    # if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
+                    if key in ('earthquake', 'donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
+
                     #if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', '401_k', 'petty_cash_$'):
                         website_url = ''
                         if key == 'local_bank_$':
@@ -1929,6 +1942,9 @@ class HrPayslipProcessRequest(models.Model):
                         elif key == 'gala_usd':
                             # continue
                             amount = obj_contract_isya.gala_usd * -1
+                        elif key == 'earthquake':
+                            # continue
+                            amount = obj_contract_isya.earthquake * -1
                         
                         result = (0, 0, {
                             'name': key,
@@ -2086,6 +2102,7 @@ class HrContract(models.Model):
     donation_yas = fields.Float(string='Yangon Animal Shelter')
     donation_chinthe = fields.Float(string='Chinthe Fund')
     gala_usd = fields.Float(string="Amount in USD to pay for ISY Gala Ticket(s) - $50 Each")
+    earthquake = fields.Float(string="Donations for Earthquake Relief")
 
     company_id = fields.Many2one('res.company', compute='', store=True, readonly=False,
         default=lambda self: self.env.company, required=True)
