@@ -1989,7 +1989,7 @@ class HrPayslipCashAllocationRequests(models.Model):
             name = dict(rec._fields.get('name').selection).get(rec.name) or ''
             if 'donation' in rec.name:
                 # rec.name_url = '<p>Donation to <u><strong><a href="https://isyedu.org/support-isy/isy-partner-projects/" target="_blank">Chinthe Fund</a></strong></u></p>'
-                rec.name_url = '<p>Donation to <strong><a href="https://isyedu.org/support-isy/isy-partner-projects/" target="_blank"><u>Chinthe Fund</u></a></strong></p>'
+                rec.name_url = '<p>Donation to the <strong><a href="https://isyedu.org/support-isy/isy-partner-projects/" target="_blank"><u>Chinthe Fund</u></a></strong></p>'
             else:
                 rec.name_url = '<p>'+name+'</p>'
 
