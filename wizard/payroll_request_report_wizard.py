@@ -29,10 +29,10 @@ CASH_ALLOCATION_TYPE = [
     # ('donation_uws','Donation to United World Schools'),
     ('donation_yas','Donation to Yangon Animal Shelter'),
     ('donation_clc','Donation to Care to the Least Center - CLC Family'),
-    ('donation_chinthe','Donation to Chinthe Fund'),
+    ('donation_chinthe','Donation to the Chinthe Fund'),
     ('savings_for_education','College Education Saving Program Deduction'),
     ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each'),
-    ('earthquake','Donations for Earthquake Relief')
+    ('earthquake','Donation for Earthquake Relief')
 
 ]
 ADJ_TYPE = [('all','All'),('school_trip', 'School Trip'), ('tuition_fee', 'Tuition Fee'), ('other', 'Other')]
@@ -51,10 +51,10 @@ ALL_TYPE = [
     # ('donation_uws','Donation to United World Schools'),
     ('donation_yas','Donation to Yangon Animal Shelter'),
     ('donation_clc','Donation to Care to the Least Center - CLC Family'),
-    ('donation_chinthe','Donation to Chinthe Fund'),
+    ('donation_chinthe','Donation to the Chinthe Fund'),
     ('savings_for_education','College Education Saving Program Deduction'),
     ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each'),
-    ('earthquake','Donations for Earthquake Relief')
+    ('earthquake','Donation for Earthquake Relief')
 ]
 class PayrollRequestReport(models.TransientModel):
     _name = "payroll.request.report"

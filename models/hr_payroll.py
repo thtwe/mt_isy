@@ -36,10 +36,10 @@ CASH_ALLOCATION_TYPE = [
     ('donation_uws','Donation to United World Schools'),
     ('donation_yas','Donation to Yangon Animal Shelter'),
     ('donation_clc','Donation to Care to the Least Center - CLC Family'),
-    ('donation_chinthe','Donation to Chinthe Fund'),
+    ('donation_chinthe','Donation to the Chinthe Fund'),
     ('savings_for_education','College Education Saving Program Deduction'),
     ('gala_usd','Amount in USD to pay for ISY Gala Ticket(s) - $50 Each'),
-    ('earthquake','Donations for Earthquake Relief')
+    ('earthquake','Donation for Earthquake Relief')
 ]
 
 
@@ -2100,7 +2100,7 @@ class HrContract(models.Model):
     donation_yas = fields.Float(string='Yangon Animal Shelter')
     donation_chinthe = fields.Float(string='Chinthe Fund')
     gala_usd = fields.Float(string="Amount in USD to pay for ISY Gala Ticket(s) - $50 Each")
-    earthquake = fields.Float(string="Donations for Earthquake Relief")
+    earthquake = fields.Float(string="Donation for Earthquake Relief")
 
     company_id = fields.Many2one('res.company', compute='', store=True, readonly=False,
         default=lambda self: self.env.company, required=True)

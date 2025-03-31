@@ -720,7 +720,7 @@
                         <notebook>
                             <page string="Cash Allocation Requests">
                                 <p invisible="is_expat == False"><b>
-                                    Cash Allocations and Donation to Chinthe Fund - Service Learning Organizations: <u><a target="_blank" href="https://isyedu.org/support-isy/isy-partner-projects/">ISY Partner Projects</a></u>
+                                    Cash Allocations and Donation to the Chinthe Fund - Service Learning Organizations: <u><a target="_blank" href="https://isyedu.org/support-isy/isy-partner-projects/">ISY Partner Projects</a></u>
                                 </b></p>
                                 <field name="cash_allocation_requests" >
                                     <tree editable="bottom" create="false">
