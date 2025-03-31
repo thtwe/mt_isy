@@ -1711,7 +1711,6 @@ class HrPayslipProcessRequest(models.Model):
             obj_contract_gty = obj_contracts.get('gty')
             obj_contract_isya = obj_contracts.get('isya')
             for car in rec.cash_allocation_requests:
-                import pdb;pdb.set_trace()
                 if car.name == 'local_bank_$':
                     if employee_type == 'local':
                         obj_contract_gty.x_studio_local_bank = car.amount * -1
@@ -1877,7 +1876,6 @@ class HrPayslipProcessRequest(models.Model):
                 obj_contract_gty = obj_contracts.get('gty')
                 obj_contract_isya = obj_contracts.get('isya')
                 functional_rate = self.env['res.currency'].search([('name','=','MMK')]).functional_rate
-                import pdb;pdb.set_trace()
                 monthly_salary_gty = obj_contract_gty.x_studio_monthly_salary - (obj_contract_gty.x_studio_income_tax/functional_rate)
                 #monthly_retirement_gty = obj_contract_gty.x_studio_local_monthly_retirement_1
                 monthly_retirement_gty = 0
