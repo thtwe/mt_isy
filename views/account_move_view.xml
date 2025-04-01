@@ -101,7 +101,7 @@
                   <field name='asset_model_id' column_invisible="parent.move_type not in ('in_invoice', 'in_refund', 'in_receipt')"/>
                 </xpath>
 
-                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]" position="after">
+                <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]" position="after">
                   <form>
                     <field name="display_type" invisible="1"/>
 
@@ -119,22 +119,14 @@
                         <field name="discount" invisible='1'/>
                         <field name="currency_id" invisible="1"/>
                       </group>
-                      <!-- <group name="studio_group_d96c8b">
-                        <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" widget="many2many_tags" options="{'color_field': 'color'}"/>
-                        <field domain="[('company_id', '=', parent.company_id)]" name="account_id" groups="account.group_account_user"/>
-                        <field name="invoice_line_tax_ids" context="{'move_type':parent.type}" domain="[('type_tax_use',!=,'none'),('company_id', '=', parent.company_id)]" widget="many2many_tags" options="{'no_create': True}"/>
-
-                        <field domain="[('company_id', '=', parent.company_id)]" name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
-                        <field name="analytic_tag_ids" widget="many2many_tags" groups="analytic.group_analytic_tags"/>
-                        <field name="company_id" groups="base.group_multi_company" readonly="1"/>
-                      </group> -->
+    
                     </group>
                     <label for="name" string="Description" invisible="display_type != False"/>
                     <label for="name" string="Section" invisible="display_type != 'line_section'"/>
                     <label for="name" string="Note" invisible="display_type != 'line_note'"/>
                     <field name="name"/>
                   </form>
-                </xpath>
+                </xpath> -->
                 <xpath expr="//field[@name='user_id']" position="attributes">
                   <attribute name="readonly">state not in ["draft"]</attribute>
                   <attribute name="invisible">1</attribute>
@@ -143,23 +135,6 @@
                   
                   <attribute name="invisible">1</attribute>
                 </xpath>
-                <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='analytic_account_id']" position="attributes">
-                  
-                  <attribute name="invisible">1</attribute>
-                </xpath> -->
-                <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='analytic_tag_ids']" position="attributes">
-                  
-                  <attribute name="invisible">1</attribute>
-                </xpath> -->
-                <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='analytic_account_id']" position="attributes">
-                  
-                  <attribute name="invisible">1</attribute>
-
-                </xpath> -->
-                <!-- <xpath expr="//field[@name='amount_tax'][not(ancestor::field)]" position="attributes">
-                  
-                  <attribute name="invisible">1</attribute>
-                </xpath> -->
 
                 <label for="journal_id" position='before'>
                   <field name="journal_id" options="{'no_create': True}" readonly="posted_before == True"/>
