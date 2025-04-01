@@ -2,7 +2,7 @@
 <odoo>
     <data>
 
-        <record id="view_move_form_inherit1" model="ir.ui.view">
+    <record id="view_move_form_inherit1" model="ir.ui.view">
             <field name="name">view_move_form_inherit1</field>
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form"/>
@@ -20,11 +20,7 @@
                 </field>
                 <field name='date' position='replace'>
                 </field>
-                <div class="d-flex" position='replace'>
-                </div>
-                <!-- <label for="invoice_payment_term_id" position='replace'>
-                </label> -->
-                <xpath expr="//field[@name='partner_id']" position="after">
+                <xpath expr="//field[@name='partner_shipping_id']" position="before">
                   <field name="x_studio_invoice_reference" string="Invoice Reference" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"/>
                   <field name="x_studio_father_name" string="Father Name" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"/>
                   <field name="x_studio_guardian_1_email" string="Guardian 1 Email" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"/>
@@ -33,7 +29,7 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
                   <field name="x_studio_grade" string="Grade" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"/>
-                  <field name="x_studio_company" string="Company (OLD)" invisible='1'/>
+                  <!-- <field name="x_studio_company" string="Company (OLD)" column_invisible="True"/> -->
                   <field name="x_company_info" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"/>
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="attributes">
@@ -44,15 +40,6 @@
                   
                   <attribute name="invisible">1</attribute>
                 </xpath>
-                
-                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='name']" position="attributes">
-                  
-                </xpath>
-
-
-                <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='analytic_account_id']" position="attributes">
-                  <attribute name="invisible">1</attribute>
-                </xpath> -->
                 <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
                   <page name="studio_page_nB4r2" string="Bank Info" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')">
                     <group name="studio_group_nB4r2">
@@ -81,7 +68,7 @@
                 <xpath expr="//button[@name='action_register_payment']" position="replace">
                   <button name="action_register_payment" id="account_invoice_payment_btn" type="object" class="oe_highlight" invisible="x_studio_field_hrbLx == 2 or state != 'posted' or payment_state not in ('not_paid', 'partial') or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')" string="Register Payment" groups="account.group_cashier" />
 
-                  <button name="action_register_payment" id="account_invoice_payment_btn" type="object" class="oe_highlight" invisible="x_studio_field_hrbLx == 2 or state != 'posted' or payment_state not in ('not_paid', 'partial') or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')" string="Register Payment" groups="account.group_business_manager,__export__.res_groups_177_b9c18b80,account.group_cashier"/>
+                  <button name="action_register_payment" id="account_invoice_payment_btn" type="object" class="oe_highlight" invisible="state != 'posted' or payment_state not in ('not_paid', 'partial') or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')" string="Register Payment" groups="account.group_business_manager,__export__.res_groups_177_b9c18b80,account.group_cashier"/>
                 
                 </xpath>
 
@@ -119,7 +106,6 @@
                         <field name="discount" invisible='1'/>
                         <field name="currency_id" invisible="1"/>
                       </group>
-    
                     </group>
                     <label for="name" string="Description" invisible="display_type != False"/>
                     <label for="name" string="Section" invisible="display_type != 'line_section'"/>
@@ -135,7 +121,6 @@
                   
                   <attribute name="invisible">1</attribute>
                 </xpath>
-
                 <label for="journal_id" position='before'>
                   <field name="journal_id" options="{'no_create': True}" readonly="posted_before == True"/>
                   <field name="currency_id" readonly="state != 'draft'"/>
@@ -172,7 +157,6 @@
                 </field>
             </field>
         </record>
-
 
         <record id="view_move_form_inherit_sale_inherit1" model="ir.ui.view">
             <field name="name">view_move_form_inherit_sale_inherit1</field>
