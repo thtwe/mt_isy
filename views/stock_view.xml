@@ -119,7 +119,7 @@
                                         <button string="Details" type="object" name="show_stock_report_by_serial_number" class="oe_highlight"/>
                                         <field name="product_id" readonly="1" force_save="1"/>
                                         <field name="qty" readonly="disable_qty == True"/>
-                                        <field name="disable_qty" invisible="1"/>
+                                        <field name="disable_qty" column_invisible="True"/>
                                         <field name="assigned_department"/>
                                         <field name="date_schedule_return"/>
                                         <field name="purchase_id"/>
@@ -226,7 +226,7 @@
                 <tree create="false">
                     <field name="serial_number"/>
                     <field name="product_category"/>
-                    <field name="name" invisible="1"/>
+                    <field name="name" column_invisible="True"/>
                     <field name="product_id"/>
                     <field name="location_id"/>
                     <field name="inventory_category"/>

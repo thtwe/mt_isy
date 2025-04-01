@@ -53,8 +53,8 @@
                 <tree string="Budget" create="false" decoration-danger="remaining &lt; 0" default_order="name">
                     <field name="name"/>
                     <field name="user_id" groups="base.group_no_one"/>
-                    <field name="budget_id" column-invisible="True"/>
-                    <field name="group_id" column-invisible="True"/>
+                    <field name="budget_id" column_invisible="True"/>
+                    <field name="group_id" column_invisible="True"/>
                     <field name="budget" sum='Total'/>
                     <field name="actual" sum='Total'/>
                     <field name="remaining" sum='Total'/>
@@ -93,8 +93,8 @@
                 <tree string="Budget" create="false" decoration-danger="remaining &#60; 0" default_order="name">
                     <field name="name"/>
                     <field name="user_id" groups="base.group_no_one"/>
-                    <field name="budget_id" column-invisible="True"/>
-                    <field name="group_id"  column-invisible="True"/>
+                    <field name="budget_id" column_invisible="True"/>
+                    <field name="group_id"  column_invisible="True"/>
                     <field name="budget_100" sum='Total'/>
                     <field name="budget" sum='Total'/>
                     <field name="actual" sum='Total'/>
@@ -136,7 +136,7 @@
             <field name="model">budget.display.ccm.result.capex</field>
             <field name="arch" type="xml">
                 <tree string="Budget" create="false" decoration-danger="remaining &#60; 0" default_order="sequence">
-                    <field name='sequence' column-invisible="True"/>
+                    <field name='sequence' column_invisible="True"/>
                     <field name="name"/>
                     <field name="budget_id" groups="base.group_no_one"/>
                     <field name="budget" sum='Total'/>
@@ -177,7 +177,7 @@
             <field name="model">budget.display.consolidated.result.capex</field>
             <field name="arch" type="xml">
                 <tree string="Budget" create="false" decoration-danger="remaining &#60; 0" default_order="sequence">
-                    <field name='sequence' column-invisible="True"/>
+                    <field name='sequence' column_invisible="True"/>
                     <field name="name"/>
                     <field name="budget_id" groups="base.group_no_one"/>
                     <field name="budget_100" sum='Total'/>
@@ -221,9 +221,9 @@
                     <page name="advance" string="Advance Expense Lines">
                         <field name="advance_expense_line_ids" context="{'adv_exp_type':adv_exp_type}" readonly="state not in ['draft']">
                             <tree editable="bottom">
-                                <field name="adv_exp_type"/>
+                                <field name="adv_exp_type" column_invisible="True"/>
                                 <field name="product_id" options="{'no_create':True,'no_open':True}" readonly="adv_exp_type == 'advance'"/>
-                                <field name="description"/>
+                                <field name="description" column_invisible="True"/>
                                 <field name="company_currency_id" groups="studio_customization.no_one_52f94e0e-8622-497d-b0f2-d9c5ac7d0194"/>
                                 <field name="amount_difference" widget="monetary" options="{'currency_field':'company_currency_id'}"  groups="isy_custom.group_order_confirmation,isy_custom.group_create_bill,purchase.group_purchase_manager"/>
                                 <field name="unit_amount" required="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
@@ -657,7 +657,7 @@
                     <field name="requested_date"/>
                     <field name="approval_person"/>
                     <field name="monthly_salary"/>
-                    <field name="is_expat" column-invisible="True"/>
+                    <field name="is_expat" column_invisible="True"/>
                     <field name="retirement_salary" />
                     <field name="total_salary"/>
                     <field name="state"/>
@@ -724,13 +724,13 @@
                                 </b></p>
                                 <field name="cash_allocation_requests" >
                                     <tree editable="bottom" create="false">
-                                        <field name="name" readonly="1" force_save="1" column-invisible="True" />
+                                        <field name="name" readonly="1" force_save="1" column_invisible="True" />
                                         <field name="name_url" widget='html' width="30%"/>
                                         <field name="amount" width="10%" readonly="parent.state != 'draft'"/>
                                         <field name="note" width="15%"/>
-                                        <field name="attachmet_1_name" column-invisible="True" />
+                                        <field name="attachmet_1_name" column_invisible="True" />
                                         <field name="attachment_1" widget="binary" filename="attachmet_1_name" width="10%"/>
-                                        <field name="attachmet_2_name" column-invisible="True" />
+                                        <field name="attachmet_2_name" column_invisible="True" />
                                         <field name="attachment_2" widget="binary" filename="attachmet_2_name" width="10%"/>
                                     </tree>
                                     <form>
@@ -756,9 +756,9 @@
                                         <field name="employee_id"/>
                                         <field name="deduction_type"/>
                                         <field name="amount"/>
-                                        <field name="attachmet_1_name" column-invisible="True"/>
+                                        <field name="attachmet_1_name" column_invisible="True"/>
                                         <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
-                                        <field name="attachmet_2_name" column-invisible="True"/>
+                                        <field name="attachmet_2_name" column_invisible="True"/>
                                         <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
                                     </tree>
                                 </field>
@@ -781,9 +781,9 @@
                                         <field name="special_instruction"/>
                                         <field name="other"/>
                                         <field name="notes"/>
-                                        <field name="attachmet_1_name" column-invisible="True"/>
+                                        <field name="attachmet_1_name" column_invisible="True"/>
                                         <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
-                                        <field name="attachmet_2_name" column-invisible="True"/>
+                                        <field name="attachmet_2_name" column_invisible="True"/>
                                         <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
                                     </tree>
                                     <form>
@@ -877,9 +877,9 @@
                     <field name="other"/>
                     <field name="notes"/>
                     <field name="time_of_entry"/>
-                    <field name="attachmet_1_name" column-invisible="True"/>
+                    <field name="attachmet_1_name" column_invisible="True"/>
                     <field name="attachment_1" widget="binary" filename="attachmet_1_name"/>
-                    <field name="attachmet_2_name" column-invisible="True"/>
+                    <field name="attachmet_2_name" column_invisible="True"/>
                     <field name="attachment_2" widget="binary" filename="attachmet_2_name"/>
                 </tree>
             </field>
