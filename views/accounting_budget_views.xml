@@ -16,9 +16,9 @@
         <field name="arch" type="xml">
             <tree string="Budget Tree" decoration-danger="state==1" decoration-info="state==3">
                 <field name="name"/>
-                <field name="account_id" invisible="1"/>
-                <field name="start_date" invisible="1"/>
-                <field name="end_date" invisible="1"/>
+                <field name="account_id" column-invisible="True"/>
+                <field name="start_date" column-invisible="True"/>
+                <field name="end_date" column-invisible="True"/>
                 <!-- <field name="category_id"/> -->
                 <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/> -->
                 <field name="last_2_year_planned_amount_100_neg" sum="Total of last 2 years planned amount 100"/>
@@ -33,7 +33,7 @@
                 <!-- <field name="practical_amount" sum="Total of current year practical amount"/> -->
 
                 <field name="last_year_variance_amount" string="Variance (E-C)" sum="Total"/>
-                <field name="state" invisible="1"/>
+                <field name="state" column-invisible="True"/>
             </tree>
         </field>
     </record>
@@ -101,7 +101,7 @@
                 <field name="practical_amount" sum="Total of current year practical amount" string="Actual Amount"/>
 
                 <field name="last_year_variance_amount" string="Variance" sum="Total"/>
-                <field name="state" invisible="1"/>
+                <field name="state" column-invisible="True"/>
 
             </tree>
         </field>
@@ -143,9 +143,9 @@
         <field name="arch" type="xml">
             <tree string="Budget Tree" decoration-danger="state==1" decoration-info="state==3">
               <field name="name"/>
-                <field name="account_id" invisible="1"/>
-                <field name="start_date" invisible="1"/>
-                <field name="end_date" invisible="1"/>
+                <field name="account_id" column-invisible="True"/>
+                <field name="start_date" column-invisible="True"/>
+                <field name="end_date" column-invisible="True"/>
                 <!-- <field name="category_id"/> -->
                 <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/> -->
                 <field name="last_2_year_planned_amount_100_neg" sum="Total of last 2 years planned amount 100"/>
@@ -160,7 +160,7 @@
                 <!-- <field name="practical_amount" sum="Total of current year practical amount"/> -->
 
                 <field name="last_year_variance_amount" string="Variance (E-C)" sum="Total"/>
-                <field name="state" invisible="1"/>
+                <field name="state" column-invisible="True"/>
 
             </tree>
         </field>
@@ -205,7 +205,7 @@
             <tree string="Payroll Budget Tree">
                 <field name="name"/>
                 <field name="base_budget_amount" sum="Total"/>
-                <field name="mt_new_feature" invisible="1"/>
+                <field name="mt_new_feature" column-invisible="True"/>
                 <field name="retirement_budget_amount" invisible="mt_new_feature == True" sum="Total"/>
                 <field name="retirement_budget_amount_mt_new_feature" invisible="mt_new_feature == False" sum="Total"/>
                 <field name="provident_fund_budget_amount" sum="Total"/>
@@ -287,11 +287,11 @@
                                     <field name="next_year_provident_fund" string="21-22 Provident Fund (M=I*C)" sum="Total"/>
                                     <!-- MT-->
                                     <field name="next_year_allowance" string="21-22 Allowance (N)" sum="Total" force_save="True" readonly="1" />
-                                    <field name="gratuity_budget_line_percent" string="Gratuity Budget Line %" invisible="1"/>
+                                    <field name="gratuity_budget_line_percent" string="Gratuity Budget Line %" column-invisible="True"/>
                                     <field name="next_year_gratuity_m" string="21-22 Gratuity (O=(N+K)*(Graduity Budget Percent/100))" sum="Total" force_save="True" readonly="1" />
                                     <field name="next_year_tax_amount" string="21-22 Tax (P)" sum="Total" force_save="True" readonly="1" />
                                     <field name="next_year_net_income" string="21-22 Net Income (Q=(I+N+O)-P)" sum="Total" force_save="True" readonly="1" />
-                                    <field name="next_year_net_income_provident_fund" string="21-22 Net Income Provident Fund (R=M+Q)" sum="Total" invisible="1" force_save="True" readonly="1" />
+                                    <field name="next_year_net_income_provident_fund" string="21-22 Net Income Provident Fund (R=M+Q)" sum="Total" column-invisible="True" force_save="True" readonly="1" />
                                     <!-- MT DONE-->
                                     <!-- KMS Update -->
                                     <field name="current_year_net_budget" string="20 - 21 Net Budget (Y=F+20-21 Gratuity+Z)" sum="Total" readonly="1" />
@@ -644,9 +644,9 @@
         <field name="arch" type="xml">
             <tree string="Capital Budget Tree">
                 <field name="name" string="Budget"/>
-                <field name="last_2_year_planned_amount" invisible="1" string="19-20 Budget (A)" sum="Total"/>
-                <field name="last_year_planned_amount" invisible="1" string="20-21 Budget (B)" sum="Total"/>
-                <field name="planned_amount" invisible="1" string="21-22 Budget (C)" sum="Total"/>
+                <field name="last_2_year_planned_amount" column-invisible="True" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount" column-invisible="True" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount" column-invisible="True" string="21-22 Budget (C)" sum="Total"/>
                 <field name="last_2_year_planned_amount_neg" string="19-20 Budget (A)" sum="Total"/>
                 <field name="last_year_planned_amount_neg" string="20-21 Budget (B)" sum="Total"/>
                 <field name="planned_amount_neg" string="21-22 Budget (C)" sum="Total"/>
@@ -771,9 +771,9 @@
         <field name="arch" type="xml">
             <tree string="Capital Budget Tree">
                 <field name="name" string="Budget"/>
-                <field name="last_2_year_planned_amount" invisible="1" string="19-20 Budget (A)" sum="Total"/>
-                <field name="last_year_planned_amount" invisible="1" string="20-21 Budget (B)" sum="Total"/>
-                <field name="planned_amount" invisible="1" string="21-22 Budget (C)" sum="Total"/>
+                <field name="last_2_year_planned_amount" column-invisible="True" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount" column-invisible="True" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount" column-invisible="True" string="21-22 Budget (C)" sum="Total"/>
                 <field name="last_2_year_planned_amount_neg" string="19-20 Budget (A)" sum="Total"/>
                 <field name="last_year_planned_amount_neg" string="20-21 Budget (B)" sum="Total"/>
                 <field name="planned_amount_neg" string="21-22 Budget (C)" sum="Total"/>
@@ -820,9 +820,9 @@
         <field name="arch" type="xml">
             <tree string="Capital Budget Tree">
                 <field name="name" string="Budget"/>
-                <field name="last_2_year_planned_amount" invisible="1" string="19-20 Budget (A)" sum="Total"/>
-                <field name="last_year_planned_amount" invisible="1" string="20-21 Budget (B)" sum="Total"/>
-                <field name="planned_amount" invisible="1" string="21-22 Budget (C)" sum="Total"/>
+                <field name="last_2_year_planned_amount" column-invisible="True" string="19-20 Budget (A)" sum="Total"/>
+                <field name="last_year_planned_amount" column-invisible="True" string="20-21 Budget (B)" sum="Total"/>
+                <field name="planned_amount" column-invisible="True" string="21-22 Budget (C)" sum="Total"/>
                 <field name="last_2_year_planned_amount_neg" string="19-20 Budget (A)" sum="Total"/>
                 <field name="last_year_planned_amount_neg" string="20-21 Budget (B)" sum="Total"/>
                 <field name="planned_amount_neg" string="21-22 Budget (C)" sum="Total"/>
