@@ -132,10 +132,10 @@
                     
                   </xpath>
                   <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='date_planned']" position="after">
-                    <field name='company_currency_id' invisible='1'/>
+                    <field name='company_currency_id' column_invisible="True"/>
                     <field name="amount_difference" widget="monetary" options="{'currency_field':'company_currency_id'}" groups="isy_custom.group_order_confirmation,isy_custom.group_create_bill,purchase.group_purchase_manager"/>
-                    <field name="id"  invisible="1"/>
-                    <field name="create_uid"  invisible="1"/>
+                    <field name="id"  column_invisible="True"/>
+                    <field name="create_uid"  column_invisible="True"/>
                   </xpath>
                   <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='order_line']/tree[1]/field[@name='company_id']" position="attributes">
                     
