@@ -552,11 +552,12 @@
             <field name="arch" type="xml">
                 <form string="Payslip Approval Form">
                     <header>
-                        <button string="RequestForApproval" type="object" class="oe_highlight " name="request_for_first_approval" groups="mt_isy.group_isy_hrpayslip_approval_checker" invisible="state != 'draft'"/>
+                        <button string="Request for Check" type="object" class="oe_highlight " name="request_for_check" groups="mt_isy.group_isy_hrpayslip_approval_checker" invisible="state != 'draft'"/>
+                        <button string="Request for Approval" type="object" class="oe_highlight " name="request_for_first_approval" groups="mt_isy.group_isy_hrpayslip_approval_checker" invisible="state != 'waitingforcheck'"/>
                         <button string="Approve" type="object" class="oe_highlight " name="request_for_second_approval" invisible="state != 'waitingforfirstapproval'"/>
                         <button string="Approve" type="object" class="oe_highlight " name="second_approved" invisible="state != 'waitingforsecondapproval'"/>
                         <button string="Cancel" type="object" name="cancel_approve" class="oe_highlight" invisible="state in ('done','cancelled')"/>
-                        <field name="state" widget="statusbar" statusbar_visible="draft,waitingforfirstapproval,done,cancelled"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,waitingforcheck,waitingforfirstapproval,waitingforsecondapproval,done,cancelled"/>
                     </header>
                     <sheet>
                         <h1>

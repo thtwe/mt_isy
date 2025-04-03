@@ -1167,7 +1167,7 @@ class HrPayslipApproval(models.Model):
         string="Total", compute="_compute_all_total", readonly=True)
     all_total_tmp = fields.Float(
         string="Temp", compute="_compute_all_total", readonly=True)
-    state = fields.Selection([('draft','Draft'), ('waitingforfirstapproval','WaitingForApproval'),('waitingforsecondapproval','WaitingForSecondApproval'),('done','Done'),('cancelled','Cancelled')], string="State", default='draft',track_visibility='onchange')
+    state = fields.Selection([('draft','Draft'), ('waitingforcheck', 'Waiting for Check'), ('waitingforfirstapproval','Waiting for Approval'),('waitingforsecondapproval','Waiting for Second Approval'),('done','Done'),('cancelled','Cancelled')], string="State", default='draft',track_visibility='onchange')
     amount_for_expat = fields.Float(
         string="Total Amount for Expat(40%)", compute="_compute_all_total", readonly=True)
     amount_for_expat_60 = fields.Float(
@@ -1242,6 +1242,9 @@ class HrPayslipApproval(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('isy.hr.payslip.approval') or 'New'
         result = super(HrPayslipApproval, self).create(vals)
         return result
+
+    def request_for_check(self):
+        self.state = 'waitingforcheck'
 
     def cancel_approve(self):
         self.state= 'cancelled'
