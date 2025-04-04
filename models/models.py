@@ -37,12 +37,11 @@ class HolidaysRequest(models.Model):
                 # Step 2: Calculate the Taken Leave from the hr.leave model
                 leave_records = self.env['hr.leave'].search([
                     ('employee_id', '=', rec.employee_id.id),
-                    ('holiday_status_id', '=', rec.holiday_status_id.id),
+                    ('holiday_status_id', '=', holiday_status_id.id),
                     ('state', '=', 'validate')  # Only consider validated leaves
                 ])
 
                 total_taken = sum(leave.number_of_days for leave in leave_records)
-
                 # Calculate remaining balance: Allocated - Taken
                 rec.current_personal_balance = total_allocated - total_taken
             else:
@@ -128,6 +127,8 @@ class HolidaysRequest(models.Model):
         #     values['leave_balance'] = obj_employee.unpaid_accumulated_leave
         # else:
         #     values['leave_balance'] = obj_leave_type.virtual_remaining_leaves
+        if not values.get('name'):
+            raise ValidationError(_("Please enter the reason for request."))
         holiday = super(HolidaysRequest, self.with_context(mail_create_nolog=True, mail_create_nosubscribe=True)).create(values)
         return holiday
 
