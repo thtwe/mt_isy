@@ -22,11 +22,19 @@
                 </t>
             </xpath>
         </template>
-            <template id="portal_isy_stock_report_teacher" name="Inventory Report" inherit_id="portal.portal_my_home" priority="10">
+        <template id="portal_odoo_tutorials" name="Odoo Turorials" inherit_id="portal.portal_my_home" priority="10">
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
                 <t t-call="isy_ticketing.portal_docs_entry">
                     <t t-set="title">Odoo Tutorials</t>
                     <t t-set="url" t-value="'/my/odoo-tutorials'"/>
+                </t>
+            </xpath>
+        </template>
+        <template id="portal_odoo_facility_tutorials" name="Housing Facility Request Tutorial" inherit_id="portal.portal_my_home" priority="10">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-call="isy_ticketing.portal_docs_entry">
+                    <t t-set="title">Housing Facility Request Tutorial</t>
+                    <t t-set="url" t-value="'/my/housing-facility-request-tutorials'"/>
                 </t>
             </xpath>
         </template>
