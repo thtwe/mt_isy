@@ -1884,7 +1884,8 @@ class HrPayslipProcessRequest(models.Model):
                 monthly_retirement_gty = 0
                 monthly_retirement_isya = 0
                 for key, val in CASH_ALLOCATION_TYPE:
-                    if key in ('earthquake', 'local_bank_$','petty_cash_$'):
+                    if key in ('local_bank_$','petty_cash_$'):
+                    # if key in ('earthquake', 'local_bank_$','petty_cash_$'):
                         if key == 'local_bank_$':
                             amount = obj_contract_gty.x_studio_local_bank * -1
                             continue
