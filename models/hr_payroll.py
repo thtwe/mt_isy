@@ -1907,8 +1907,8 @@ class HrPayslipProcessRequest(models.Model):
                 monthly_retirement_isya = obj_contract_isya.x_studio_expatriate_monthly_retirement
                 for key, val in CASH_ALLOCATION_TYPE:
                     # if key in ('gala_usd','donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
-                    # if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
-                    if key in ('earthquake', 'donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
+                    if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
+                    # if key in ('earthquake', 'donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
 
                     #if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', '401_k', 'petty_cash_$'):
                         website_url = ''
