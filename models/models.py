@@ -164,6 +164,8 @@ class HolidaysRequest(models.Model):
                     continue
             
             # Now validate the remaining leave balance for the employee
+            if self.state == 'validate':
+                break
             if holiday.employee_id:
                 remaining_leaves = remaining_leave_map.get(holiday.employee_id.id, 0)
                 if remaining_leaves < self.number_of_days:
