@@ -310,6 +310,22 @@
                         </div>
                     </div>
                     <label for="number_of_days" string="Duration" invisible="request_unit_half == True and leave_type_request_unit != 'hour'"/>
+                    <div name="duration_display" invisible="request_unit_half == True and leave_type_request_unit != 'hour'">
+                        <div class="o_row">
+                            <div groups="!hr_holidays.group_hr_holidays_manager" invisible="request_unit_half == True or request_unit_hours == True" class="o_row">
+                                <field name="number_of_days_display" nolabel="1" readonly="1" class="oe_inline"/>
+                                <span>Days</span>
+                            </div>
+                            <div groups="hr_holidays.group_hr_holidays_manager" invisible="request_unit_half == True or request_unit_hours == True">
+                                <field name="number_of_days" nolabel="1" readonly="1" class="oe_inline"/>
+                                <span class="ml8">Days</span>
+                            </div>
+                            <div invisible="leave_type_request_unit != 'hour'" class="o_row">
+                                <field name="number_of_hours_text" nolabel="1" class="oe_inline"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <label for="number_of_days" string="Duration" invisible="request_unit_half == True and leave_type_request_unit != 'hour'"/>
                     <div name="duration_display">
                         <div class="o_row">
                             <div groups="!hr_holidays.group_hr_holidays_manager" invisible="request_unit_half == True or request_unit_hours == True" class="o_row">
@@ -324,7 +340,7 @@
                                 <field name="number_of_hours_text" nolabel="1" class="oe_inline"/>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </label>
 
                 
