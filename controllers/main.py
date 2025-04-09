@@ -39,7 +39,7 @@ class HrPayroll1(HrPayroll):
         for payslip in payslips:
             report = request.env.ref('mt_isy.report_payslip_adjustment_details', False)
             
-            report = report.with_context(lang=payslip.employee_id.sudo().address_home_id.lang)
+            report = report.with_context(lang=payslip.employee_id.sudo().address_id.lang)
             pdf_content, _ = report.sudo()._render_qweb_pdf(payslip.id, data={'company_id': payslip.company_id})
             reader = PdfFileReader(io.BytesIO(pdf_content), strict=False, overwriteWarnings=False)
 
