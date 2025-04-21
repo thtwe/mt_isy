@@ -1,9 +1,9 @@
 <odoo>
     <data>
 
-        <template id="stock_inventory" name="Portal layout : inventory menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <template id="stock_inventory" name="Portal layout : inventory menu entries" inherit_id="portal.portal_breadcrumbs" priority="25">
             <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-                <li t-if="page_name == 'stock_inventory' or stock_inventory" t-attf-class="breadcrumb-item #{'active ' if not stock_inventory else ''}">
+                <li t-if="page_name == 'stock_inventory' or stock_inventory" t-attf-class="breadcrumb-item #{'active ' if not isy_stock_report_teacher_data else ''}">
                     <a t-if="stock_inventories" t-attf-href="/my/stock_inventories?{{ keep_query() }}">Inventory Transfer</a>
                     <t t-else="">Inventory Transfer</t>
                 </li>
@@ -15,7 +15,7 @@
 
         <template id="portal_stock_inventory" name="Inventory Portal" inherit_id="portal.portal_my_home" priority="40">
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-                <t t-if="request.env.user.portal_inventory_user" t-call="portal.portal_docs_entry">
+                <t t-if="request.env.user.portal_inventory_user" t-call="isy_ticketing.portal_docs_entry">
                     <t t-set="title">Inventory Transfer</t>
                     <t t-set="url" t-value="'/my/stock_inventories'"/>
                     <t t-set="count" t-value="stock_inventories_count"/>
