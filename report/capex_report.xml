@@ -22,7 +22,7 @@
         <template id="report_x_capex_view">
             <t t-call="web.html_container">
                 <t t-call="web.basic_layout">
-                    <div class="page" style="font-size: 9px;">
+                    <div class="page" style="font-size: 15px;">
                         <strong>The International School Yangon</strong>
                         <div class="row">
                             <div class="col-11 pull-left">
@@ -104,21 +104,21 @@
 
                                             <tr>
                                                 <td><span t-field="o.x_name" /></td>
-                                                <td class="text-right"><span t-field="o.x_jul"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_aug"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_sep"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_oct"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_nov"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_dec"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_jan"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_feb"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_mar"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_apr"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_may"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_jun"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_total"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><span t-field="o.x_budget_total"  t-options='{"widget" : "integer"}'/></td>
-                                                <td class="text-right"><t t-esc="'{0:,.0f}%'.format(int(o.x_percentage))" /></td>
+                                                <td class="text-center"><span t-field="o.x_jul"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_aug"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_sep"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_oct"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_nov"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_dec"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_jan"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_feb"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_mar"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_apr"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_may"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_jun"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_total"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><span t-field="o.x_budget_total"  t-options='{"widget" : "integer"}'/></td>
+                                                <td class="text-center"><t t-esc="'{0:,.0f}%'.format(int(o.x_percentage))" /></td>
                                             </tr>
 
                                         </t>
@@ -126,20 +126,20 @@
                                     </t>
                                     <tr style="background-color: #ebe8e8;">
                                         <td>Subtotal</td>
-                                        <td class="text-right"><span t-esc="jul_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="aug_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="sep_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="oct_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="nov_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="dec_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="jan_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="feb_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="mar_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="apr_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="may_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="jun_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="total_subtotal" t-options='{"widget" : "integer"}'/></td>
-                                        <td class="text-right"><span t-esc="budget_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="jul_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="aug_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="sep_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="oct_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="nov_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="dec_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="jan_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="feb_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="mar_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="apr_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="may_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="jun_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="total_subtotal" t-options='{"widget" : "integer"}'/></td>
+                                        <td class="text-center"><span t-esc="budget_subtotal" t-options='{"widget" : "integer"}'/></td>
                                     </tr>
 
                                 </t>
@@ -177,20 +177,20 @@
                                 </t>
                                 <tr style="background-color: #292929;color: #fff;">
                                     <td><strong>Total</strong></td>
-                                    <td class="text-right" t-esc="jul_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="aug_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="sep_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="oct_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="nov_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="dec_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="jan_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="feb_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="mar_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="apr_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="may_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="jun_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="total_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
-                                    <td class="text-right" t-esc="budget_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="jul_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="aug_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="sep_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="oct_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="nov_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="dec_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="jan_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="feb_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="mar_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="apr_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="may_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="jun_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="total_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
+                                    <td class="text-center" t-esc="budget_total" style="font-weight: bold" t-options='{"widget" : "integer"}'/>
                                 </tr>
                             </tbody>
 
