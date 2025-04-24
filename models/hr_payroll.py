@@ -78,7 +78,24 @@ class HrPayslip(models.Model):
         readonly=False,
         default=lambda self: self.env.company,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
-    
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('verify', 'Waiting'),
+        ('done', 'Done'),
+        ('paid', 'Paid'),
+        ('cancel', 'Canceled')],
+        string='Status',
+        index=True,
+        copy=False,
+        default='draft',
+        tracking=True,
+        help="""* When the payslip is created the status is 'Draft'
+                \n* If the payslip is under verification, the status is 'Waiting'.
+                \n* If the payslip is confirmed then status is set to 'Done'.
+                \n* When user cancel payslip the status is 'Rejected'.""",
+        readonly=False  # <--- This is the update!
+    )
+
     @api.depends('employee_id')
     def _compute_company_id(self):
         for slip in self:
@@ -227,7 +244,7 @@ class HrPayslip(models.Model):
         employee_type = 'expat' if 'Local' not in self.employee_id.sudo().category_ids.mapped('name') else 'local'
         
         # Expat->ISYA, Local->GTY
-        if (employee_type=='expat' and not self.contract_id.company_id) or (employee_type=='local' and self.contract_id.company_id):
+        if (employee_type=='expat' and self.contract_id.company_id) or (employee_type=='local' and self.contract_id.company_id):
             advance_clear_amount_usd_objs = self.env['employee.advance.expense'].sudo().search([('partner_id', '=', self.employee_id.user_id.partner_id.id), ('state', 'in', ['done', 'partial', 'payable']), ('salary_advance', '=', True)])
             for advance_clear_amount_obj in advance_clear_amount_usd_objs:
                 #ADVANCE USD AND MMK For INPUT LINES

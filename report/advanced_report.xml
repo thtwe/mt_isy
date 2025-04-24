@@ -175,7 +175,7 @@
 															<t t-set='new_value' t-value="track.new_value_char or track.new_value_datetime or track.new_value_integer or ''" />
 															<li>
 																<div>
-																	<span><t t-esc='track.field_desc'/>:</span> &#160;&#160;&#160;
+																	<span><t t-esc='field_desc'/>:</span> &#160;&#160;&#160;
 																	<span><t t-esc='old_value'/></span>
 																	<span class='fa fa-long-arrow-right'></span>
 																	<span><t t-esc='new_value'/></span>

@@ -171,7 +171,7 @@ class AccountMoveLine(models.Model):
     origin = fields.Char('Source Document',related='move_id.purchase_id.name')
 
     asset_model_id = fields.Many2one('account.asset',string='Asset Category',domain=[('state','=','model')])
-
+    account_company_id = fields.Many2one('res.company',string='Company of Account', related='account_id.company_id', store=True)
 
     def budget_account_dict(self, account_id, price_subtotal, budget_account_dict, account_analytic,product_id=False,date_from=False,date_to=False):
         # if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
