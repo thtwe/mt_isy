@@ -114,6 +114,18 @@ class PurchaseOrder(models.Model):
         ('paid','Paid'),
         ('cancel','Canelled')],string='INV  Status', related='order_line.invoice_lines.move_id.state', store=True)
 
+    state = fields.Selection([
+        ('draft', 'RFQ'),
+        ('sent', 'RFQ Sent'),
+        ('to_check', 'To Check'),
+        ('to approve', 'To Approve'),
+        ('purchase', 'Purchase Order'),
+        ('done', 'Locked'),
+        ('cancel', 'Cancelled')
+    ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
+    both_approval = fields.Boolean(string='Both Approval', default=False)
+    checker_id = fields.Many2one('res.users', string='Checker', default=lambda self: self.env.user)
+
     def check_two_step(self):
         is_two_step = False
         avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
@@ -134,19 +146,44 @@ class PurchaseOrder(models.Model):
 
         self.write({'state': 'cancel', 'mail_reminder_confirmed': False})
 
+    def check_both_approval(self):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
+
+        if self.check_two_step() or self.x_studio_approver.id==director_id:
+            self.x_studio_approver=bm_id
+            self.checker_id=director_id
+            self.both_approval = True
+        elif not self.check_two_step():
+            self.both_approval = False
+            self.checker_id = bm_id
+
     @api.model
     def create(self, vals):
         gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
         if len(self.env.companies.ids)>1 or self.env.companies[0].id!=gty_comp.id:
             raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
+
         result = super(PurchaseOrder, self).create(vals)
         if result.amount_total<=0:
             raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
-        if result.check_two_step()==True:
-            director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-            if result.x_studio_approver.id!=director_id:
-                result.x_studio_approver=director_id
+
+        result.check_both_approval()
         return result
+
+    # @api.model
+    # def create(self, vals):
+    #     gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
+    #     if len(self.env.companies.ids)>1 or self.env.companies[0].id!=gty_comp.id:
+    #         raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
+    #     result = super(PurchaseOrder, self).create(vals)
+    #     if result.amount_total<=0:
+    #         raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
+    #     if result.check_two_step()==True:
+    #         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+    #         if result.x_studio_approver.id!=director_id:
+    #             result.x_studio_approver=director_id
+    #     return result
 
     def write(self, values):
         result = super(PurchaseOrder, self).write(values)
@@ -290,41 +327,60 @@ class PurchaseOrder(models.Model):
         if warning_msg:
             raise UserError(_(''.join(warning_msg)))
 
+    def button_check(self):
+        for order in self:
+            if (order.state == 'to_check' and order.checker_id and order.checker_id.id!=self.env.user.id):
+                if self.env.user.login!='odooadmin@isyedu.org':
+                    raise UserError("%s is reviewer for this Purchase Order. You are not allowed to check this."%(self.checker_id.name))
+
+            order.state = 'to approve'
+
     def button_confirm(self):
         for order in self:
             if order.state not in ['draft', 'sent']:
                 continue
             order._add_supplier_to_product()
-            # Deal with double validation process
-            is_two_step = False
-            if order.company_id.po_double_validation == 'one_step'\
-                    or (order.company_id.po_double_validation == 'two_step'
-                        and order.amount_total < self.env.user.company_id.currency_id._convert(
-                            order.company_id.po_double_validation_amount, order.currency_id, order.company_id, order.date_order or fields.Date.today()))\
-                    or order.user_has_groups('purchase.group_purchase_manager'):
-                avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
-                    'mt_isy.avoid_rules_accounts', [])
-                avoid_rules_accounts_social_event = self.env['ir.config_parameter'].sudo().get_param(
-                    'mt_isy.avoid_rules_accounts_social_event', [])
-                avoid_rules_accounts_social_event = avoid_rules_accounts_social_event.split(",")
-                for rec_details in order.order_line:
-                    # two steps for PD
-                    if str(rec_details.product_id.id) in avoid_rules_accounts.split(","):
-                        is_two_step = True
-                        break
-                    elif rec_details.product_id.id in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-                        is_two_step = True
-                        break
-                    else: # one step
-                        is_two_step = False
-            else: # two steps for Double Validation
-                is_two_step = True
+            if (order.state in ['draft', 'sent'] and order.x_studio_approver and order.x_studio_approver.id!=self.env.user.id):
+                if self.env.user.login!='odooadmin@isyedu.org':
+                    raise UserError("%s is approver for this Purchase Order. You are not allowed to approve this."%(self.checker_id.name))
             
-            if is_two_step:
-                order.write({'state': 'to approve'})
-            else:
-                order.button_approve()
-        return True
+            order.state = 'to_check'
+
+    # def button_confirm(self):
+    #     for order in self:
+    #         if order.state not in ['draft', 'sent']:
+    #             continue
+    #         order._add_supplier_to_product()
+    #         # Deal with double validation process
+    #         is_two_step = False
+    #         if order.company_id.po_double_validation == 'one_step'\
+    #                 or (order.company_id.po_double_validation == 'two_step'
+    #                     and order.amount_total < self.env.user.company_id.currency_id._convert(
+    #                         order.company_id.po_double_validation_amount, order.currency_id, order.company_id, order.date_order or fields.Date.today()))\
+    #                 or order.user_has_groups('purchase.group_purchase_manager'):
+    #             avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
+    #                 'mt_isy.avoid_rules_accounts', [])
+    #             avoid_rules_accounts_social_event = self.env['ir.config_parameter'].sudo().get_param(
+    #                 'mt_isy.avoid_rules_accounts_social_event', [])
+    #             avoid_rules_accounts_social_event = avoid_rules_accounts_social_event.split(",")
+    #             for rec_details in order.order_line:
+    #                 # two steps for PD
+    #                 if str(rec_details.product_id.id) in avoid_rules_accounts.split(","):
+    #                     is_two_step = True
+    #                     break
+    #                 elif rec_details.product_id.id in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
+    #                     is_two_step = True
+    #                     break
+    #                 else: # one step
+    #                     is_two_step = False
+    #         else: # two steps for Double Validation
+    #             is_two_step = True
+
+    #         if is_two_step:
+    #             order.write({'state': 'to approve'})
+    #         else:
+    #             order.button_approve()
+    #     return True
 
     def _prepare_invoice(self):
         """Prepare the dict of values to create the new invoice for a purchase order.

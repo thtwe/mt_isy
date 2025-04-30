@@ -196,6 +196,15 @@
             <field name="model">employee.advance.expense</field>
             <field name="inherit_id" ref="employee_expense_advance.employee_advance_expense_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//button[@name='get_apprv_hr_manager']" position='attributes'>
+                    <attribute name='invisible'>state not in ['check']</attribute>
+                </xpath>
+                <xpath expr="//button[@name='get_reject']" position='attributes'>
+                    <attribute name='invisible'>state not in ['confirm','check']</attribute>
+                </xpath>
+                <button name="get_confirm" position="after">
+                    <button string="Check" class="oe_highlight" name="get_check" type="object" invisible="state != 'confirm'"/>
+                </button>
                 <button name="get_done" position="after">
                     <button string="Make Clearance" class="oe_highlight" name="make_clearance" type="object" invisible="adv_exp_type == 'expense' or state not in ('done','partial')"/>
                     <button
@@ -212,8 +221,8 @@
                 </button>
                 <field name="state" position="replace">
                     <field name="state" invisible="1"/>
-                    <field name="state_exp" widget="statusbar" invisible="adv_exp_type != 'expense'" statusbar_visible="draft,confirm,approved_hr_manager,payable,paid,cleared" colspan="2"/>
-                    <field name="state_adv" widget="statusbar" invisible="adv_exp_type != 'advance'" statusbar_visible="draft,confirm,approved_hr_manager,partial,paid,done,cleared" colspan="2"/>
+                    <field name="state_exp" widget="statusbar" invisible="adv_exp_type != 'expense'" statusbar_visible="draft,confirm,check,approved_hr_manager,payable,paid,cleared" colspan="2"/>
+                    <field name="state_adv" widget="statusbar" invisible="adv_exp_type != 'advance'" statusbar_visible="draft,confirm,check,approved_hr_manager,partial,paid,done,cleared" colspan="2"/>
 
                 </field>
 
@@ -236,7 +245,7 @@
                             </tree>
                         </field>
                         <group string="Reason for Advance">
-                            <field name="reason_for_advance" readonly="state in ['done','paid','confirm','approved_hr_manager']" nolabel="1" placeholder="Reason for Advance............." colspan="2"/>
+                            <field name="reason_for_advance" readonly="state in ['done','paid','confirm','check','approved_hr_manager']" nolabel="1" placeholder="Reason for Advance............." colspan="2"/>
                         </group>
                         <group string="Comment">
                             <field name="comment" readonly="state in ['done','paid']" nolabel="1" placeholder="Add Comment" colspan="2"/>
@@ -430,7 +439,7 @@
                 </field>
                 <field name="user_id" position="before">
                     <field name="is_asset"/>
-                    <field name="p_type" required="state in ('draft','confirm','approved_hr_manager') and adv_exp_type == 'advance'" readonly="state not in ('draft','confirm','approved_hr_manager')" invisible="adv_exp_type != 'advance'"/>
+                    <field name="p_type" required="state in ('draft','confirm', 'check','approved_hr_manager') and adv_exp_type == 'advance'" readonly="state not in ('draft','confirm','check','approved_hr_manager')" invisible="adv_exp_type != 'advance'"/>
                 </field>
             </field>
         </record>

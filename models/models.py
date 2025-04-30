@@ -307,7 +307,22 @@ class EmployeeAdvanceExpense(models.Model):
     _inherit = 'employee.advance.expense'
     _description = "Employee Advance Expense"
 
-    state = fields.Selection(selection_add=[('payable', 'Payable'), ('partial', 'Partial'), ('cleared', 'Cleared')])
+    state = fields.Selection(selection=[
+                        ('draft', 'Draft'),
+                        ('confirm', 'Confirmed'),
+                        ('check', 'Checked'),
+                        ('approved_hr_manager', 'Approved'),
+                        ('paid', 'Done'),
+                        ('done', 'Paid'),
+                        ('cancel', 'Cancelled'),
+                        ('reject', 'Rejected'),
+                        ('payable', 'Payable'),
+                        ('partial', 'Partial'),
+                        ('cleared', 'Cleared')
+                        ],string='State',
+                        readonly=True, default='draft',
+                        track_visibility='onchange')
+    # state = fields.Selection(selection_add=[('check', 'Checked'), ('payable', 'Payable'), ('partial', 'Partial'), ('cleared', 'Cleared')])
     advance_expense_clearance_line_ids = fields.One2many('advance.expense.clearance.line', 'advance_id', string='Advance Expenses Lines', copy=False)
 
     cls_journal_id = fields.Many2one('account.journal', string='Clearance Journal')
@@ -335,32 +350,33 @@ class EmployeeAdvanceExpense(models.Model):
     is_asset = fields.Boolean(string="Is Asset(?)", default=False)
     x_studio_to_approve = fields.Many2one('res.users', string='To Approve')
     x_studio_field_b6lRX = fields.Many2one(related='x_studio_to_approve', string='To Approve')
-
-
     both_approval = fields.Boolean(default=False, string="Both Approval", help="It is true then user who has approval accounts can able to approve without caring the rules below 1000 and above 1000.")
     p_type = fields.Selection([
         ('inventory','Inventory'),
         ('consumable','Consumable'),
         ('service','Service')],string='Type')
+    checker_id = fields.Many2one('res.users', string='Checker')
+    checked_date = fields.Date(string='Checked Date', \
+                        readonly=True, copy=False)
 
     def get_apprv_hr_manager(self):
-        total_amount = self.total_amount_expense
-        if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
-            currency_id = self.currency_id
-            rate = currency_id.with_context(date=self.request_date)
-            total_amount = currency_id._convert(self.total_amount_expense, self.company_id.currency_id, self.company_id, self.request_date or fields.Date.today())
-        # over $1000 MMK
-        if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.currency_id.name=='MMK' and self.total_amount_expense>2100000:
-            raise UserError(_('You do not have permission to approve this request.'))
-        # over $1000 USD
-        if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.currency_id.name=='USD' and total_amount > 999.99:
-            raise UserError(_('You do not have permission to approve this request.'))
-        # Salary Advance
-        if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.salary_advance:
-            raise UserError(_('You do not have permission to approve this request.'))
-        # Professional Development and Social Event
-        if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.both_approval:
-            raise UserError(_('You do not have permission to approve this request.'))
+        # total_amount = self.total_amount_expense
+        # if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
+        #     currency_id = self.currency_id
+        #     rate = currency_id.with_context(date=self.request_date)
+        #     total_amount = currency_id._convert(self.total_amount_expense, self.company_id.currency_id, self.company_id, self.request_date or fields.Date.today())
+        # # over $1000 MMK
+        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.currency_id.name=='MMK' and self.total_amount_expense>2100000:
+        #     raise UserError(_('You do not have permission to approve this request.'))
+        # # over $1000 USD
+        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.currency_id.name=='USD' and total_amount > 999.99:
+        #     raise UserError(_('You do not have permission to approve this request.'))
+        # # Salary Advance
+        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.salary_advance:
+        #     raise UserError(_('You do not have permission to approve this request.'))
+        # # Professional Development and Social Event
+        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.both_approval:
+        #     raise UserError(_('You do not have permission to approve this request.'))
         
 
         # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and total_amount > 999.99:
@@ -368,7 +384,9 @@ class EmployeeAdvanceExpense(models.Model):
         # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.salary_advance:
         #     raise UserError(_('You do not have permission to approve this request.'))
         
-        
+        if self.env.user.id != 191 and not self.env.user.has_group('base.group_system'):
+            raise UserError(_('You do not have permission to approve this request.'))
+
         self.state = 'approved_hr_manager'
         self.hr_validate_date = time.strftime('%Y-%m-%d')
         self.hr_manager_by_id = self.env.user.id
@@ -501,7 +519,6 @@ class EmployeeAdvanceExpense(models.Model):
         if warning_msg:
             raise UserError(_(''.join(warning_msg)))
     
-
     @api.model
     def create(self, values):
         gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
@@ -513,50 +530,100 @@ class EmployeeAdvanceExpense(models.Model):
         avoid_rules_accounts_social_event = self.env['ir.config_parameter'].sudo().get_param(
             'mt_isy.avoid_rules_accounts_social_event', [])
         avoid_rules_accounts_social_event = avoid_rules_accounts_social_event.split(",")
+
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
         if values['adv_exp_type'] == 'advance':
-            if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(","):
+            if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(",") or\
+                values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
                 values['both_approval'] = True
-                director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-                values['x_studio_to_approve']=director_id
-                values['x_studio_field_b6lRX']=director_id
-            elif values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-                values['both_approval'] = True
-                values['x_type_name'] = 'Social Event'
-                director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-                if self.env.user.id==director_id:
-                    coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1737))
-                    values['x_studio_to_approve']=coo_id
-                    values['x_studio_field_b6lRX']=coo_id
+                values['x_studio_to_approve']=bm_id
+                values['x_studio_field_b6lRX']=bm_id
+                values['checker_id'] = director_id
             else:
                 values['both_approval'] = False
         elif values['adv_exp_type'] == 'expense':
             for rec_details in values['advance_expense_line_ids']:
-                if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(","):
+                if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(",") or\
+                    rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
                     values['both_approval'] = True
-                    director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-                    values['x_studio_to_approve']=director_id
-                    values['x_studio_field_b6lRX']=director_id
-                    break
-                elif rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-                    values['both_approval'] = True
-                    values['x_type_name'] = 'Social Event'
-                    director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-                    if self.env.user.id==director_id:
-                        coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1737))
-                        values['x_studio_to_approve']=coo_id
-                        values['x_studio_field_b6lRX']=coo_id
+                    values['x_studio_to_approve']=bm_id
+                    values['x_studio_field_b6lRX']=bm_id
+                    values['checker_id'] = director_id
                     break
                 else:
                    values['both_approval'] = False
-        
+
+        if values['x_studio_to_approve'] == director_id:
+            values['x_studio_to_approve'] = bm_id
+            values['x_studio_field_b6lRX'] = bm_id
+            values['checker_id'] = director_id
+            values['both_approval'] = True
+
         advance_expenses = super(EmployeeAdvanceExpense, self).create(values)
         if advance_expenses.total_amount_expense<=0:
             raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
         warning_msg = []
         budget_account_dict = {}
-        account_analytic = []   
+        account_analytic = []
         self.accouting_budget_warning(advance_expenses, advance_expenses.advance_expense_line_ids, warning_msg, budget_account_dict, account_analytic, update=False)
         return advance_expenses
+
+    # @api.model
+    # def create(self, values):
+    #     gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
+    #     if len(self.env.companies)>1 or self.env.companies[0].id!=gty_comp.id:
+    #         raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
+
+    #     avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
+    #         'mt_isy.avoid_rules_accounts', [])
+    #     avoid_rules_accounts_social_event = self.env['ir.config_parameter'].sudo().get_param(
+    #         'mt_isy.avoid_rules_accounts_social_event', [])
+    #     avoid_rules_accounts_social_event = avoid_rules_accounts_social_event.split(",")
+    #     if values['adv_exp_type'] == 'advance':
+    #         if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(","):
+    #             values['both_approval'] = True
+    #             director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+    #             values['x_studio_to_approve']=director_id
+    #             values['x_studio_field_b6lRX']=director_id
+    #         elif values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
+    #             values['both_approval'] = True
+    #             values['x_type_name'] = 'Social Event'
+    #             director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+    #             if self.env.user.id==director_id:
+    #                 coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1737))
+    #                 values['x_studio_to_approve']=coo_id
+    #                 values['x_studio_field_b6lRX']=coo_id
+    #         else:
+    #             values['both_approval'] = False
+    #     elif values['adv_exp_type'] == 'expense':
+    #         for rec_details in values['advance_expense_line_ids']:
+    #             if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(","):
+    #                 values['both_approval'] = True
+    #                 director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+    #                 values['x_studio_to_approve']=director_id
+    #                 values['x_studio_field_b6lRX']=director_id
+    #                 break
+    #             elif rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
+    #                 values['both_approval'] = True
+    #                 values['x_type_name'] = 'Social Event'
+    #                 director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+    #                 if self.env.user.id==director_id:
+    #                     coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1737))
+    #                     values['x_studio_to_approve']=coo_id
+    #                     values['x_studio_field_b6lRX']=coo_id
+    #                 break
+    #             else:
+    #                values['both_approval'] = False
+
+    #     advance_expenses = super(EmployeeAdvanceExpense, self).create(values)
+    #     if advance_expenses.total_amount_expense<=0:
+    #         raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
+    #     warning_msg = []
+    #     budget_account_dict = {}
+    #     account_analytic = []
+    #     self.accouting_budget_warning(advance_expenses, advance_expenses.advance_expense_line_ids, warning_msg, budget_account_dict, account_analytic, update=False)
+    #     return advance_expenses
 
     def write(self, values):
         if values and 'x_studio_anticipated_account_code' in values.keys() and self.env.user.login not in ('director@isyedu.org','odooadmin@isyedu.org'):
@@ -794,6 +861,13 @@ class EmployeeAdvanceExpense(models.Model):
             # if post_move and created_moves:
             #     created_moves.filtered(lambda m: any(m.asset_depreciation_ids.mapped('asset_id.category_id.open_asset'))).post()
 
+    def get_check(self):
+        if (self.state == 'confirm' and self.checker_id and self.checker_id.id!=self.env.user.id):
+            if self.env.user.login!='odooadmin@isyedu.org':
+                raise UserError("%s is reviewer for this request. You are not allowed to check this."%(self.checker_id.name))
+
+        self.state = 'check'
+        self.checked_date = time.strftime('%Y-%m-%d')
 
     def get_confirm(self):
         if not self.advance_expense_line_ids:

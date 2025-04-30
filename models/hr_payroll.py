@@ -1062,7 +1062,7 @@ class AccountMoveLine(models.Model):
             row += 1
         workbook.close()
         fp.seek(0)
-        file = base64.encodestring(fp.read())
+        file = base64.b64encode(fp.read())
         fp.close()
 
         current_str = str(date.today())
@@ -1445,7 +1445,7 @@ class HrPayslipApproval(models.Model):
 
         workbook.close()
         fp.seek(0)
-        file = base64.encodestring(fp.read())
+        file = base64.b64encode(fp.read())
         self.write({'datas': file})
         filename = 'Payslip Approval %s'%(datetime.now())
         return {
