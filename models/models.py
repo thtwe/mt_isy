@@ -559,6 +559,9 @@ class EmployeeAdvanceExpense(models.Model):
             values['x_studio_field_b6lRX'] = bm_id
             values['checker_id'] = director_id
             values['both_approval'] = True
+        elif not values.get('x_studio_to_approve'):
+            values['both_approval'] = False
+            values['checker_id'] = bm_id
 
         advance_expenses = super(EmployeeAdvanceExpense, self).create(values)
         if advance_expenses.total_amount_expense<=0:
