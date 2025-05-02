@@ -554,7 +554,7 @@ class EmployeeAdvanceExpense(models.Model):
                 else:
                    values['both_approval'] = False
 
-        if values['x_studio_to_approve'] == director_id:
+        if values.get('x_studio_to_approve') and values['x_studio_to_approve'] == director_id:
             values['x_studio_to_approve'] = bm_id
             values['x_studio_field_b6lRX'] = bm_id
             values['checker_id'] = director_id
