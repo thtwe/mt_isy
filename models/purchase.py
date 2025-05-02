@@ -342,7 +342,7 @@ class PurchaseOrder(models.Model):
             order._add_supplier_to_product()
             if (order.state in ['draft', 'sent'] and order.x_studio_approver and order.x_studio_approver.id!=self.env.user.id):
                 if self.env.user.login!='odooadmin@isyedu.org':
-                    raise UserError("%s is approver for this Purchase Order. You are not allowed to approve this."%(self.checker_id.name))
+                    raise UserError("%s is approver for this Purchase Order. You are not allowed to approve this."%(self.x_studio_approver.name))
             
             order.state = 'to_check'
 
