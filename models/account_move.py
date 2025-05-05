@@ -168,6 +168,7 @@ class AccountMoveLine(models.Model):
     # x_studio_student = fields.Many2one(string='Student')
     x_studio_student_1 = fields.Many2one('res.partner',string='Student',related='move_id.partner_id')
     x_studio_vendor = fields.Many2one('res.partner',string='Vendor',related='move_id.partner_id')
+    x_studio_account_type = fields.Selection(string='Account Type',related='account_id.account_type')
     origin = fields.Char('Source Document',related='move_id.purchase_id.name')
 
     asset_model_id = fields.Many2one('account.asset',string='Asset Category',domain=[('state','=','model')])

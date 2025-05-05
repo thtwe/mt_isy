@@ -865,19 +865,21 @@ class EmployeeAdvanceExpense(models.Model):
             #     created_moves.filtered(lambda m: any(m.asset_depreciation_ids.mapped('asset_id.category_id.open_asset'))).post()
 
     def get_check(self):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
         if (self.state == 'confirm' and self.checker_id and self.checker_id.id!=self.env.user.id):
-            if self.env.user.login!='odooadmin@isyedu.org':
+            if self.env.user.login!='odooadmin@isyedu.org' and self.env.user.id!=director_id:
                 raise UserError("%s is reviewer for this request. You are not allowed to check this."%(self.checker_id.name))
 
         self.state = 'check'
         self.checked_date = time.strftime('%Y-%m-%d')
 
     def get_confirm(self):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
         if not self.advance_expense_line_ids:
             raise UserError(_('Please add some advance expense lines.'))
         else:
             if self.x_studio_to_approve and self.x_studio_to_approve.id!=self.env.user.id:
-                if self.env.user.login!='odooadmin@isyedu.org':
+                if self.env.user.login!='odooadmin@isyedu.org' and self.env.user.id!=director_id:
                     raise UserError("%s is approver for this request. You are not allowed to approve this."%(self.x_studio_to_approve.name))
             if self.adv_exp_type == 'advance':
                 if len(self.advance_expense_line_ids) > 1:
