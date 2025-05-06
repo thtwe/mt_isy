@@ -122,9 +122,10 @@ class PurchaseOrder(models.Model):
         ('purchase', 'Purchase Order'),
         ('done', 'Locked'),
         ('cancel', 'Cancelled')
-    ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
+    ], string='Status', index=True, readonly=False, copy=False, default='draft', tracking=True)
     both_approval = fields.Boolean(string='Both Approval', default=False)
     checker_id = fields.Many2one('res.users', string='Checker', default=lambda self: self.env.user)
+    created_by_director = fields.Boolean("Created by Director", default=False)
 
     def check_two_step(self):
         is_two_step = False
@@ -150,7 +151,11 @@ class PurchaseOrder(models.Model):
         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
         bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
 
-        if self.check_two_step() or self.x_studio_approver.id==director_id:
+        if self.created_by_director:
+            self.x_studio_approver = director_id
+            self.checker_id = director_id
+            self.both_approval = True
+        elif self.check_two_step() or self.x_studio_approver.id==director_id:
             self.x_studio_approver=bm_id
             self.checker_id=director_id
             self.both_approval = True
@@ -160,6 +165,10 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def create(self, vals):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        if self.env.user.id == director_id:
+            vals['created_by_director'] = True
+
         gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
         if len(self.env.companies.ids)>1 or self.env.companies[0].id!=gty_comp.id:
             raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
@@ -345,6 +354,8 @@ class PurchaseOrder(models.Model):
                     raise UserError("%s is approver for this Purchase Order. You are not allowed to approve this."%(self.x_studio_approver.name))
             
             order.state = 'to_check'
+            if order.created_by_director:
+                order.state = 'to approve'
 
     # def button_confirm(self):
     #     for order in self:

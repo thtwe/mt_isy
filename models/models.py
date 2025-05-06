@@ -320,7 +320,8 @@ class EmployeeAdvanceExpense(models.Model):
                         ('partial', 'Partial'),
                         ('cleared', 'Cleared')
                         ],string='State',
-                        readonly=True, default='draft',
+                        default='draft',
+                        readonly=False,
                         track_visibility='onchange')
     # state = fields.Selection(selection_add=[('check', 'Checked'), ('payable', 'Payable'), ('partial', 'Partial'), ('cleared', 'Cleared')])
     advance_expense_clearance_line_ids = fields.One2many('advance.expense.clearance.line', 'advance_id', string='Advance Expenses Lines', copy=False)
@@ -358,6 +359,7 @@ class EmployeeAdvanceExpense(models.Model):
     checker_id = fields.Many2one('res.users', string='Checker')
     checked_date = fields.Date(string='Checked Date', \
                         readonly=True, copy=False)
+    created_by_director = fields.Boolean("Created by Director", default=False)
 
     def get_apprv_hr_manager(self):
         # total_amount = self.total_amount_expense
@@ -383,8 +385,8 @@ class EmployeeAdvanceExpense(models.Model):
         #     raise UserError(_('You do not have permission to approve this request.'))
         # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.salary_advance:
         #     raise UserError(_('You do not have permission to approve this request.'))
-        
-        if self.env.user.id != 191 and not self.env.user.has_group('base.group_system'):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        if self.env.user.id != director_id and not self.env.user.has_group('base.group_system'):
             raise UserError(_('You do not have permission to approve this request.'))
 
         self.state = 'approved_hr_manager'
@@ -521,6 +523,7 @@ class EmployeeAdvanceExpense(models.Model):
     
     @api.model
     def create(self, values):
+        values['created_by_director'] = False
         gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
         if len(self.env.companies)>1 or self.env.companies[0].id!=gty_comp.id:
             raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
@@ -533,34 +536,42 @@ class EmployeeAdvanceExpense(models.Model):
 
         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
         bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
-        if values['adv_exp_type'] == 'advance':
-            if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(",") or\
-                values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-                values['both_approval'] = True
-                values['x_studio_to_approve']=bm_id
-                values['x_studio_field_b6lRX']=bm_id
-                values['checker_id'] = director_id
-            else:
-                values['both_approval'] = False
-        elif values['adv_exp_type'] == 'expense':
-            for rec_details in values['advance_expense_line_ids']:
-                if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(",") or\
-                    rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
+        #If Director requests, all the approval go to him
+        if self.env.user.id == director_id:
+            values['created_by_director'] = True
+            values['both_approval'] = True
+            values['x_studio_to_approve'] = director_id
+            values['x_studio_field_b6lRX'] = director_id
+            values['checker_id'] = director_id
+        else:
+            if values['adv_exp_type'] == 'advance':
+                if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(",") or\
+                    values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
                     values['both_approval'] = True
                     values['x_studio_to_approve']=bm_id
                     values['x_studio_field_b6lRX']=bm_id
                     values['checker_id'] = director_id
-                    break
                 else:
-                   values['both_approval'] = False
+                    values['both_approval'] = False
+            elif values['adv_exp_type'] == 'expense':
+                for rec_details in values['advance_expense_line_ids']:
+                    if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(",") or\
+                        rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
+                        values['both_approval'] = True
+                        values['x_studio_to_approve']=bm_id
+                        values['x_studio_field_b6lRX']=bm_id
+                        values['checker_id'] = director_id
+                        break
+                    else:
+                        values['both_approval'] = False
 
-        if values.get('x_studio_to_approve') and values['x_studio_to_approve'] == director_id:
-            values['x_studio_to_approve'] = bm_id
-            values['x_studio_field_b6lRX'] = bm_id
-            values['checker_id'] = director_id
-            values['both_approval'] = True
-        elif not values.get('x_studio_to_approve'):
-            values['both_approval'] = False
+            if values.get('x_studio_to_approve') and values['x_studio_to_approve'] == director_id:
+                values['x_studio_to_approve'] = bm_id
+                values['x_studio_field_b6lRX'] = bm_id
+                values['checker_id'] = director_id
+                values['both_approval'] = True
+            elif not values.get('x_studio_to_approve'):
+                values['both_approval'] = False
             values['checker_id'] = bm_id
 
         advance_expenses = super(EmployeeAdvanceExpense, self).create(values)
@@ -906,6 +917,10 @@ class EmployeeAdvanceExpense(models.Model):
             self.state = 'confirm'
             self.confirm_date = time.strftime('%Y-%m-%d')
             self.confirm_by_id = self.env.user.id
+            #If the Director requests, skip to check action state and ask for approve state.
+            if self.created_by_director:
+                self.state = 'check'
+                self.checked_date = time.strftime('%Y-%m-%d')
 
     # Done State key is 'paid'.
     # override reverse process with get_done and action_sheet_move_advance
