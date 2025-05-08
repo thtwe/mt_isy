@@ -242,9 +242,9 @@ class HrPayslip(models.Model):
         total_other = 0
         total_tuition_fee = 0
         employee_type = 'expat' if 'Local' not in self.employee_id.sudo().category_ids.mapped('name') else 'local'
-        
         # Expat->ISYA, Local->GTY
-        if (employee_type=='expat' and self.contract_id.company_id) or (employee_type=='local' and self.contract_id.company_id):
+        # All Employee's company is GTY
+        if (employee_type=='expat' and self.contract_id.company_id != self.employee_id.company_id) or (employee_type=='local' and self.contract_id.company_id == self.employee_id.company_id):
             advance_clear_amount_usd_objs = self.env['employee.advance.expense'].sudo().search([('partner_id', '=', self.employee_id.user_id.partner_id.id), ('state', 'in', ['done', 'partial', 'payable']), ('salary_advance', '=', True)])
             for advance_clear_amount_obj in advance_clear_amount_usd_objs:
                 #ADVANCE USD AND MMK For INPUT LINES

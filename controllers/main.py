@@ -30,7 +30,6 @@ class HrPayroll1(HrPayroll):
         
         # if not request.env.user.has_group('hr_payroll.group_hr_payroll_user') or not list_ids or re.search("[^0-9|,]", list_ids):
         #     return request.not_found()
-
         ids = [int(s) for s in list_ids.split(',')]
         payslips = request.env['hr.payslip'].browse(ids)
 
@@ -38,10 +37,10 @@ class HrPayroll1(HrPayroll):
 
         for payslip in payslips:
             report = request.env.ref('mt_isy.report_payslip_adjustment_details', False)
-            
             report = report.with_context(lang=payslip.employee_id.sudo().address_id.lang)
-            pdf_content, _ = report.sudo()._render_qweb_pdf(payslip.id, data={'company_id': payslip.company_id})
-            reader = PdfFileReader(io.BytesIO(pdf_content), strict=False, overwriteWarnings=False)
+            pdf_content, _ = report.sudo()._render_qweb_pdf(report,payslip.id, data={'company_id': payslip.company_id})
+            # reader = PdfFileReader(io.BytesIO(pdf_content), strict=False, overwriteWarnings=False)
+            reader = PdfFileReader(io.BytesIO(pdf_content))
 
             for page in range(reader.getNumPages()):
                 pdf_writer.addPage(reader.getPage(page))
