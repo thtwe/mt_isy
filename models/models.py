@@ -63,6 +63,11 @@ class HolidaysRequest(models.Model):
         'hr.employee', compute='', store=True, string='Employee', index=True, readonly=False, ondelete="restrict",
         states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
         tracking=True,default=lambda x: x.env['hr.employee'].search([('user_id','=',x.env.user.id)]).id)
+    sub_leave_type_id = fields.Many2one(
+        "hr.sub.leave.type", string="Sub Leave Type", readonly=False,
+        states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]}
+    )
+    check_sub_leave_type = fields.Boolean(string="Check Sub Leave Type", default=False)
 
     @api.depends('employee_ids')
     def _compute_from_employee_ids(self):
@@ -98,10 +103,19 @@ class HolidaysRequest(models.Model):
             else:
                 holiday.employee_ids = self.env.context.get('default_employee_id') or holiday.employee_id or self.env.user.employee_id
 
+    def _get_check_sub_leave_type(self):
+        sub_leave_type_id = self.env['hr.sub.leave.type'].search([('hr_leave_type_id', '=', self.holiday_status_id.id)])
+        if sub_leave_type_id:
+            return True
+
+        return False
+
     @api.onchange('holiday_status_id')
     def _onchange_holiday_status_id(self):
         self.request_unit_half = False
         self.request_unit_hours = False
+        self.sub_leave_type_id = False
+        self.check_sub_leave_type = self._get_check_sub_leave_type()
         #self.request_unit_custom = False
         if self.holiday_status_id.requires_allocation == "yes":
             self.leave_balance = self.holiday_status_id.virtual_remaining_leaves
@@ -135,15 +149,6 @@ class HolidaysRequest(models.Model):
     def activity_update(self):
         # not to send odoo default email
         return True
-    
-    @api.depends('employee_ids')
-    def _compute_from_employee_ids(self):
-        for holiday in self:
-            # if len(holiday.employee_ids) == 1:
-            #     holiday.employee_id = holiday.employee_ids[0]._origin
-            # else:
-            #     holiday.employee_id = False
-            holiday.multi_employee = (len(holiday.employee_ids) > 1)
 
     @api.constrains('state', 'number_of_days', 'holiday_status_id')
     def _check_holidays(self):
@@ -204,6 +209,25 @@ class HolidaysRequest(models.Model):
         taken_days = sum(leave.number_of_days for leave in taken_leaves)
 
         remaining_leave = allocated_days - taken_days
+
+        # Check sub leave type
+        max_sub_leave_days = 0
+        remaining_sub_leave_days = 0
+        if self.check_sub_leave_type and self.sub_leave_type_id:
+            max_sub_leave_days = self.sub_leave_type_id.max_days
+            taken_sub_leave_days = self.env['hr.leave'].search([
+                ('employee_id', '=', employee.id),
+                ('holiday_status_id', '=', holiday_status.id),
+                ('sub_leave_type_id', '=', self.sub_leave_type_id.id),
+                ('state', '=', 'validate')  # Only consider validated leaves
+            ])
+            taken_sub_leave_days = sum(leave.number_of_days for leave in taken_sub_leave_days)
+            remaining_sub_leave_days = max_sub_leave_days - taken_sub_leave_days
+            if remaining_sub_leave_days > 0 and remaining_leave <= 0:
+                return {employee.id: remaining_leave}
+
+            return {employee.id: remaining_sub_leave_days}
+
         return {employee.id: remaining_leave}
 
     def action_approve(self):
@@ -237,6 +261,20 @@ class HolidaysAllocation(models.Model):
         states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
         domain=_domain_holiday_status_id,
         default=_default_holiday_status_id)
+    state = fields.Selection([
+        ('confirm', 'To Approve'),
+        ('refuse', 'Refused'),
+        ('validate', 'Approved'),
+        ('expired', 'Expired')],
+        string='Status', readonly=True, tracking=True, copy=False, default='confirm',
+        help="The status is set to 'To Submit', when an allocation request is created."
+        "\nThe status is 'To Approve', when an allocation request is confirmed by user."
+        "\nThe status is 'Refused', when an allocation request is refused by manager."
+        "\nThe status is 'Approved', when an allocation request is approved by manager.")
+
+    def set_expired(self):
+        for rec in self.search([('state', '=', 'validate'), ('date_to', '<', fields.Date.today())]):
+            rec.state = 'expired'
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
