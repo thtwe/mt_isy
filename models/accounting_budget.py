@@ -13,19 +13,24 @@ class BudgetExtension_Budget(models.Model):
 
     company_id = fields.Many2one('res.company',string='Company',default=lambda self:self.env.user.company_id.id)
 
+    account_type_order = fields.Char(
+        compute="_compute_account_type_order", store=True)
+
+    def _compute_account_type_order(self):
+        for rec in self:
+            rec.account_type_order = '1. Income' if rec.account_type.lower() == 'income' else '2. Expense'
+
+    _order = "end_date desc, account_type_order asc"
+
     @api.model
-    def fields_view_get(self, view_id=None, view_type='tree', toolbar=False,
-                        submenu=False):
-        result = super(BudgetExtension_Budget, self).fields_view_get(view_id,
-                                                            view_type,
-                                                            toolbar=toolbar,
-                                                            submenu=submenu)
+    def get_view(self, view_id=None, view_type='form', **options):
+        result = super(BudgetExtension_Budget, self).get_view(view_id, view_type, **options)
         doc = etree.XML(result['arch'])
         if view_type == 'tree' and self._module == 'mt_isy':
             #current view
             ref_view_id = self.env.ref('mt_isy.isy_budget_view_tree')
             last_year_ref_view_id = self.env.ref('mt_isy.all_year_isy_budget_view_tree')
-            future_year_ref_view_id = self.env.ref('mt_isy.future_year_isy_budget_view_tree')
+            future_year_ref_view_id = self.env.ref('mt_isy.future_year_isy_budget_view_tree') 
             if view_id == ref_view_id.id:
                 val = self._get_year_from_to('current')
                 #current year
@@ -37,7 +42,7 @@ class BudgetExtension_Budget(models.Model):
                 #last year
                 #planned amount
                 last_year_planned_amount_100_reference = doc.xpath(
-                    "//field[@name='x_last_year_planned_amount_100']")
+                    "//field[@name='last_year_planned_amount_100_neg']")
                 last_year_planned_amount_100_reference[0].set(
                     "string", val['last_year'] + " - \n Budget (C)")
                
@@ -75,7 +80,7 @@ class BudgetExtension_Budget(models.Model):
                 #last year
                 #planned amount
                 last_year_planned_amount_100_reference = doc.xpath(
-                    "//field[@name='x_last_year_planned_amount_100']")
+                    "//field[@name='last_year_planned_amount_100_neg']")
                 last_year_planned_amount_100_reference[0].set(
                     "string", val['last_year'] + " - \n Budget (C)")
 
@@ -195,12 +200,8 @@ class PayrollBudget(models.Model):
     _inherit = 'payroll.budget'
 
     @api.model
-    def fields_view_get(self, view_id=None, view_type='form', toolbar=False,
-                        submenu=False):
-        result = super(PayrollBudget, self).fields_view_get(view_id,
-                                                                     view_type,
-                                                                     toolbar=toolbar,
-                                                                     submenu=submenu)
+    def get_view(self, view_id=None, view_type='form', **options):
+        result = super(PayrollBudget, self).get_view(view_id, view_type, **options)
         doc = etree.XML(result['arch'])
         
         ref_view_id = self.env.ref('mt_isy.isy_payroll_budget_view_form')
@@ -516,12 +517,8 @@ class CapitalBudgetTemplate(models.Model):
     _inherit = "capital.budget.template"
 
     @api.model
-    def fields_view_get(self, view_id=None, view_type='form', toolbar=False,
-                        submenu=False):
-        result = super(CapitalBudgetTemplate, self).fields_view_get(view_id,
-                                                                     view_type,
-                                                                     toolbar=toolbar,
-                                                                     submenu=submenu)
+    def get_view(self, view_id=None, view_type='form', **options):
+        result = super(CapitalBudgetTemplate, self).get_view(view_id, view_type, **options)
         doc = etree.XML(result['arch'])
         
         ref_view_id = self.env.ref('mt_isy.isy_capital_budget_template_view_tree')
@@ -796,12 +793,8 @@ class RevenueBudgetYgn(models.Model):
     surcharge_amount = fields.Float('Surcharge')
 
     @api.model
-    def fields_view_get(self, view_id=None, view_type='tree', toolbar=False,
-                        submenu=False):
-        result = super(RevenueBudgetYgn, self).fields_view_get(view_id,
-                                                                     view_type,
-                                                                     toolbar=toolbar,
-                                                                     submenu=submenu)
+    def get_view(self, view_id=None, view_type='form', **options):
+        result = super(RevenueBudgetYgn, self).get_view(view_id, view_type, **options)
         doc = etree.XML(result['arch'])
         if view_type == 'tree' and self._module == 'mt_isy':
             #current view

@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+<data>
     <menuitem id="isy_menu_budget_template_root" name="ISY Budgeting" parent="account_accountant.menu_accounting" sequence="5"/>
     <menuitem id="isy_menu_budget_template_sub_root" name="Extended Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="5"/>
     <menuitem id="isy_menu_budget_template_sub_payroll_budget" name="Payroll Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
@@ -6,9 +8,6 @@
     <menuitem id="isy_menu_budget_template_sub_rental_budget" name="Rental Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
     <menuitem id="isy_menu_budget_template_sub_capital_budget" name="Capital Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
     <menuitem id="isy_menu_budget_template_sub_revenue_budget" name="Revenue Budget" parent="mt_isy.isy_menu_budget_template_root" sequence="6"/>
-
-
-
 
     <record id="isy_budget_view_tree" model="ir.ui.view">
         <field name="name">budget.tree</field>
@@ -19,20 +18,15 @@
                 <field name="account_id" column_invisible="True"/>
                 <field name="start_date" column_invisible="True"/>
                 <field name="end_date" column_invisible="True"/>
-                <!-- <field name="category_id"/> -->
-                <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/> -->
-                <field name="last_2_year_planned_amount_100_neg" sum="Total of last 2 years planned amount 100"/>
-                <field name="last_2_year_practical_amount_neg" sum="Total of last 2 years practical amount"/>
+                <field name="last_2_year_planned_amount_100_neg" sum="Total"/>
+                <field name="last_2_year_practical_amount_neg" sum="Total"/>
 
-                <!-- <field name="last_year_planned_amount" sum="Total of last year planned amount"/> -->
-                <field name="x_last_year_planned_amount_100" sum="Total of last year planned amount 100"/>
-                <field name="last_year_practical_amount_neg" sum="Total of last year practical amount"/>
+                <field name="last_year_planned_amount_100_neg" sum="Total"/>
+                <field name="last_year_practical_amount_neg" sum="Total"/>
 
-                <field name="planned_amount_100_neg" sum="Total of current year planned amount 100"/>
-                <!-- <field name="planned_amount" sum="Total of current year planned amount"/> -->
-                <!-- <field name="practical_amount" sum="Total of current year practical amount"/> -->
+                <field name="planned_amount_100_neg" sum="Total"/>
 
-                <field name="last_year_variance_amount" string="Variance (E-C)" sum="Total"/>
+                <field name="last_year_variance_amount" sum="Total"/>
                 <field name="state" column_invisible="True"/>
             </tree>
         </field>
@@ -44,7 +38,8 @@
         <field name="view_mode">tree,form,graph</field>
         <field name="view_id" ref="isy_budget_view_tree"/>
         <field name="domain">[('state', '=', '2')]</field>
-        <field name="context">{'state':'2'}</field>
+        <field name="context">{'state': '2', 'group_by': ['account_type_order', 'x_studio_group']}</field>
+
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">Create the first budget!</p>
         </field>
@@ -57,25 +52,9 @@
         <field name="act_window_id" ref="isy_budget_action"/>
     </record>
 
-    <record id="isy_budget_view_form_action" model="ir.actions.act_window.view">
-        <field eval="1" name="sequence"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="accounting_budget_extension_V7.budget_view_form"/>
-        <field name="act_window_id" ref="isy_budget_action"/>
-    </record>
-
-    <!-- <record id="budget_view_form_inherit" model="ir.ui.view"> 
-        <field name="name">budget_view_form_inherit</field> 
-        <field name="model">budgetextension.budget</field> 
-        <field name="inherit_id" ref="accounting_budget_extension_V7.budget_view_form"/> 
-        <field name="arch" type="xml"> 
-            <field name='last_year_variance_amount' position='after'>
-                <field name="company_id" groups="base.group_no_one"/>
-            </field>
-        </field> 
-    </record> -->
-
-    <menuitem id="budget_menu" name="ISY Extended Budgets - ( Current Year Based )" parent="mt_isy.isy_menu_budget_template_sub_root" action="isy_budget_action" sequence="1"/>
+    <menuitem id="budget_menu" name="ISY Extended Budgets - ( Current Year Based )"
+            parent="mt_isy.isy_menu_budget_template_sub_root"
+            action="isy_budget_action" sequence="1"/>
 
 
     <record id="all_year_isy_budget_view_tree" model="ir.ui.view">
@@ -87,18 +66,10 @@
                 <field name="account_id"/>
                 <field name="start_date"/>
                 <field name="end_date"/>
-                <!-- <field name="category_id"/> -->
-                <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/>
-                <field name="last_2_year_planned_amount_100" sum="Total of last 2 years planned amount 100"/>
-                <field name="last_2_year_practical_amount" sum="Total of last 2 years practical amount"/>
 
-                <field name="last_year_planned_amount" sum="Total of last year planned amount"/>
-                <field name="last_year_planned_amount_100" sum="Total of last year planned amount 100"/>
-                <field name="last_year_practical_amount" sum="Total of last year practical amount"/> -->
-
-                <field name="planned_amount_100_neg" sum="Total of current year planned amount 100" string="Planned Amount 100"/>
-                <field name="planned_amount" sum="Total of current year planned amount" string="Planned Amount"/>
-                <field name="practical_amount" sum="Total of current year practical amount" string="Actual Amount"/>
+                <field name="planned_amount_100_neg" sum="Total" string="Planned Amount 100"/>
+                <field name="planned_amount" sum="Total" string="Planned Amount"/>
+                <field name="practical_amount" sum="Total" string="Actual Amount"/>
 
                 <field name="last_year_variance_amount" string="Variance" sum="Total"/>
                 <field name="state" column_invisible="True"/>
@@ -106,6 +77,7 @@
             </tree>
         </field>
     </record>
+
 
     <record id="all_year_isy_budget_action" model="ir.actions.act_window">
         <field name="name">ISY Extended Budgets - ( All Years )</field>
@@ -132,8 +104,9 @@
         <field name="act_window_id" ref="all_year_isy_budget_action"/>
     </record>
 
-    <!-- <record id="budget_buttons" model="ir.ui.view"> <field name="name">budget.buttons</field> <field name="model">budgetextension.budget</field> <field name="inherit_id" ref="accounting_budget_extension_V7.budget_view_form"/> <field name="arch" type="xml"> <button type="object" class="oe_stat_button" icon="fa-refresh" name="update_planned_amount"> <div class="o_form_field o_stat_info"> <span class="o_stat_text">Update Budget</span> </div> </button> </field> </record> -->
-    <menuitem id="all_year_budget_menu" name="ISY Extended Budgets - ( All Years )" parent="mt_isy.isy_menu_budget_template_sub_root" action="all_year_isy_budget_action" sequence="3"/>
+    <menuitem id="all_year_budget_menu" name="ISY Extended Budgets - ( All Years )"
+            parent="mt_isy.isy_menu_budget_template_sub_root"
+            action="all_year_isy_budget_action" sequence="3"/>
 
 
 
@@ -146,20 +119,15 @@
                 <field name="account_id" column_invisible="True"/>
                 <field name="start_date" column_invisible="True"/>
                 <field name="end_date" column_invisible="True"/>
-                <!-- <field name="category_id"/> -->
-                <!-- <field name="last_2_year_planned_amount" sum="Total of last 2 years planned amount"/> -->
-                <field name="last_2_year_planned_amount_100_neg" sum="Total of last 2 years planned amount 100"/>
-                <field name="last_2_year_practical_amount_neg" sum="Total of last 2 years practical amount"/>
+                <field name="last_2_year_planned_amount_100_neg" sum="Total"/>
+                <field name="last_2_year_practical_amount_neg" sum="Total"/>
 
-                <!-- <field name="last_year_planned_amount" sum="Total of last year planned amount"/> -->
-                <field name="x_last_year_planned_amount_100" sum="Total of last year planned amount 100"/>
-                <field name="last_year_practical_amount_neg" sum="Total of last year practical amount"/>
+                <field name="last_year_planned_amount_100_neg" sum="Total"/>
+                <field name="last_year_practical_amount_neg" sum="Total"/>
 
-                <field name="planned_amount_100_neg" sum="Total of current year planned amount 100"/>
-                <!-- <field name="planned_amount" sum="Total of current year planned amount"/> -->
-                <!-- <field name="practical_amount" sum="Total of current year practical amount"/> -->
+                <field name="planned_amount_100_neg" sum="Total"/>
 
-                <field name="last_year_variance_amount" string="Variance (E-C)" sum="Total"/>
+                <field name="last_year_variance_amount" sum="Total"/>
                 <field name="state" column_invisible="True"/>
 
             </tree>
@@ -192,10 +160,9 @@
         <field name="act_window_id" ref="future_year_isy_budget_action"/>
     </record>
 
-    <!-- <record id="budget_buttons" model="ir.ui.view"> <field name="name">budget.buttons</field> <field name="model">budgetextension.budget</field> <field name="inherit_id" ref="accounting_budget_extension_V7.budget_view_form"/> <field name="arch" type="xml"> <button type="object" class="oe_stat_button" icon="fa-refresh" name="update_planned_amount"> <div class="o_form_field o_stat_info"> <span class="o_stat_text">Update Budget</span> </div> </button> </field> </record> -->
-    <menuitem id="future_year_budget_menu" name="ISY Extended Budgets - ( Future Year Based )" parent="mt_isy.isy_menu_budget_template_sub_root" action="future_year_isy_budget_action" sequence="2"/>
-
-
+    <menuitem id="future_year_budget_menu" name="ISY Extended Budgets - ( Future Year Based )"
+            parent="mt_isy.isy_menu_budget_template_sub_root"
+            action="future_year_isy_budget_action" sequence="2"/>
 
     <!-- Payroll Budget Tree View -->
     <record id="isy_payroll_budget_view_tree" model="ir.ui.view">
@@ -355,7 +322,9 @@
 
 
     <!-- Payroll Buget Menu -->
-    <menuitem id="isy_menu_payroll_budget" name="Payroll Budget - ( Current Year Based )" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_action" sequence="1"/>
+    <menuitem id="isy_menu_payroll_budget" name="Payroll Budget - ( Current Year Based )"
+            parent="mt_isy.isy_menu_budget_template_sub_payroll_budget"
+            action="isy_payroll_budget_action" sequence="1"/>
 
    
     <!-- Payroll Budget View Action -->
@@ -384,7 +353,9 @@
         <field name="act_window_id" ref="isy_payroll_budget_action_future"/>
     </record>
 
-    <menuitem id="isy_menu_payroll_budget_future" name="Payroll Budget - ( Future Year Based )" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_action_future" sequence="1"/>
+    <menuitem id="isy_menu_payroll_budget_future" name="Payroll Budget - ( Future Year Based )"
+            parent="mt_isy.isy_menu_budget_template_sub_payroll_budget"
+            action="isy_payroll_budget_action_future" sequence="1"/>
 
     <!-- Payroll Budget View Action -->
     <record id="isy_payroll_budget_action_all" model="ir.actions.act_window">
@@ -412,7 +383,9 @@
         <field name="act_window_id" ref="isy_payroll_budget_action_all"/>
     </record>
     
-    <menuitem id="isy_menu_payroll_budget_all" name="Payroll Budget - ( All Years )" parent="mt_isy.isy_menu_budget_template_sub_payroll_budget" action="isy_payroll_budget_action_all" sequence="1"/>
+    <menuitem id="isy_menu_payroll_budget_all" name="Payroll Budget - ( All Years )"
+            parent="mt_isy.isy_menu_budget_template_sub_payroll_budget"
+            action="isy_payroll_budget_action_all" sequence="1"/>
 
 
     <!-- Allowance Tree View -->
@@ -452,7 +425,9 @@
     </record>
 
     <!-- Allowance Menu -->
-    <menuitem id="isy_menu_allowance_budget" name="Allowance Budget" parent="mt_isy.isy_menu_budget_template_sub_allowance_budget" action="isy_allowance_budget_action" sequence="3"/>
+    <menuitem id="isy_menu_allowance_budget" name="Allowance Budget"
+            parent="mt_isy.isy_menu_budget_template_sub_allowance_budget"
+            action="isy_allowance_budget_action" sequence="3"/>
 
     <!-- Payroll Budget Line (Master) Tree View -->
     <!-- <record id="isy_payroll_budget_line_master_view_tree" model="ir.ui.view">
@@ -598,7 +573,9 @@
     </record>
 
     <!-- Rental Buget Menu -->
-    <menuitem id="isy_menu_rental_budget" name="Rental Budget" parent="mt_isy.isy_menu_budget_template_sub_rental_budget" action="isy_rental_budget_action" sequence="1"/>
+    <menuitem id="isy_menu_rental_budget" name="Rental Budget"
+            parent="mt_isy.isy_menu_budget_template_sub_rental_budget"
+            action="isy_rental_budget_action" sequence="1"/>
 
 
     <!-- Rental Budget Category Tree View -->
@@ -635,7 +612,9 @@
     </record>
 
     <!-- Rental Budget Category Menu -->
-    <menuitem id="isy_menu_rental_budget_category" name="Rental Category" parent="mt_isy.isy_menu_budget_template_sub_rental_budget" action="isy_rental_budget_category_action" sequence="3"/>
+    <menuitem id="isy_menu_rental_budget_category" name="Rental Category"
+            parent="mt_isy.isy_menu_budget_template_sub_rental_budget"
+            action="isy_rental_budget_category_action" sequence="3"/>
 
     <!-- Capital Budget Tree View -->
     <record id="isy_capital_budget_template_view_tree" model="ir.ui.view">
@@ -761,7 +740,9 @@
 
 
     <!-- Capital Buget Menu -->
-    <menuitem id="isy_menu_capital_budget" name="Capital Budget - ( Current Year Based )" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="isy_capital_budget_template_action" sequence="3"/>
+    <menuitem id="isy_menu_capital_budget" name="Capital Budget - ( Current Year Based )"
+            parent="mt_isy.isy_menu_budget_template_sub_capital_budget"
+            action="isy_capital_budget_template_action" sequence="3"/>
 
     <!-- Capital Budget View Action Future -->
 
@@ -810,7 +791,9 @@
 
 
     <!-- Capital Buget Menu -->
-    <menuitem id="isy_menu_capital_budget_future" name="Capital Budget - ( Future Year Based )" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="isy_capital_budget_template_action_future" sequence="4"/>
+    <menuitem id="isy_menu_capital_budget_future" name="Capital Budget - ( Future Year Based )"
+            parent="mt_isy.isy_menu_budget_template_sub_capital_budget"
+            action="isy_capital_budget_template_action_future" sequence="4"/>
 
     <!-- Capital Budget View Action All Years-->
 
@@ -859,7 +842,9 @@
 
 
     <!-- Payroll Buget Menu -->
-    <menuitem id="isy_menu_capital_budget_all" name="Capital Budget - ( All Years )" parent="mt_isy.isy_menu_budget_template_sub_capital_budget" action="isy_capital_budget_template_action_all" sequence="5"/>
+    <menuitem id="isy_menu_capital_budget_all" name="Capital Budget - ( All Years )"
+            parent="mt_isy.isy_menu_budget_template_sub_capital_budget"
+            action="isy_capital_budget_template_action_all" sequence="5"/>
 
     <!-- Revenue YGN Tree View -->
     <record id="isy_revenue_budget_ygn_view_tree" model="ir.ui.view">
@@ -914,7 +899,9 @@
 
 
     <!-- Revenue YGN Menu -->
-    <menuitem id="isy_menu_revenue_budget_ygn" name="Revenue Budget (YGN - Current Year Based)" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="isy_revenue_budget_ygn_action" sequence="1"/>
+    <menuitem id="isy_menu_revenue_budget_ygn" name="Revenue Budget (YGN - Current Year Based)"
+            parent="mt_isy.isy_menu_budget_template_sub_revenue_budget"
+            action="isy_revenue_budget_ygn_action" sequence="1"/>
 
     <!-- Revenue YGN Tree View -->
     <record id="isy_revenue_budget_ygn_view_tree_future" model="ir.ui.view">
@@ -969,8 +956,9 @@
 
 
     <!-- Revenue YGN Menu -->
-    <menuitem id="isy_menu_revenue_budget_ygn_future" name="Revenue Budget (YGN - Future Year Based)" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="isy_revenue_budget_ygn_action_future" sequence="2"/>
-
+    <menuitem id="isy_menu_revenue_budget_ygn_future" name="Revenue Budget (YGN - Future Year Based)"
+        parent="mt_isy.isy_menu_budget_template_sub_revenue_budget"
+        action="isy_revenue_budget_ygn_action_future" sequence="2"/>
     
     <!-- Revenue YGN Tree View -->
     <record id="isy_revenue_budget_ygn_view_tree_all" model="ir.ui.view">
@@ -1024,7 +1012,10 @@
 
 
     <!-- Revenue YGN Menu -->
-    <menuitem id="isy_menu_revenue_budget_ygn_all" name="Revenue Budget (YGN - All Years)" parent="mt_isy.isy_menu_budget_template_sub_revenue_budget" action="isy_revenue_budget_ygn_action_all" sequence="3"/>
+    <menuitem id="isy_menu_revenue_budget_ygn_all" name="Revenue Budget (YGN - All Years)"
+            parent="mt_isy.isy_menu_budget_template_sub_revenue_budget"
+            action="isy_revenue_budget_ygn_action_all" sequence="3"
+    />
 
-
+</data>
 </odoo>

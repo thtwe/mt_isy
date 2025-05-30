@@ -694,7 +694,8 @@ class ExpenseSettlement(models.TransientModel):
             'partner_id': obj_eae.partner_id.id,
 #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'sale' else False,
             'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-            'amount_currency': company_currency != current_currency and 1.0 * obj_eae.total_amount_expense or 0.0,
+            # 'amount_currency': company_currency != current_currency and 1.0 * obj_eae.total_amount_expense or 0.0,
+            'amount_currency': 1.0 * obj_eae.total_amount_expense,
         })
         vals.append(move_line_debit)
         # cash_amount = current_currency.compute(obj_eae.total_amount_expense, company_currency)
@@ -713,7 +714,8 @@ class ExpenseSettlement(models.TransientModel):
             'partner_id': obj_eae.partner_id.id,
 #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'sale' else False,
             'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-            'amount_currency': company_currency != current_currency and -1.0 * obj_eae.total_amount_expense or 0.0,
+            # 'amount_currency': company_currency != current_currency and -1.0 * obj_eae.total_amount_expense or 0.0,
+            'amount_currency': -1.0 * obj_eae.total_amount_expense,
         })
         vals.append(move_line_credit)
 
