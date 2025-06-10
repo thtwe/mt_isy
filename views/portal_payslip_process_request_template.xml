@@ -86,7 +86,7 @@
                                     <t t-esc="round(si.total_salary,2)" t-if="si.total_salary"/>
                                 </td>                               
                                 <td class="text-right">
-                                    <span class="badge badge-pill badge-info" t-esc="dict(si._fields['state'].selection).get(si.state)"/>
+                                    <t class="badge badge-pill badge-info" t-esc="dict(si._fields['state'].selection).get(si.state)"/>
                                 </td>
                             </tr>
                         </t>
