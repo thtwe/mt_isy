@@ -297,19 +297,16 @@
             <field name="model">hr.leave</field>
             <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
             <field name="arch" type="xml">
-                <!-- <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/label[2]" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[2]" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath> -->
                 <xpath expr="//field[@name='request_date_from']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='request_date_to']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-
+                <xpath expr="//field[@name='holiday_status_id']" position="after">
+                    <field name="check_sub_leave_type" invisible="1"/>
+                    <field name="sub_leave_type_id" domain="[('hr_leave_type_id', '=', holiday_status_id)]" readonly="check_sub_leave_type == False" required="check_sub_leave_type == True"/>
+                </xpath>
                 <label for="request_date_from" position="before">
                     <label for="leave_balance" string="Leave Balance"/>
                     <div>
@@ -318,7 +315,8 @@
                             <span class="ml8">Days</span>
                         </div>
                     </div>
-                    <label for="number_of_days" string="Duration" invisible="request_unit_half == True and leave_type_request_unit != 'hour'"/>
+                </label>
+                    <!-- <label for="number_of_days" string="Duration" invisible="request_unit_half == True and leave_type_request_unit != 'hour'"/>
                     <div name="duration_display" invisible="request_unit_half == True and leave_type_request_unit != 'hour'">
                         <div class="o_row">
                             <div groups="!hr_holidays.group_hr_holidays_manager" invisible="request_unit_half == True or request_unit_hours == True" class="o_row">
@@ -334,23 +332,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <label for="number_of_days" string="Duration" invisible="request_unit_half == True and leave_type_request_unit != 'hour'"/>
-                    <div name="duration_display">
-                        <div class="o_row">
-                            <div groups="!hr_holidays.group_hr_holidays_manager" invisible="request_unit_half == True or request_unit_hours == True" class="o_row">
-                                <field name="number_of_days_display" nolabel="1" readonly="1" class="oe_inline"/>
-                                <span>Days</span>
-                            </div>
-                            <div groups="hr_holidays.group_hr_holidays_manager" class="o_row" invisible="request_unit_half == True or request_unit_hours == True">
-                                <field name="number_of_days" nolabel="1" readonly="1" class="oe_inline"/>
-                                <span>Days</span>
-                            </div>
-                            <div invisible="leave_type_request_unit != 'hour'" class="o_row">
-                                <field name="number_of_hours_text" nolabel="1" class="oe_inline"/>
-                            </div>
-                        </div>
-                    </div> -->
-                </label>
+                </label> -->
 
                 
             </field>

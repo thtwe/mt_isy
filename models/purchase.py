@@ -228,7 +228,7 @@ class PurchaseOrder(models.Model):
 
         #check pending Advance amount
         # domain = [('x_studio_anticipated_account_code','=',product_id),('id','!=',self.id),('state','in',('draft','confirm','approved_hr_manager','paid')),('company_id','=',self.company_id.id)]
-        domain = [('x_studio_anticipated_account_code.property_account_expense_id','=',account_id.id),('state','not in',('cancel','rejected','cleared')),('company_id','=',self.company_id.id)]
+        domain = [('x_studio_anticipated_account_code.property_account_expense_id','=',account_id.id),('state','not in',('cancel','reject','cleared')),('company_id','=',self.company_id.id)]
         if self.capex_group_id:
             domain += [('capex_group_id','=',self.capex_group_id.id)]
         lines = self.env['employee.advance.expense'].sudo().search(domain)

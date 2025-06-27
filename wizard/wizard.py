@@ -562,6 +562,7 @@ class BudgetDisplayConsolidatedWizardCapex(models.TransientModel):
         domain = [('from_date', '>=', date_start), ('to_date', '<=', date_end),('type_id.name','ilike','expense')]
         all_budget_ids = self.env['capital.budget.template'].search(domain)
         _logger.debug("start listing.")
+        budget_date_filter = self.env['ir.config_parameter'].sudo().get_param('isy.consolidated_capex_budget_date_filter', '2024-08-01')
         for budget_id in all_budget_ids:
             #if b_acc.id in account_ids.ids:
             planned_amount = 0
@@ -576,7 +577,7 @@ class BudgetDisplayConsolidatedWizardCapex(models.TransientModel):
                 
             practical_amount = 0
             line_obj = self.env['account.move.line']
-            domain = ['&','&','&',('date','>=','2024-08-01'),('date','<=',date_end),('move_id.state','=','posted')
+            domain = ['&','&','&',('date','>=', budget_date_filter),('date','<=',date_end),('move_id.state','=','posted')
                     ,'&',('account_id', 'in', wip_accounts.ids),('capex_group_id.name','=',budget_id.name)]
             # if b_acc.sudo().workinprocess:
             #     domain += [('capex_group_id.name','=',rec.x_capex.x_name)]

@@ -63,6 +63,10 @@ class HolidaysRequest(models.Model):
         'hr.employee', compute='', store=True, string='Employee', index=True, readonly=False, ondelete="restrict",
         states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
         tracking=True,default=lambda x: x.env['hr.employee'].search([('user_id','=',x.env.user.id)]).id)
+    sub_leave_type_id = fields.Many2one('hr.sub.leave.type', string='Sub Leave Type', readonly=True,
+        states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
+        domain=[('hr_leave_type_id', '=', 'holiday_status_id')])
+    check_sub_leave_type = fields.Boolean(string='Check Sub Leave Type', default=False)
 
     @api.depends('employee_ids')
     def _compute_from_employee_ids(self):
@@ -98,10 +102,19 @@ class HolidaysRequest(models.Model):
             else:
                 holiday.employee_ids = self.env.context.get('default_employee_id') or holiday.employee_id or self.env.user.employee_id
 
+    def _get_check_sub_leave_type(self):
+        sub_leave_type_id = self.env['hr.sub.leave.type'].search([('hr_leave_type_id', '=', self.holiday_status_id.id)])
+        if sub_leave_type_id:
+            return True
+
+        return False
+
     @api.onchange('holiday_status_id')
     def _onchange_holiday_status_id(self):
         self.request_unit_half = False
         self.request_unit_hours = False
+        self.sub_leave_type_id = False
+        self.check_sub_leave_type = self._get_check_sub_leave_type()
         #self.request_unit_custom = False
         if self.holiday_status_id.requires_allocation == "yes":
             self.leave_balance = self.holiday_status_id.virtual_remaining_leaves
@@ -119,31 +132,20 @@ class HolidaysRequest(models.Model):
         obj_employee = self.env['hr.employee'].sudo().search([('id','=', values.get('employee_id'))])
         if obj_employee.user_id.login!='director@isyedu.org' and not obj_employee.parent_id:
             raise UserError("%s doesn't have Supervisor in the system. Please contact to Ei Pan Phyu<ephyu@isyedu.org>."%(obj_employee.name))
+
         if obj_leave_type.accumulated_leave:
             if obj_employee.unpaid_accumulated_leave > 0:
                 raise ValidationError(_("Please take Unpaid Accumulated Leave Type First."))
-        #     values['leave_balance'] = obj_employee.accumulated_leave
-        # elif obj_leave_type.unpaid_accumulated_leave:
-        #     values['leave_balance'] = obj_employee.unpaid_accumulated_leave
-        # else:
-        #     values['leave_balance'] = obj_leave_type.virtual_remaining_leaves
+
         if not values.get('name'):
             raise ValidationError(_("Please enter the reason for request."))
+
         holiday = super(HolidaysRequest, self.with_context(mail_create_nolog=True, mail_create_nosubscribe=True)).create(values)
         return holiday
 
     def activity_update(self):
         # not to send odoo default email
         return True
-    
-    @api.depends('employee_ids')
-    def _compute_from_employee_ids(self):
-        for holiday in self:
-            # if len(holiday.employee_ids) == 1:
-            #     holiday.employee_id = holiday.employee_ids[0]._origin
-            # else:
-            #     holiday.employee_id = False
-            holiday.multi_employee = (len(holiday.employee_ids) > 1)
 
     @api.constrains('state', 'number_of_days', 'holiday_status_id')
     def _check_holidays(self):
@@ -184,7 +186,15 @@ class HolidaysRequest(models.Model):
                                             'Please also check the time off waiting for validation.') +
                                         _('The employees that lack allocation days are:\n%s' % (', '.join(unallocated_employees))))
 
+
+    def _check_accumulated_leave(self, employee, holiday_status):
+        employee_obj = self.env['hr.employee'].search([('id', '=', employee.id)])
+        if holiday_status.requires_allocation == 'no' and holiday_status.unpaid_accumulated_leave:
+            if (employee_obj.accumulated_leave + holiday_status.unpaid_accumulated_leave) - self.number_of_days < 0:
+                raise ValidationError(_('The number of remaining time off is not sufficient for this time off type.'))
+
     def _get_remaining_leave_for_employees(self, employee, holiday_status):
+        self._check_accumulated_leave(employee, holiday_status)
         # Get all the allocations for the given holiday status
         allocations = self.env['hr.leave.allocation'].search([
             ('employee_id', '=', employee.id),
@@ -204,6 +214,24 @@ class HolidaysRequest(models.Model):
         taken_days = sum(leave.number_of_days for leave in taken_leaves)
 
         remaining_leave = allocated_days - taken_days
+
+        #check sub leave type
+        max_sub_leave_days = 0
+        if self.check_sub_leave_type and self.sub_leave_type_id:
+            max_sub_leave_days = self.sub_leave_type_id.max_days
+            taken_sub_leave_days = self.env['hr.leave'].search([
+                ('employee_id', '=', employee.id),
+                ('holiday_status_id', '=', holiday_status.id),
+                ('state', 'in', ['validate', 'validate1', 'confirm']),
+                ('sub_leave_type_id', '=', self.sub_leave_type_id.id)
+            ])
+            taken_sub_leave_days = sum(leave.number_of_days for leave in taken_sub_leave_days)
+            remaining_sub_leave_days = max_sub_leave_days - taken_sub_leave_days
+            if remaining_sub_leave_days > 0 and remaining_leave <= 0:
+                return {employee.id: remaining_leave}
+
+            return {employee.id: remaining_sub_leave_days}
+
         return {employee.id: remaining_leave}
 
     def action_approve(self):
@@ -416,7 +444,7 @@ class EmployeeAdvanceExpense(models.Model):
 
         #check other Advance amount
         # domain = [('x_studio_anticipated_account_code','=',product_id),('id','!=',self.id),('state','in',('draft','confirm','approved_hr_manager','paid')),('company_id','=',self.company_id.id)]
-        domain = [('x_studio_anticipated_account_code.property_account_expense_id','=',account_id.id),('id','!=',self.id),('state','not in',('cancel','rejected','cleared')),('company_id','=',self.company_id.id)]
+        domain = [('x_studio_anticipated_account_code.property_account_expense_id','=',account_id.id),('id','!=',self.id),('state','not in',('cancel','reject','cleared')),('company_id','=',self.company_id.id)]
         if self.capex_group_id:
             domain += [('capex_group_id','=',self.capex_group_id.id)]
         lines = self.env['employee.advance.expense'].sudo().search(domain)
