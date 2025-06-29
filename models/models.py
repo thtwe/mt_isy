@@ -219,11 +219,13 @@ class HolidaysRequest(models.Model):
         max_sub_leave_days = 0
         if self.check_sub_leave_type and self.sub_leave_type_id:
             max_sub_leave_days = self.sub_leave_type_id.max_days
+            date_from = self.holiday_status_id.get_fiscal_date()
             taken_sub_leave_days = self.env['hr.leave'].search([
                 ('employee_id', '=', employee.id),
                 ('holiday_status_id', '=', holiday_status.id),
-                ('state', 'in', ['validate', 'validate1', 'confirm']),
-                ('sub_leave_type_id', '=', self.sub_leave_type_id.id)
+                ('state', 'in', ['validate']),
+                ('sub_leave_type_id', '=', self.sub_leave_type_id.id),
+                ('date_from','>',date_from)
             ])
             taken_sub_leave_days = sum(leave.number_of_days for leave in taken_sub_leave_days)
             remaining_sub_leave_days = max_sub_leave_days - taken_sub_leave_days
