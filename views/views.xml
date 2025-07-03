@@ -305,7 +305,10 @@
                 </xpath>
                 <xpath expr="//field[@name='holiday_status_id']" position="after">
                     <field name="check_sub_leave_type" invisible="1"/>
-                    <field name="sub_leave_type_id" domain="[('hr_leave_type_id', '=', holiday_status_id)]" readonly="check_sub_leave_type == False" required="check_sub_leave_type == True"/>
+                    <field name="valid_sub_leave_type_ids" invisible="1"/>
+                    <field name="sub_leave_type_id" readonly="check_sub_leave_type == False" required="check_sub_leave_type == True"
+                        domain="[('id', 'in', valid_sub_leave_type_ids)]" options="{'no_open':True,'no_create':True}"
+                        context="{'sub_leave_type_display_name': True, 'employee_id': employee_id}"/>
                 </xpath>
                 <label for="request_date_from" position="before">
                     <label for="leave_balance" string="Leave Balance"/>
@@ -936,6 +939,9 @@
             <field name="model">hr.contract</field>
             <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='schedule_pay']" position="after">
+                    <field name="total_wages"/>
+                </xpath>
                 <xpath expr="//field[@name='wage']" position="replace">
                     <field name="wage" force_save="1" readonly="1"/>
                 </xpath>

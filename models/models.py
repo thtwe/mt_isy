@@ -64,9 +64,30 @@ class HolidaysRequest(models.Model):
         states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
         tracking=True,default=lambda x: x.env['hr.employee'].search([('user_id','=',x.env.user.id)]).id)
     sub_leave_type_id = fields.Many2one('hr.sub.leave.type', string='Sub Leave Type', readonly=True,
-        states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
-        domain=[('hr_leave_type_id', '=', 'holiday_status_id')])
+        states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]})
     check_sub_leave_type = fields.Boolean(string='Check Sub Leave Type', default=False)
+    valid_sub_leave_type_ids = fields.Many2many(
+        'hr.sub.leave.type',
+        compute='_compute_sub_leave_type_id',
+        string='Valid Sub Leave Types', store=True
+    )
+
+    @api.depends('holiday_status_id', 'employee_id')
+    def _compute_sub_leave_type_id(self):
+        for rec in self:
+            subtypeids = []
+            sub_leave_type_ids = rec.env['hr.sub.leave.type'].search([('hr_leave_type_id', '=', rec.holiday_status_id.id)])
+            if rec.holiday_status_id and rec.employee_id:
+                # sub_leave_type_ids = sub_leave_type_ids.filtered(
+                #     lambda s: s.get_remaining_leaves()[1] > 0 and (not s.is_personal_leave or (s.is_personal_leave and s.hr_leave_type_id.max_leaves > s.max_days))
+                # )
+                for sub_leave_type_id in sub_leave_type_ids:
+                    if sub_leave_type_id.is_personal_leave:
+                        if sub_leave_type_id.hr_leave_type_id.max_leaves > sub_leave_type_id.max_days:
+                            subtypeids.append(sub_leave_type_id.id)
+                    else:
+                        subtypeids.append(sub_leave_type_id.id)
+                rec.valid_sub_leave_type_ids = subtypeids
 
     @api.depends('employee_ids')
     def _compute_from_employee_ids(self):

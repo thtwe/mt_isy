@@ -2058,6 +2058,7 @@ class HrContract(models.Model):
         default=lambda self: self.env.company, required=True)
 
     savings_for_education = fields.Float('Saving for Children Education')
+    total_wages = fields.Monetary('Total Wages', required=True, tracking=True, help="Employee's anual total gross wages.", group_operator="avg")
 
     @api.depends('employee_id')
     def _compute_employee_contract(self):
