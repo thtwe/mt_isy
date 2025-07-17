@@ -3,6 +3,7 @@
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError, UserError
 import datetime
+from datetime import timedelta
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 from itertools import groupby
 import logging
@@ -126,6 +127,7 @@ class PurchaseOrder(models.Model):
     both_approval = fields.Boolean(string='Both Approval', default=False)
     checker_id = fields.Many2one('res.users', string='Checker', default=lambda self: self.env.user)
     created_by_director = fields.Boolean("Created by Director", default=False)
+    expiry_date = fields.Date(string="Expiry Date", tracking=True)
 
     def check_two_step(self):
         is_two_step = False
@@ -498,6 +500,18 @@ class PurchaseOrder(models.Model):
         #moves.filtered(lambda m: m.currency_id.round(m.amount_total) < 0).action_switch_invoice_into_refund_credit_note()
         return self.action_view_invoice(moves)
 
+    def check_exprity_date(self):
+        today = fields.Datetime.today()
+        po_reminder_days = int(self.env['ir.config_parameter'].sudo().get_param('isy.po_reminder_days', 30))
+        notify_date = today + timedelta(days=po_reminder_days)
+        records_to_notify = self.search([
+            ('expiry_date', '=', notify_date),
+            ('state', 'in', ['purchase'])
+            ])
+        for record in records_to_notify:
+            template = self.env.ref('mt_isy.po_expiry_reminder')
+            if template:
+                self.env['mail.template'].browse(template.id).sudo().send_mail(record.id)
 
 # class AccountInvoice(models.Model):
 #     _inherit = "account.invoice"

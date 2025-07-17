@@ -1,6 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+  
+        <record id="po_expiry_reminder" model="mail.template">
+            <field name="name">PO Expiry Reminder</field>
+            <field name="email_from">odooadmin@isyedu.org</field>
+            <field name="subject">{{object.name}} - Expiry Reminder</field>
+            <field name="model_id" ref="mt_isy.model_purchase_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+                      <p style="margin:0px 0 0px 0;box-sizing:border-box;margin-bottom: 0px;">
+                          Dear Tech Team,
+                      </p>
+                      <p style="margin:0px 0 0px 0;box-sizing:border-box;margin-bottom: 0px;"><br></p>
+                      <p style="margin:0px 0 0px 0;box-sizing:border-box;margin-bottom: 0px;">
+                          This is a reminder regarding the following Purchase Order:<br>
+                      </p>
+                      <ul style="padding:0 0 0 32px;margin:0px 0 16px 0;box-sizing:border-box;list-style-type:disc;">
+                          <li>PO Number: <t t-esc="object.name"/></li>
+                          <li>Vendor: <t t-esc="object.partner_id.name"/></li>
+                          <li>Expiry Date: <t t-esc="object.expiry_date"/></li>
+                      </ul>
+
+                      <p style="margin:0px 0 16px 0;box-sizing:border-box;"></p>
+
+                      <p style="margin:0px 0 16px 0;box-sizing:border-box;">
+                          <a class="btn btn-beta"
+                            style="box-sizing:border-box;white-space:nowrap;transition:0.15s ease-in-out;
+                                    border:1px solid #875a7b;padding:6px 12px;font-size:17.33px;
+                                    background-color:#875a7b;color:#ffffff;text-decoration:none;
+                                    border-radius:0px;display:inline-block;font-weight:500;text-align:center;"
+                            t-attf-href="https://sas.isyedu.org/web#id={{ object.id }}&amp;action=355&amp;model=purchase.order&amp;view_type=form&amp;menu_id=234">
+                              Go to Request
+                          </a>
+                      </p>
+
+                ]]>
+            </field>
+        </record>
+
         <record id="clearance_reminder" model="mail.template">
           <field name="name">Clearance Reminder</field>
           <field name="email_from">odooadmin@isyedu.org</field>

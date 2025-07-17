@@ -13,12 +13,12 @@ class BudgetExtension_Budget(models.Model):
 
     company_id = fields.Many2one('res.company',string='Company',default=lambda self:self.env.user.company_id.id)
 
-    account_type_order = fields.Char(
+    account_type_order = fields.Char(string="Account Type Order",
         compute="_compute_account_type_order", store=True)
 
     def _compute_account_type_order(self):
         for rec in self:
-            rec.account_type_order = '1. Income' if rec.account_type.lower() == 'income' else '2. Expense'
+            rec.account_type_order = '1. Income' if rec.account_type and rec.account_type.lower() == 'income' else '2. Expense'
 
     _order = "end_date desc, account_type_order asc"
 
