@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import time
+from lxml import etree
+
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_compare, float_is_zero
 import odoo.addons.decimal_precision as dp
 from odoo.tools.misc import format_date
+
 import logging
 _logger = logging.getLogger(__name__)
 from odoo.osv import expression
@@ -12,18 +15,25 @@ from odoo.osv import expression
 class HolidaysRequest(models.Model):
     _inherit = 'hr.leave'
 
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        result = super(HolidaysRequest, self).get_view(view_id, view_type, **options)
+        doc = etree.XML(result['arch'])
+        if self._module == 'mt_isy' and self._name == 'hr.leave':
+            holiday_status_id = self.env['hr.leave.type'].search([('name','ilike','Sick'),('active','=',True)],limit=1, order='id desc')
+            current_personal_balance = doc.xpath(
+                "//field[@name='current_personal_balance']")
+            if current_personal_balance:
+                current_personal_balance[0].set(
+                    "string", holiday_status_id.name)
+        
+        result['arch'] = etree.tostring(doc, encoding='unicode')
+        return result
+
     @api.depends('employee_id','holiday_status_id')
     def compute_current_leave_balance(self):
-        # for rec in self:
-        #     holiday_status_id = self.env['hr.leave.type'].search([('name','ilike','Personal Leave'),('active','=',True)],limit=1, order='id desc')
-        #     mapped_days = holiday_status_id.get_employees_days((rec.employee_id | rec.employee_ids).ids)
-        #     if rec.employee_id:
-        #         leave_days = mapped_days[rec.employee_id.id][holiday_status_id.id]
-        #         rec.current_personal_balance = leave_days.get('virtual_remaining_leaves') or 0
-        #     else:
-        #         rec.current_personal_balance = 0
         for rec in self:
-            holiday_status_id = self.env['hr.leave.type'].search([('name','ilike','Personal Leave'),('active','=',True)],limit=1, order='id desc')
+            holiday_status_id = self.env['hr.leave.type'].search([('name','ilike','Sick'),('active','=',True)],limit=1, order='id desc')
             if rec.employee_id and holiday_status_id:
                 # Step 1: Calculate the Allocated Leave from the hr.leave.allocation model
                 allocation_records = self.env['hr.leave.allocation'].search([
@@ -48,7 +58,7 @@ class HolidaysRequest(models.Model):
                 rec.current_personal_balance = 0
 
     leave_balance = fields.Float(string="Leave Balance", store=True)
-    current_personal_balance = fields.Float(string="Personal Leave",compute='compute_current_leave_balance')
+    current_personal_balance = fields.Float(string="Sick Leave",compute='compute_current_leave_balance')
     # x_current_leave_balance = fields.Float('')
     activity_ids = fields.One2many(
         'mail.activity', 'res_id', 'Activities',

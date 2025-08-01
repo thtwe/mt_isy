@@ -35,8 +35,8 @@
                     <field name="x_studio_justification" string="Justification"/>
                     <field name="x_studio_approver_2" string="Approver" options="{'no_create': True, 'no_open': True}"  required="0" domain="[[&quot;x_studio_is_manager&quot;,&quot;=&quot;,True]]" readonly="1"/>
                     <field name="current_personal_balance"/>
-                    <field name="x_studio_unpaid_accumulated_leave" readonly="1"/>
-                    <field name="x_studio_accumulated_leave" string="Accumulated Leave (P)"  readonly="1"/>
+                    <!-- <field name="x_studio_unpaid_accumulated_leave" readonly="1"/> -->
+                    <!-- <field name="x_studio_accumulated_leave" string="Accumulated Leave (P)"  readonly="1"/> -->
                     <field invisible="1" name="x_studio_attachment_filename"/>
                     <field filename="x_studio_attachment_filename" name="x_studio_attachment" string="Attachment"/>
                     <field name="x_studio_reason_for_refusal" string="Reason for Refusal" invisible="state == 'confirm' or state !='validate1'"/>
