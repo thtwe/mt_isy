@@ -55,9 +55,13 @@
                     
                     <attribute name='invisible'>1</attribute>
                 </xpath>
-
                 <button name="button_confirm" position="after">
-                    <button string="Check" class="oe_highlight" name="button_check" type="object" invisible="state != 'to_check'"/>
+                    <button string="Check" class="oe_highlight" name="button_check" type="object" invisible="state != 'to_check'"
+                      groups="mt_isy.group_po_checker"/>
+                    <button string="First Check" class="oe_highlight" name="button_first_check" type="object" invisible="state != 'to_first_check'"
+                      groups="mt_isy.group_po_first_checker"/>
+                    <button string="First Approve" class="oe_highlight" name="button_first_approve" type="object" invisible="state != 'to_first_approve'"
+                      groups="mt_isy.group_po_approver"/>
                 </button>
                 <!-- Studio Purchase View -->
 

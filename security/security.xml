@@ -55,6 +55,43 @@
 	        <field name="name">PO and Advanced Expenses Cancel</field>
     	</record>
 
+		<!-- Purchase -->
+
+		<record id="group_po_first_checker" model="res.groups">
+			<field name="name">PO First Checker</field>
+		</record>
+
+		<record id="group_po_checker" model="res.groups">
+			<field name="name">PO Checker</field>
+		</record>
+
+		<record id="group_po_approver" model="res.groups">
+			<field name="name">PO Approver</field>
+		</record>
+
+		<record id="group_po_special_approver" model="res.groups">
+			<field name="name">PO Special Approver</field>
+		</record>
+		<!-- Purchase -->
+
+		<!-- Advance/Reimbursement -->
+		<record id="group_adv_reimb_first_checker" model="res.groups">
+			<field name="name">Adv/Reimb First Checker</field>
+		</record>
+
+		<record id="group_adv_reimb_checker" model="res.groups">
+			<field name="name">Adv/Reimb Checker</field>
+		</record>
+
+		<record id="group_adv_reimb_approver" model="res.groups">
+			<field name="name">Adv/Reimb Approver</field>
+		</record>
+
+		<record id="group_adv_reimb_special_approver" model="res.groups">
+			<field name="name">Adv/Reimb Special Approver</field>
+		</record>
+		<!-- Advance/Reimbursement -->
+
 		<record model="ir.rule" id="group_isy_payslip_process_requestor_rule">
 			<field name="name">Requestor see own records.</field>
 			<field name="model_id" ref="mt_isy.model_hr_payslip_process_request"/>

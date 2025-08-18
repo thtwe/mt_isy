@@ -9,22 +9,6 @@ from itertools import groupby
 import logging
 _logger = logging.getLogger(__name__)
 
-
-# class PurchaseOrder(models.Model):
-#     _inherit = "purchase.order"
-
-#     @api.depends('order_line.invoice_lines.invoice_id')
-#     def _get_invoiced_status(self):
-#         invoice_count = len(self.invoice_ids)
-#         paid_invoice_status = len(self.invocie_ids.filtered(lambda x: x.state=='paid'))
-#         partial_invoice_status = len(self.invocie_ids.filtered(lambda x: x.state in ('open','in_payment')))
-#         if partial_invoice_status:
-#             self.payment_status = 'partial'
-#         if invoice_count == paid_invoice_status:
-#             self.payment_status = 'paid'
-
-
-#     payment_status = fields.Selection([('partial','Partial Paid'),('paid','Paid')], compute='_get_invoiced_status', store=True, readonly=True, copy=False, string = "Payment Status")
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
@@ -118,28 +102,20 @@ class PurchaseOrder(models.Model):
     state = fields.Selection([
         ('draft', 'RFQ'),
         ('sent', 'RFQ Sent'),
-        ('to_check', 'To Check'),
-        ('to approve', 'To Approve'),
+        ('to_first_check', 'Pending First Check'),
+        ('to_check', 'Pending Check'),
+        ('to_first_approve', 'Pending First Approval'),
+        ('to approve', 'Pending Approval'),
         ('purchase', 'Purchase Order'),
         ('done', 'Locked'),
         ('cancel', 'Cancelled')
-    ], string='Status', index=True, readonly=False, copy=False, default='draft', tracking=True)
+    ], string='Status', index=True, readonly=False, copy=False, default='draft')
     both_approval = fields.Boolean(string='Both Approval', default=False)
-    checker_id = fields.Many2one('res.users', string='Checker', default=lambda self: self.env.user)
+    checker_id = fields.Many2one('res.users', string='Checker')
+    first_checker_id = fields.Many2one('res.users', string='First Checker')
+    first_approver_id = fields.Many2one('res.users', string='First Approver')
     created_by_director = fields.Boolean("Created by Director", default=False)
     expiry_date = fields.Date(string="Expiry Date", tracking=True)
-
-    def check_two_step(self):
-        is_two_step = False
-        avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
-            'mt_isy.avoid_rules_accounts', [])
-        for rec_details in self.order_line:
-            # two steps for PD
-            if str(rec_details.product_id.id) in avoid_rules_accounts.split(","):
-                return True
-            else:
-                is_two_step = False
-        return is_two_step
 
     def button_cancel_greg(self):
         for order in self:
@@ -149,21 +125,61 @@ class PurchaseOrder(models.Model):
 
         self.write({'state': 'cancel', 'mail_reminder_confirmed': False})
 
-    def check_both_approval(self):
-        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-        bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
+    #Special case for PD, Chinthe Fund & Sustainable Account
+    def check_special_accounts(self):
+        avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
+            'mt_isy.avoid_rules_accounts', [])
+        for rec_details in self.order_line:
+            if str(rec_details.product_id.name) in avoid_rules_accounts.split(",") or\
+                str(rec_details.product_id.default_code) in avoid_rules_accounts.split(","):
+                return True
 
+        return False
+
+    def to_bool(self, value):
+        if value:
+            return str(value).strip().lower() in ['true', '1', 'yes']
+
+        return False
+
+    def check_two_step_approver(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.po_two_step_approve', False))
+
+    def check_two_step_check(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.po_two_step_check'))
+
+    def check_coo_approve_special_account(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.po_coo_approve_special_account', False))
+
+    def check_approval_steps(self):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1811))
+        bm_assistant_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm_assistant', 1795))
+        bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
+        self.first_approver_id = coo_id
+        self.first_checker_id = bm_assistant_id
+        self.checker_id = bm_id
         if self.created_by_director:
             self.x_studio_approver = director_id
-            self.checker_id = director_id
-            self.both_approval = True
-        elif self.check_two_step() or self.x_studio_approver.id==director_id:
-            self.x_studio_approver=bm_id
-            self.checker_id=director_id
-            self.both_approval = True
-        elif not self.check_two_step():
-            self.both_approval = False
-            self.checker_id = bm_id
+            self.first_approver_id = False
+            self.first_checker_id = False
+            self.checker_id = False
+        else:
+            if self.x_studio_approver.id in (coo_id, director_id):
+                #Checker will become CCM for COO & Director
+                self.x_studio_approver = bm_assistant_id
+                self.first_checker_id = False
+                if not self.check_two_step_check():
+                    self.x_studio_approver = bm_id
+                    self.checker_id = False
+
+            if not self.check_two_step_check():
+                self.first_checker_id = False
+            if not self.check_two_step_approver() or (self.check_special_accounts() and not self.check_coo_approve_special_account()): #Special case for PD, Chinthe Fund & Sustainable
+                self.first_approver_id = False
 
     @api.model
     def create(self, vals):
@@ -179,32 +195,15 @@ class PurchaseOrder(models.Model):
         if result.amount_total<=0:
             raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
 
-        result.check_both_approval()
+        result.check_approval_steps()
         return result
-
-    # @api.model
-    # def create(self, vals):
-    #     gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
-    #     if len(self.env.companies.ids)>1 or self.env.companies[0].id!=gty_comp.id:
-    #         raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
-    #     result = super(PurchaseOrder, self).create(vals)
-    #     if result.amount_total<=0:
-    #         raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
-    #     if result.check_two_step()==True:
-    #         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-    #         if result.x_studio_approver.id!=director_id:
-    #             result.x_studio_approver=director_id
-    #     return result
 
     def write(self, values):
         result = super(PurchaseOrder, self).write(values)
         for rec in self:
             if rec.amount_total<=0:
                 raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
-    #     if self.check_two_step()==True:
-    #         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-    #         if self.x_studio_approver.id!=director_id:
-    #             self.x_studio_approver=director_id
+
         return result
 
     def budget_account_dict(self, account_id, price_subtotal, budget_account_dict, account_analytic,product_id=False,date_from=False,date_to=False):
@@ -229,7 +228,6 @@ class PurchaseOrder(models.Model):
             price_subtotal += subtotal
 
         #check pending Advance amount
-        # domain = [('x_studio_anticipated_account_code','=',product_id),('id','!=',self.id),('state','in',('draft','confirm','approved_hr_manager','paid')),('company_id','=',self.company_id.id)]
         domain = [('x_studio_anticipated_account_code.property_account_expense_id','=',account_id.id),('state','not in',('cancel','reject','cleared')),('company_id','=',self.company_id.id)]
         if self.capex_group_id:
             domain += [('capex_group_id','=',self.capex_group_id.id)]
@@ -295,9 +293,7 @@ class PurchaseOrder(models.Model):
                 account_id = product_id.property_account_expense_id
             elif product_id.categ_id.property_account_expense_categ_id:
                 account_id = product_id.categ_id.property_account_expense_categ_id
-            # elif product_id.asset_category_id:
-            #     account_id = product_id.asset_category_id.account_asset_id
-            #     asset = True
+
             if account_id:
                 if not account_id.no_budget:
                     if account_id.workinprocess and not line.order_id.capex_group_id:
@@ -338,11 +334,30 @@ class PurchaseOrder(models.Model):
         if warning_msg:
             raise UserError(_(''.join(warning_msg)))
 
+    def button_first_check(self):
+        for order in self:
+            if (order.state == 'to_first_check' and order.first_checker_id and order.first_checker_id.id!=self.env.user.id):
+                if self.env.user.login!='odooadmin@isyedu.org':
+                    raise UserError("%s is reviewer for this Purchase Order. You are not allowed to check this."%(self.first_checker_id.name))
+
+            order.state = 'to_check'
+
     def button_check(self):
         for order in self:
             if (order.state == 'to_check' and order.checker_id and order.checker_id.id!=self.env.user.id):
                 if self.env.user.login!='odooadmin@isyedu.org':
                     raise UserError("%s is reviewer for this Purchase Order. You are not allowed to check this."%(self.checker_id.name))
+
+            if self.first_approver_id:
+                order.state = 'to_first_approve'
+            else:
+                order.state = 'to approve'
+
+    def button_first_approve(self):
+        for order in self:
+            if (order.state == 'to_first_approve' and order.first_approver_id and order.first_approver_id.id!=self.env.user.id):
+                if self.env.user.login!='odooadmin@isyedu.org':
+                    raise UserError("%s is reviewer for this Purchase Order. You are not allowed to approve this."%(self.first_approver_id.name))
 
             order.state = 'to approve'
 
@@ -354,46 +369,14 @@ class PurchaseOrder(models.Model):
             if (order.state in ['draft', 'sent'] and order.x_studio_approver and order.x_studio_approver.id!=self.env.user.id):
                 if self.env.user.login!='odooadmin@isyedu.org':
                     raise UserError("%s is approver for this Purchase Order. You are not allowed to approve this."%(self.x_studio_approver.name))
-            
-            order.state = 'to_check'
+
             if order.created_by_director:
                 order.state = 'to approve'
-
-    # def button_confirm(self):
-    #     for order in self:
-    #         if order.state not in ['draft', 'sent']:
-    #             continue
-    #         order._add_supplier_to_product()
-    #         # Deal with double validation process
-    #         is_two_step = False
-    #         if order.company_id.po_double_validation == 'one_step'\
-    #                 or (order.company_id.po_double_validation == 'two_step'
-    #                     and order.amount_total < self.env.user.company_id.currency_id._convert(
-    #                         order.company_id.po_double_validation_amount, order.currency_id, order.company_id, order.date_order or fields.Date.today()))\
-    #                 or order.user_has_groups('purchase.group_purchase_manager'):
-    #             avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
-    #                 'mt_isy.avoid_rules_accounts', [])
-    #             avoid_rules_accounts_social_event = self.env['ir.config_parameter'].sudo().get_param(
-    #                 'mt_isy.avoid_rules_accounts_social_event', [])
-    #             avoid_rules_accounts_social_event = avoid_rules_accounts_social_event.split(",")
-    #             for rec_details in order.order_line:
-    #                 # two steps for PD
-    #                 if str(rec_details.product_id.id) in avoid_rules_accounts.split(","):
-    #                     is_two_step = True
-    #                     break
-    #                 elif rec_details.product_id.id in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-    #                     is_two_step = True
-    #                     break
-    #                 else: # one step
-    #                     is_two_step = False
-    #         else: # two steps for Double Validation
-    #             is_two_step = True
-
-    #         if is_two_step:
-    #             order.write({'state': 'to approve'})
-    #         else:
-    #             order.button_approve()
-    #     return True
+            else:
+                if self.first_checker_id:
+                    order.state = 'to_first_check'
+                else:
+                    order.state = 'to_check'
 
     def _prepare_invoice(self):
         """Prepare the dict of values to create the new invoice for a purchase order.
@@ -512,30 +495,3 @@ class PurchaseOrder(models.Model):
             template = self.env.ref('mt_isy.po_expiry_reminder')
             if template:
                 self.env['mail.template'].browse(template.id).sudo().send_mail(record.id)
-
-# class AccountInvoice(models.Model):
-#     _inherit = "account.invoice"
-
-#     def action_invoice_paid(self):
-#         # lots of duplicate calls to action_invoice_paid, so we remove those already paid
-#         to_pay_invoices = self.filtered(lambda inv: inv.state != 'paid')
-#         if to_pay_invoices.filtered(lambda inv: inv.state not in ('open', 'in_payment')):
-#             raise UserError(_('Invoice must be validated in order to set it to register payment.'))
-#         if to_pay_invoices.filtered(lambda inv: not inv.reconciled):
-#             raise UserError(_('You cannot pay an invoice which is partially paid. You need to reconcile payment entries first.'))
-
-#         for invoice in to_pay_invoices:
-#             if any([move.journal_id.post_at_bank_rec and move.state == 'draft' for move in invoice.payment_move_line_ids.mapped('move_id')]):
-#                 invoice.write({'state': 'in_payment'})
-#             else:
-#                 obj_po_invoices = self.search([('origin','=',invoice.origin)])
-#                 obj_po = self.env['purchase.order'].search([('name','=',invoice.origin)])
-#                 if obj_po_invoices and len(obj_po_invoices) > 1:
-#                     obj_po_invoice -= invoice
-#                     if not obj_po_invoices:
-#                         obj_po.write({'payment_status': 'paid'})
-#                     else:
-#                         for  opi in obj_po_invoices:
-#                             if opi.state != 'paid':
-#                                 obj_po.write({'payment_status': 'partial'})
-#                 invoice.write({'state': 'paid'})

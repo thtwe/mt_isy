@@ -196,15 +196,51 @@
             <field name="model">employee.advance.expense</field>
             <field name="inherit_id" ref="employee_expense_advance.employee_advance_expense_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//button[@name='get_apprv_hr_manager']" position='attributes'>
-                    <attribute name='invisible'>state not in ['check']</attribute>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="first_approver_id" invisible="1"/>
+                    <field name="first_checker_id" invisible="1"/>
+                    <field name="created_by_director" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//button[@name='get_apprv_hr_manager']" position="replace">
+                    <!-- Approve Button -->
+                    <button string="Approve" name="get_apprv_hr_manager"
+                        invisible="not (state == 'confirm' and created_by_director != False)"
+                        type="object" groups="mt_isy.group_adv_reimb_special_approver"  class="oe_highlight"/>
+
+                    <button string="Approve" name="get_apprv_hr_manager"
+                        invisible="not(state == 'check' and first_approver_id == False)"
+                        type="object" groups="mt_isy.group_adv_reimb_special_approver" class="oe_highlight"/>
+
+                    <button string="Approve" name="get_apprv_hr_manager"
+                        invisible="state != 'first_approve'"
+                        type="object" groups="mt_isy.group_adv_reimb_special_approver"  class="oe_highlight"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_sheet_move_advance']" position="replace">
+                    <button string="Done" name="action_sheet_move_advance" invisible="state != 'approved_hr_manager'" groups="account.group_business_manager,account.group_cashier" type="object" class="oe_highlight o_expense_sheet_approve"/>
                 </xpath>
                 <xpath expr="//button[@name='get_reject']" position='attributes'>
                     <attribute name='invisible'>state not in ['confirm','check']</attribute>
                 </xpath>
+
                 <button name="get_confirm" position="after">
-                    <button string="Check" class="oe_highlight" name="get_check" type="object" invisible="state != 'confirm'"/>
+                    <!-- First Check Button -->
+                    <button string="First Check" class="oe_highlight" name="get_first_check" type="object"
+                        invisible="not (state == 'confirm' and first_checker_id != False)" groups="mt_isy.group_adv_reimb_first_checker"/>
+
+                    <!-- Check Button -->
+                    <button string="Check" class="oe_highlight" name="get_check" type="object"
+                        invisible="not (state == 'confirm' and first_checker_id == False and created_by_director == False)" groups="mt_isy.group_adv_reimb_checker"/>
+
+                    <button string="Check" class="oe_highlight" name="get_check" type="object"
+                        invisible="state != 'first_check'" groups="mt_isy.group_adv_reimb_checker"/>
+
+                    <!-- First Approval Button -->
+                    <button string="First Approval" class="oe_highlight" name="get_first_approval" type="object"
+                        invisible="not (state == 'check' and first_approver_id != False)" groups="mt_isy.group_adv_reimb_approver"/>
                 </button>
+
                 <button name="get_done" position="after">
                     <button string="Make Clearance" class="oe_highlight" name="make_clearance" type="object" invisible="adv_exp_type == 'expense' or state not in ('done','partial')"/>
                     <button

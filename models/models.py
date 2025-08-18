@@ -331,7 +331,6 @@ class AdvanceExpenseClearanceLine(models.Model):
     description = fields.Char(string='Description', required=True)
     total_amount = fields.Float(string='Subtotal', compute='_compute_total_line_expense', digits=dp.get_precision('Account'))
     currency_id = fields.Many2one('res.currency', string='Currency', related='advance_id.currency_id', readonly=True, store=True)
-    #expense_line_ids = fields.One2many('hr.expense', 'sheet_id', string='Expense Lines', copy=False)
     advance_id = fields.Many2one('employee.advance.expense', string="Advance Expense Report")
     employee_id = fields.Many2one('hr.employee', required=True, string="Employee", related='advance_id.employee_id')
     name = fields.Char(
@@ -371,7 +370,9 @@ class EmployeeAdvanceExpense(models.Model):
     state = fields.Selection(selection=[
                         ('draft', 'Draft'),
                         ('confirm', 'Confirmed'),
+                        ('first_check', 'First Checked'),
                         ('check', 'Checked'),
+                        ('first_approve', 'First Approved'),
                         ('approved_hr_manager', 'Approved'),
                         ('paid', 'Done'),
                         ('done', 'Paid'),
@@ -384,7 +385,6 @@ class EmployeeAdvanceExpense(models.Model):
                         default='draft',
                         readonly=False,
                         track_visibility='onchange')
-    # state = fields.Selection(selection_add=[('check', 'Checked'), ('payable', 'Payable'), ('partial', 'Partial'), ('cleared', 'Cleared')])
     advance_expense_clearance_line_ids = fields.One2many('advance.expense.clearance.line', 'advance_id', string='Advance Expenses Lines', copy=False)
 
     cls_journal_id = fields.Many2one('account.journal', string='Clearance Journal')
@@ -418,34 +418,13 @@ class EmployeeAdvanceExpense(models.Model):
         ('consumable','Consumable'),
         ('service','Service')],string='Type')
     checker_id = fields.Many2one('res.users', string='Checker')
+    first_checker_id = fields.Many2one('res.users', string='First Checker')
+    first_approver_id = fields.Many2one('res.users', string='First Approver')
     checked_date = fields.Date(string='Checked Date', \
                         readonly=True, copy=False)
     created_by_director = fields.Boolean("Created by Director", default=False)
 
     def get_apprv_hr_manager(self):
-        # total_amount = self.total_amount_expense
-        # if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
-        #     currency_id = self.currency_id
-        #     rate = currency_id.with_context(date=self.request_date)
-        #     total_amount = currency_id._convert(self.total_amount_expense, self.company_id.currency_id, self.company_id, self.request_date or fields.Date.today())
-        # # over $1000 MMK
-        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.currency_id.name=='MMK' and self.total_amount_expense>2100000:
-        #     raise UserError(_('You do not have permission to approve this request.'))
-        # # over $1000 USD
-        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.currency_id.name=='USD' and total_amount > 999.99:
-        #     raise UserError(_('You do not have permission to approve this request.'))
-        # # Salary Advance
-        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.salary_advance:
-        #     raise UserError(_('You do not have permission to approve this request.'))
-        # # Professional Development and Social Event
-        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.both_approval:
-        #     raise UserError(_('You do not have permission to approve this request.'))
-        
-
-        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and total_amount > 999.99:
-        #     raise UserError(_('You do not have permission to approve this request.'))
-        # if self.env.user.id != 191 and not self.env.user.has_group('base.group_system') and self.salary_advance:
-        #     raise UserError(_('You do not have permission to approve this request.'))
         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
         if self.env.user.id != director_id and not self.env.user.has_group('base.group_system'):
             raise UserError(_('You do not have permission to approve this request.'))
@@ -476,7 +455,6 @@ class EmployeeAdvanceExpense(models.Model):
             price_subtotal += subtotal
 
         #check other Advance amount
-        # domain = [('x_studio_anticipated_account_code','=',product_id),('id','!=',self.id),('state','in',('draft','confirm','approved_hr_manager','paid')),('company_id','=',self.company_id.id)]
         domain = [('x_studio_anticipated_account_code.property_account_expense_id','=',account_id.id),('id','!=',self.id),('state','not in',('cancel','reject','cleared')),('company_id','=',self.company_id.id)]
         if self.capex_group_id:
             domain += [('capex_group_id','=',self.capex_group_id.id)]
@@ -541,9 +519,7 @@ class EmployeeAdvanceExpense(models.Model):
                 account_id = product_id.property_account_expense_id
             elif product_id.categ_id.property_account_expense_categ_id:
                 account_id = product_id.categ_id.property_account_expense_categ_id
-            # elif product_id.asset_category_id:
-            #     account_id = product_id.asset_category_id.account_asset_id
-            #     asset = True
+
             if account_id:
                 if not account_id.no_budget:
                     if account_id.workinprocess and not order.capex_group_id:
@@ -581,7 +557,71 @@ class EmployeeAdvanceExpense(models.Model):
                 raise UserError("%s is not an expense type. \n Please contact Odoo team to choose the correct account code."%(product_id.display_name))
         if warning_msg:
             raise UserError(_(''.join(warning_msg)))
-    
+
+    #Special case for PD, Chinthe Fund & Sustainable Account
+    def check_special_accounts(self):
+        avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
+            'mt_isy.avoid_rules_accounts', [])
+        if self.adv_exp_type == 'advance':
+            if str(self.x_studio_anticipated_account_code.name) in avoid_rules_accounts.split(",") or\
+                str(self.x_studio_anticipated_account_code.default_code) in avoid_rules_accounts.split(","):
+                return True
+        else:
+            for line in self.advance_expense_line_ids:
+                if str(line.product_id.name) in avoid_rules_accounts.split(",") or\
+                    str(line.product_id.default_code) in avoid_rules_accounts.split(","):
+                    return True
+
+        return False
+
+    def to_bool(self, value):
+        if value:
+            return str(value).strip().lower() in ['true', '1', 'yes']
+
+        return False
+
+    def check_two_step_approver(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.adv_reim_two_step_approve', False))
+
+    def check_two_step_check(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.adv_reim_two_step_check', False))
+
+    def check_coo_approve_special_account(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.adv_reim_coo_approve_special_account', False))
+
+    def check_approval_steps(self):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1811))
+        bm_assistant_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm_assistant', 1795))
+        bm_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.bm', 178))
+        self.first_approver_id = coo_id
+        self.first_checker_id = bm_assistant_id
+        self.checker_id = bm_id
+        if self.created_by_director:
+            self.x_studio_to_approve = director_id
+            self.x_studio_field_b6lRX = director_id
+            self.first_approver_id = False
+            self.first_checker_id = False
+            self.checker_id = False
+        else:
+            if self.x_studio_to_approve.id in (coo_id, director_id) or (self.check_special_accounts()):
+                #Checker will become CCM for COO & Director
+                self.x_studio_to_approve = bm_assistant_id
+                self.x_studio_field_b6lRX = bm_assistant_id
+                self.first_checker_id = False
+                if not self.check_two_step_check():
+                    self.x_studio_to_approve = bm_id
+                    self.x_studio_field_b6lRX = bm_id
+                    self.checker_id = False
+
+            if not self.check_two_step_check():
+                self.first_checker_id = False
+            if not self.check_two_step_approver() or (self.check_special_accounts() and not self.check_coo_approve_special_account()): #Special case for PD, Chinthe Fund & Sustainable
+                self.first_approver_id = False
+
     @api.model
     def create(self, values):
         values['created_by_director'] = False
@@ -600,105 +640,16 @@ class EmployeeAdvanceExpense(models.Model):
         #If Director requests, all the approval go to him
         if self.env.user.id == director_id:
             values['created_by_director'] = True
-            values['both_approval'] = True
-            values['x_studio_to_approve'] = director_id
-            values['x_studio_field_b6lRX'] = director_id
-            values['checker_id'] = director_id
-        else:
-            if values['adv_exp_type'] == 'advance':
-                if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(",") or\
-                    values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-                    values['both_approval'] = True
-                    values['x_studio_to_approve']=bm_id
-                    values['x_studio_field_b6lRX']=bm_id
-                    values['checker_id'] = director_id
-                else:
-                    values['both_approval'] = False
-            elif values['adv_exp_type'] == 'expense':
-                for rec_details in values['advance_expense_line_ids']:
-                    if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(",") or\
-                        rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-                        values['both_approval'] = True
-                        values['x_studio_to_approve']=bm_id
-                        values['x_studio_field_b6lRX']=bm_id
-                        values['checker_id'] = director_id
-                        break
-                    else:
-                        values['both_approval'] = False
-
-            if values.get('x_studio_to_approve') and values['x_studio_to_approve'] == director_id:
-                values['x_studio_to_approve'] = bm_id
-                values['x_studio_field_b6lRX'] = bm_id
-                values['checker_id'] = director_id
-                values['both_approval'] = True
-            elif not values.get('x_studio_to_approve'):
-                values['both_approval'] = False
-            values['checker_id'] = bm_id
 
         advance_expenses = super(EmployeeAdvanceExpense, self).create(values)
         if advance_expenses.total_amount_expense<=0:
             raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
+        advance_expenses.check_approval_steps()
         warning_msg = []
         budget_account_dict = {}
         account_analytic = []
         self.accouting_budget_warning(advance_expenses, advance_expenses.advance_expense_line_ids, warning_msg, budget_account_dict, account_analytic, update=False)
         return advance_expenses
-
-    # @api.model
-    # def create(self, values):
-    #     gty_comp = self.env['res.company'].sudo().search([('name','ilike','GTY')])
-    #     if len(self.env.companies)>1 or self.env.companies[0].id!=gty_comp.id:
-    #         raise UserError(_("Please change your current company to '"+(gty_comp.name or '')+"'"))
-
-    #     avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
-    #         'mt_isy.avoid_rules_accounts', [])
-    #     avoid_rules_accounts_social_event = self.env['ir.config_parameter'].sudo().get_param(
-    #         'mt_isy.avoid_rules_accounts_social_event', [])
-    #     avoid_rules_accounts_social_event = avoid_rules_accounts_social_event.split(",")
-    #     if values['adv_exp_type'] == 'advance':
-    #         if str(values['x_studio_anticipated_account_code']) in avoid_rules_accounts.split(","):
-    #             values['both_approval'] = True
-    #             director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-    #             values['x_studio_to_approve']=director_id
-    #             values['x_studio_field_b6lRX']=director_id
-    #         elif values['x_studio_anticipated_account_code'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-    #             values['both_approval'] = True
-    #             values['x_type_name'] = 'Social Event'
-    #             director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-    #             if self.env.user.id==director_id:
-    #                 coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1737))
-    #                 values['x_studio_to_approve']=coo_id
-    #                 values['x_studio_field_b6lRX']=coo_id
-    #         else:
-    #             values['both_approval'] = False
-    #     elif values['adv_exp_type'] == 'expense':
-    #         for rec_details in values['advance_expense_line_ids']:
-    #             if str(rec_details[2]['product_id']) in avoid_rules_accounts.split(","):
-    #                 values['both_approval'] = True
-    #                 director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-    #                 values['x_studio_to_approve']=director_id
-    #                 values['x_studio_field_b6lRX']=director_id
-    #                 break
-    #             elif rec_details[2]['product_id'] in self.env['product.product'].search(['|',('default_code','in',avoid_rules_accounts_social_event),('name','in',avoid_rules_accounts_social_event)]).ids:
-    #                 values['both_approval'] = True
-    #                 values['x_type_name'] = 'Social Event'
-    #                 director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-    #                 if self.env.user.id==director_id:
-    #                     coo_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.COO', 1737))
-    #                     values['x_studio_to_approve']=coo_id
-    #                     values['x_studio_field_b6lRX']=coo_id
-    #                 break
-    #             else:
-    #                values['both_approval'] = False
-
-    #     advance_expenses = super(EmployeeAdvanceExpense, self).create(values)
-    #     if advance_expenses.total_amount_expense<=0:
-    #         raise UserError("Your requested amount cannot be ZERO. \nPlease input Unit Price and Quantity.")
-    #     warning_msg = []
-    #     budget_account_dict = {}
-    #     account_analytic = []
-    #     self.accouting_budget_warning(advance_expenses, advance_expenses.advance_expense_line_ids, warning_msg, budget_account_dict, account_analytic, update=False)
-    #     return advance_expenses
 
     def write(self, values):
         if values and 'x_studio_anticipated_account_code' in values.keys() and self.env.user.login not in ('director@isyedu.org','odooadmin@isyedu.org'):
@@ -716,24 +667,6 @@ class EmployeeAdvanceExpense(models.Model):
             if 'advance_expense_line_ids' in values:  
                     rec.accouting_budget_warning(rec, rec.advance_expense_line_ids, warning_msg, budget_account_dict, account_analytic, update=True)
         return res
-
-    # def _compute_both_approval(self):
-    #     for rec in self:
-    #         avoid_rules_accounts = self.env['ir.config_parameter'].sudo().get_param(
-    #             'mt_isy.avoid_rules_accounts', [])
-    #         if rec.adv_exp_type == 'advance':
-    #             if str(rec.x_studio_anticipated_account_code.id) in avoid_rules_accounts.split(","):
-    #                 rec.both_approval = True
-    #             else:
-    #                 rec.both_approval = False
-    #         elif rec.adv_exp_type == 'expense':
-    #             for rec_details in rec.advance_expense_line_ids:
-    #                 if str(rec_details.product_id.id) in avoid_rules_accounts.split(","):
-    #                     rec.both_approval = True
-    #                     break
-    #                 else:
-    #                     rec.both_approval = False
-
 
     @api.constrains('advance_expense_line_ids')
     def check_lines_count(self):
@@ -757,8 +690,6 @@ class EmployeeAdvanceExpense(models.Model):
                 print("----------------------- 30 Days after for " + rec.employee_id.name)
 
     def days_between(d1, d2):
-        #d1 = datetime.strptime(d1, "%Y-%m-%d")
-        #d2 = datetime.strptime(d2, "%Y-%m-%d")
         return abs((d2 - d1).days)
 
     def make_settlement(self):
@@ -803,13 +734,11 @@ class EmployeeAdvanceExpense(models.Model):
             if not self.journal_id:
                 raise UserError(_("No Debit account found for the account, please configure one.") % (self.account_id))
             for line in self:
-                #             category_id = line.asset_id.category_id
                 adv_exp_date = fields.Date.context_today(self)
                 if line.company_id != self.env.user.company_id:
                     raise UserError(_("You are doing from different company."))
                 company_currency = line.company_id.currency_id
                 current_currency = line.currency_id
-                #amount = current_currency.compute(line.total_amount_expense, company_currency)
                 amount = current_currency._convert(
                     from_amount=line.total_amount_expense,
                     to_currency=company_currency,
@@ -825,32 +754,21 @@ class EmployeeAdvanceExpense(models.Model):
                     move_line_credit = {
                         'name': ref,
                         'account_id': line.journal_id.default_account_id.id,
-                        # 'debit': 0.0 if float_compare(amount, 0.0, precision_digits=prec) > 0 else -amount,
-                        # 'credit': amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else 0.0,
                         'debit': 0.0,
                         'credit': amount,
                         'journal_id': line.journal_id.id,
                         'partner_id': line.partner_id.id,
-                        #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'sale' else False,
-                        #'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
                         'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                        # 'amount_currency': company_currency != current_currency and - 1.0 * line.total_amount_expense or 0.0,
                         'amount_currency': line.total_amount_expense * -1.0,
-                        #'amount_currency': -amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else amount,
                     }
                     move_line_debit = {
                         'name': ref,
                         'account_id': line.account_id.id,
-                        # 'credit': 0.0 if float_compare(amount, 0.0, precision_digits=prec) > 0 else -amount,
-                        # 'debit': amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else 0.0,
                         'credit': 0.0,
                         'debit': amount,
                         'journal_id': line.journal_id.id,
                         'partner_id': line.partner_id.id,
-                        #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
-                        #'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
                         'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                        # 'amount_currency': company_currency != current_currency and line.total_amount_expense or 0.0,
                         'amount_currency': line.total_amount_expense,
                     }
                     move_vals = {
@@ -865,21 +783,15 @@ class EmployeeAdvanceExpense(models.Model):
                     move_line_credit = (0, 0, {
                         'name': ref,
                         'account_id': line.account_id.id,
-                        # 'debit': 0.0 if float_compare(amount, 0.0, precision_digits=prec) > 0 else -amount,
-                        # 'credit': amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else 0.0,
                         'debit': 0.0,
                         'credit': amount,
                         'journal_id': line.exp_journal_id.id,
                         'partner_id': line.partner_id.id,
-                        #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'sale' else False,
-                        #'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
                         'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                        # 'amount_currency': company_currency != current_currency and - 1.0 * line.total_amount_expense or 0.0,
                         'amount_currency': line.total_amount_expense * -1.0,
                     })
                     move_line_list.append(move_line_credit)
                     for adv_exp_line in line.advance_expense_line_ids:
-                        #debit_amount = current_currency.compute(adv_exp_line.total_amount, company_currency)
                         debit_amount = current_currency._convert(
                             from_amount=adv_exp_line.total_amount,
                             to_currency=company_currency,
@@ -889,16 +801,11 @@ class EmployeeAdvanceExpense(models.Model):
                         move_line_debit = (0, 0, {
                             'name': ref,
                             'account_id': adv_exp_line.product_id.property_account_expense_id.id,
-                            # 'credit': 0.0 if float_compare(debit_amount, 0.0, precision_digits=prec) > 0 else -debit_amount,
-                            # 'debit': debit_amount if float_compare(debit_amount, 0.0, precision_digits=prec) > 0 else 0.0,
                             'credit': 0.0,
                             'debit': debit_amount,
                             'journal_id': line.exp_journal_id.id,
                             'partner_id': line.partner_id.id,
-                            #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
-                            #'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
                             'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                            # 'amount_currency': company_currency != current_currency and line.total_amount_expense or 0.0,
                             'amount_currency': line.total_amount_expense,
                             'capex_group_id': self.capex_group_id.id
                         })
@@ -933,25 +840,34 @@ class EmployeeAdvanceExpense(models.Model):
                         'date': time.strftime('%Y-%m-%d'),
                     })
 
-            # if post_move and created_moves:
-            #     created_moves.filtered(lambda m: any(m.asset_depreciation_ids.mapped('asset_id.category_id.open_asset'))).post()
+    def get_first_check(self):
+        if (self.first_checker_id and self.first_checker_id.id!=self.env.user.id):
+            if self.env.user.login!='odooadmin@isyedu.org':
+                raise UserError("%s is reviewer for this request. You are not allowed to check this."%(self.first_checker_id.name))
+
+        self.state = 'first_check'
 
     def get_check(self):
-        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-        if (self.state == 'confirm' and self.checker_id and self.checker_id.id!=self.env.user.id):
-            if self.env.user.login!='odooadmin@isyedu.org' and self.env.user.id!=director_id:
+        if (self.checker_id and self.checker_id.id!=self.env.user.id):
+            if self.env.user.login!='odooadmin@isyedu.org':
                 raise UserError("%s is reviewer for this request. You are not allowed to check this."%(self.checker_id.name))
 
         self.state = 'check'
         self.checked_date = time.strftime('%Y-%m-%d')
 
+    def get_first_approval(self):
+        if (self.first_approver_id and self.first_approver_id.id!=self.env.user.id):
+            if self.env.user.login!='odooadmin@isyedu.org':
+                raise UserError("%s is reviewer for this request. You are not allowed to approve this."%(self.first_approver_id.name))
+
+        self.state = 'first_approve'
+
     def get_confirm(self):
-        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
         if not self.advance_expense_line_ids:
             raise UserError(_('Please add some advance expense lines.'))
         else:
             if self.x_studio_to_approve and self.x_studio_to_approve.id!=self.env.user.id:
-                if self.env.user.login!='odooadmin@isyedu.org' and self.env.user.id!=director_id:
+                if self.env.user.login!='odooadmin@isyedu.org':
                     raise UserError("%s is approver for this request. You are not allowed to approve this."%(self.x_studio_to_approve.name))
             if self.adv_exp_type == 'advance':
                 if len(self.advance_expense_line_ids) > 1:
@@ -972,16 +888,10 @@ class EmployeeAdvanceExpense(models.Model):
                 currency_id = self.currency_id
                 rate = currency_id.with_context(date=self.request_date)
                 total_amount = currency_id._convert(self.total_amount_expense, self.company_id.currency_id, self.company_id, self.request_date or fields.Date.today())
-            # if(total_amount > 250000 and self.env.user.login != 'director@isyedu.org'):
-            #     raise UserError(_('Cannot confirm this advance as it exceeds $250,000 limit.'))
-            # else:
+
             self.state = 'confirm'
             self.confirm_date = time.strftime('%Y-%m-%d')
             self.confirm_by_id = self.env.user.id
-            #If the Director requests, skip to check action state and ask for approve state.
-            if self.created_by_director:
-                self.state = 'check'
-                self.checked_date = time.strftime('%Y-%m-%d')
 
     # Done State key is 'paid'.
     # override reverse process with get_done and action_sheet_move_advance
@@ -1011,7 +921,6 @@ class EmployeeAdvanceExpense(models.Model):
             move_vals = self.get_salary_adv_move_vals(clear_amount)
 
         move = self.env['account.move'].create(move_vals)
-        #move.post()
         clearance_total_amount = sum(result.total_amount for result in self.advance_expense_clearance_line_ids.search([('advance_id', '=', self.id)]))
         state = 'partial' if self.total_amount_expense != round(clearance_total_amount + self.cash_cleared_amount, 2) else 'cleared'
         self.write({
@@ -1020,11 +929,6 @@ class EmployeeAdvanceExpense(models.Model):
                     'clearnce_account_by_id': self.env.user.id,
                     })
         self.advance_expense_clearance_line_ids.search([('cls_move_id', '=', False), ('advance_id', '=', self.id)]).write({'cls_move_id': move.id})
-        #created_moves |= move
-
-        # if post_move and created_moves:
-        #     created_moves.filtered(lambda m: any(m.asset_depreciation_ids.mapped('asset_id.category_id.open_asset'))).post()
-        #return [x.id for x in created_moves]
 
     def get_salary_adv_move_vals(self, clear_amount):
         created_moves = self.env['account.move']
@@ -1048,9 +952,7 @@ class EmployeeAdvanceExpense(models.Model):
             'credit': amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else 0.0,
             'journal_id': self.cls_journal_id.id,
             'partner_id': self.partner_id.id,
-            #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'sale' else False,
             'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-            # 'amount_currency': company_currency != current_currency and - 1.0 * clear_amount or 0.0,
             'amount_currency': clear_amount * -1.0,
         })
         vals.append(move_line_credit)
@@ -1064,9 +966,7 @@ class EmployeeAdvanceExpense(models.Model):
             'debit': cash_debit_amount if float_compare(cash_debit_amount, 0.0, precision_digits=prec) > 0 else 0.0,
             'journal_id': self.cls_journal_id.id,
             'partner_id': self.partner_id.id,
-            #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
             'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-            # 'amount_currency': company_currency != current_currency and clear_amount or 0.0,
             'amount_currency': clear_amount,
         })
         vals.append(cash_move_line_debit)
@@ -1086,9 +986,7 @@ class EmployeeAdvanceExpense(models.Model):
                 'debit': diff_amount if float_compare(diff_amount, 0.0, precision_digits=prec) > 0 else 0.0,
                 'journal_id': self.cls_journal_id.id,
                 'partner_id': self.partner_id.id,
-                #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
                 'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                # 'amount_currency': company_currency != current_currency and diff_amount_currency or 0.0,
                 'amount_currency': diff_amount_currency,
             })
             vals.append(gain_loss_diff)
@@ -1117,7 +1015,6 @@ class EmployeeAdvanceExpense(models.Model):
         company_currency = self.company_id.currency_id
         current_currency = self.currency_id
         #usd amount
-        # amount = current_currency.with_context({'date': self.account_validate_date}).compute(self.total_amount_expense, company_currency)
         amount = current_currency._convert(
             from_amount=self.total_amount_expense,
             to_currency=company_currency,
@@ -1142,9 +1039,7 @@ class EmployeeAdvanceExpense(models.Model):
         counter_amount = 0
         counter_amount_currency = 0
         for line in self.advance_expense_clearance_line_ids:
-            #             category_id = line.asset_id.category_id
             #usd amount
-            # line_amount = current_currency.with_context({'date': self.cash_clearance_date}).compute(line.total_amount, company_currency)
             line_amount = current_currency._convert(
                 from_amount=line.total_amount,
                 to_currency=company_currency,
@@ -1162,9 +1057,7 @@ class EmployeeAdvanceExpense(models.Model):
                 'debit': line_amount if float_compare(line_amount, 0.0, precision_digits=prec) > 0 else 0.0,
                 'journal_id': line.advance_id.cls_journal_id.id,
                 'partner_id': line.advance_id.partner_id.id,
-                #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
                 'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                # 'amount_currency': company_currency != current_currency and line.total_amount or 0.0,
                 'amount_currency': line.total_amount,
                 'capex_group_id': self.capex_group_id.id,
             })
@@ -1175,7 +1068,6 @@ class EmployeeAdvanceExpense(models.Model):
             #mmk amount
             cash_debit_amount_before = self.cash_cleared_amount  # self.total_amount_expense - counter_amount_currency
             #convert mmk to usd
-            # cash_debit_amount = current_currency.with_context({'date': self.cash_clearance_date}).compute(cash_debit_amount_before, company_currency)
             cash_debit_amount = current_currency._convert(
                 from_amount=cash_debit_amount_before,
                 to_currency=company_currency,
@@ -1189,9 +1081,7 @@ class EmployeeAdvanceExpense(models.Model):
                 'debit': cash_debit_amount if float_compare(cash_debit_amount, 0.0, precision_digits=prec) > 0 else 0.0,
                 'journal_id': self.cls_journal_id.id,
                 'partner_id': self.partner_id.id,
-                #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
                 'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                # 'amount_currency': company_currency != current_currency and cash_debit_amount_before or 0.0,
                 'amount_currency': cash_debit_amount_before,
             })
             vals.append(cash_move_line_debit)
@@ -1202,7 +1092,6 @@ class EmployeeAdvanceExpense(models.Model):
             print("need to make exchange adjustment")
             account_id = self.company_id.currency_exchange_journal_id.default_account_id.id
             #convert usd to mmk
-            # diff_amount_currency = company_currency.with_context({'date': self.cash_clearance_date}).compute(diff_amount, current_currency)
             diff_amount_currency = company_currency._convert(
                 from_amount=diff_amount,
                 to_currency=current_currency,
@@ -1216,9 +1105,7 @@ class EmployeeAdvanceExpense(models.Model):
                 'debit': diff_amount if float_compare(diff_amount, 0.0, precision_digits=prec) > 0 else 0.0,
                 'journal_id': self.cls_journal_id.id,
                 'partner_id': self.partner_id.id,
-                #                 'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
                 'currency_id': current_currency.id if company_currency != current_currency else company_currency.id,
-                # 'amount_currency': company_currency != current_currency and diff_amount_currency or 0.0,
                 'amount_currency': diff_amount_currency,
             })
             vals.append(gain_loss_diff)
