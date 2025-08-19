@@ -168,7 +168,7 @@ class PurchaseOrder(models.Model):
             self.first_checker_id = False
             self.checker_id = False
         else:
-            if self.x_studio_approver.id in (coo_id, director_id):
+            if self.x_studio_approver.id in (coo_id, director_id) or (self.check_special_accounts()):
                 #Checker will become CCM for COO & Director
                 self.x_studio_approver = bm_assistant_id
                 self.first_checker_id = False
