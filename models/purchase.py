@@ -109,7 +109,7 @@ class PurchaseOrder(models.Model):
         ('purchase', 'Purchase Order'),
         ('done', 'Locked'),
         ('cancel', 'Cancelled')
-    ], string='Status', index=True, readonly=False, copy=False, default='draft')
+    ], string='Status', index=True, readonly=False, copy=False, default='draft', tracking=False)
     both_approval = fields.Boolean(string='Both Approval', default=False)
     checker_id = fields.Many2one('res.users', string='Checker')
     first_checker_id = fields.Many2one('res.users', string='First Checker')
