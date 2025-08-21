@@ -74,7 +74,7 @@
                       <button name="button_cancel_greg" 
                           type="object" 
                           string="Cancel" 
-                          invisible="state not in ('draft','to approve','sent','purchase')"
+                          invisible="state not in ('draft','to_first_check', 'to_check', 'to_first_approve', 'to approve', 'sent', 'purchase')"
                           groups="mt_isy.group_po_cancel_user"/>
                   </xpath>
                   <!-- <xpath expr="//field[@name='picking_count']" position="attributes">
