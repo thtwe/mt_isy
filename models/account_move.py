@@ -122,14 +122,6 @@ class AccountMove(models.Model):
         self[self._sequence_field] = format.format(**format_values)
         self._compute_split_sequence()
 
-    # def preview_invoice(self):
-    #     self.ensure_one()
-    #     return {
-    #         'type': 'ir.actions.act_url',
-    #         'target': 'new',
-    #         'url': self.get_portal_url(),
-    #     }
-
     def _compute_access_url(self):
         super(AccountMove, self)._compute_access_url()
         for move in self:
@@ -138,17 +130,36 @@ class AccountMove(models.Model):
             else:
                 move.access_url = '/my/journalentry/%s' % (move.id)
 
-    #def write(self, values):
-    #    for move in self:
-    #        for move_line in move.line_ids:
-    #            warning_msg = []
-    #            budget_account_dict = {}
-    #            account_analytic = []
-    #            if 'state' in values and values.get('state') in ('posted','draft') and move.state!='posted':  
-    #                move_line.accouting_budget_warning(move_line.move_id, move_line, warning_msg, budget_account_dict, account_analytic, update=True)
-    #    res = super(AccountMove, self).write(values)
-    #    return res
+    #CRON --override func
+    def _autopost_draft_entries(self):
+        ''' This method is called from a cron job.
+        It is used to post entries such as those created by the module
+        account_asset and recurring entries created in _post().
+        '''
+        moves = self.search([
+            ('state', '=', 'draft'),
+            ('date', '<=', fields.Date.context_today(self)),
+            ('auto_post', '!=', 'no'),
+            ('to_check', '=', False),
+        ], limit=100)
 
+        if not moves:
+            return
+
+        for move in moves:
+            try:
+                with self.env.cr.savepoint():
+                    move._post()
+            except UserError as e:
+                move.to_check = True
+                msg = _('The move could not be posted for the following reason: %(error_message)s', error_message=e)
+                move.message_post(body=msg, message_type='comment')
+
+        if len(moves) == 100:  # assumes there are more whenever search hits limit
+            # self.env.ref('account.ir_cron_auto_post_draft_entry')._trigger()
+            cron = self.env.ref("account.ir_cron_auto_post_draft_entry", raise_if_not_found=False)
+            if cron:
+                cron._trigger()
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'

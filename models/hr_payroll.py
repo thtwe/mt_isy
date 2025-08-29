@@ -1086,6 +1086,7 @@ class AccountMoveLine(models.Model):
 class HrPayslipApproval(models.Model):
     _name = 'hr.payslip.approval'
     _inherit = ['mail.thread']
+    _order = "id desc"
 
     name = fields.Char(string="Reference Number", readonly=True,
                        required=True, copy=False, default='New')

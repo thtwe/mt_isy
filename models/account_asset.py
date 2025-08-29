@@ -28,6 +28,7 @@ class AccountFiscalYear(models.Model):
 
 class AccountAssetAsset(models.Model):
     _inherit = 'account.asset'
+    _order = 'acquisition_date desc'
 
     posted_count = fields.Integer('Posted Count',compute="compute_posted_count")
 
