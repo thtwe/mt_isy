@@ -31,7 +31,7 @@
     'author': 'MYAT THU',
     'company': 'ISY',
     'website': "https://www.isyedu.org",
-    'depends': ['base', 'account', 'web', 'employee_expense_advance','hr_contract', 'hr_payroll', 'hr_payroll_account', 'hr_holidays', 'mail','portal', 'fail_safe', 'stock', 'accounting_budget_extension_V7'],
+    'depends': ['base', 'account', 'web', 'employee_expense_advance','hr_contract', 'hr_payroll', 'hr_payroll_account', 'hr_holidays', 'mail','portal', 'fail_safe', 'stock', 'accounting_budget_extension_V7', 'report_xlsx'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -71,6 +71,7 @@
         'report/capex_report.xml',
         'report/stock_report.xml',
         'report/payroll_request_process_report.xml',
+        'report/asset_report_action.xml'
         
     ],
     "external_dependencies": {"python3": ["pyjwt"]},
