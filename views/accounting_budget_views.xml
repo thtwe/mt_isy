@@ -232,38 +232,38 @@
                                     <field name="employee_type" required="1"/>
                                     <field name="budget_id" string="Budget"/>
                                     <!-- KMS Update (29/9/2020) -->
-                                    <field name="current_year_base" string="20-21 Base (A)" readonly="1" sum="Total"/>
+                                    <field name="current_year_base" string="Base (A)" readonly="1" sum="Total"/>
                                     <!-- END -->
                                     <field name="retirement_percentage" string="Retirement % (B)" force_save="True" readonly="employee_type == 'local' or employee_type == False"/>
                                     <field name="provident_fund_percentage" string="Provident Fund % (C)" force_save="True" readonly="employee_type == 'expatriate' or employee_type == False"/>
-                                    <field name="current_year_retirement" string="20-21 Retirement (D=A*B)" sum="Total"/>
-                                    <field name="current_year_provident_fund" string="20-21 Provident Fund (E=A*C)" sum="Total"/>
-                                    <field name="current_year_budget" string="20-21 Budget (F=A+D|E)" sum="Total"/>
+                                    <field name="current_year_retirement" string="Retirement (D=A*B)" sum="Total"/>
+                                    <field name="current_year_provident_fund" string="Provident Fund (E=A*C)" sum="Total"/>
+                                    <field name="current_year_budget" string="Budget (F=A+D|E)" sum="Total"/>
                                     <!-- KMS Update -->
-                                    <field name="current_year_allowance" string="20 - 21 Allowance (Z)" sum="Total" readonly="employee_type == 'expatriate' or employee_type == False" />
-                                    <field name="current_year_tax_amount" string="20 - 21 Tax (X)" sum="Total" readonly="employee_type == 'expatriate' or employee_type == False" />
+                                    <field name="current_year_allowance" string="Allowance (Z)" sum="Total" readonly="employee_type == 'expatriate' or employee_type == False" />
+                                    <field name="current_year_tax_amount" string="Tax (X)" sum="Total" readonly="employee_type == 'expatriate' or employee_type == False" />
                                     <!-- END -->
                                     <!-- KMS Update (29/9/2020) -->
-                                    <field name="next_year_origin" string="21 - 22 Origin (G)" />
+                                    <field name="next_year_origin" string="Next Year Origin (G)" />
                                     <!-- END -->
                                     <field name="inflation" string="Inflation % (H)"/>
-                                    <field name="next_year_base" string="21-22 Base (I=G+(G*H)" force_save="True" readonly="1" sum="Total"/>
+                                    <field name="next_year_base" string="Next Year Base (I=G+(G*H)" force_save="True" readonly="1" sum="Total"/>
                                     <field name="additional_stipend" string="Additional Stipend % (J)"/>
-                                    <field name="next_year_base_additional" string="21-22 Base (Additional) (K=I+(I*J))" sum="Total"/>
-                                    <field name="next_year_retirement" string="21-22 Retirement (L=I*B)" sum="Total"/>
-                                    <field name="next_year_provident_fund" string="21-22 Provident Fund (M=I*C)" sum="Total"/>
+                                    <field name="next_year_base_additional" string="Next Year Base (Additional) (K=I+(I*J))" sum="Total"/>
+                                    <field name="next_year_retirement" string="Next Year Retirement (L=I*B)" sum="Total"/>
+                                    <field name="next_year_provident_fund" string="Next Year Provident Fund (M=I*C)" sum="Total"/>
                                     <!-- MT-->
-                                    <field name="next_year_allowance" string="21-22 Allowance (N)" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_allowance" string="Next Year Allowance (N)" sum="Total" force_save="True" readonly="1" />
                                     <field name="gratuity_budget_line_percent" string="Gratuity Budget Line %" column_invisible="True"/>
-                                    <field name="next_year_gratuity_m" string="21-22 Gratuity (O=(N+K)*(Graduity Budget Percent/100))" sum="Total" force_save="True" readonly="1" />
-                                    <field name="next_year_tax_amount" string="21-22 Tax (P)" sum="Total" force_save="True" readonly="1" />
-                                    <field name="next_year_net_income" string="21-22 Net Income (Q=(I+N+O)-P)" sum="Total" force_save="True" readonly="1" />
-                                    <field name="next_year_net_income_provident_fund" string="21-22 Net Income Provident Fund (R=M+Q)" sum="Total" column_invisible="True" force_save="True" readonly="1" />
+                                    <field name="next_year_gratuity_m" string="Next Year Gratuity (O=(N+K)*(Graduity Budget Percent/100))" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_tax_amount" string="Next Year Tax (P)" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_net_income" string="Next Year Net Income (Q=(I+N+O)-P)" sum="Total" force_save="True" readonly="1" />
+                                    <field name="next_year_net_income_provident_fund" string="Next Year Net Income Provident Fund (R=M+Q)" sum="Total" column_invisible="True" force_save="True" readonly="1" />
                                     <!-- MT DONE-->
                                     <!-- KMS Update -->
-                                    <field name="current_year_net_budget" string="20 - 21 Net Budget (Y=F+20-21 Gratuity+Z)" sum="Total" readonly="1" />
+                                    <field name="current_year_net_budget" string="Net Budget (Y=F+20-21 Gratuity+Z)" sum="Total" readonly="1" />
                                     <!-- END -->
-                                    <field name="next_year_budget" string="21-22 Budget (S=K+L|K+M+N+O)" sum="Total"/>
+                                    <field name="next_year_budget" string="Next Year Budget (S=K+L|K+M+N+O)" sum="Total"/>
                                     <!-- KMS Update -->
                                     <field name="variance" string="Variance (T=((S-P)-(Y-X))" sum="Total"/>
                                     <!-- END -->
@@ -650,10 +650,10 @@
                     </h1>
                     <group>
                         <group name="budget_info">
-                            <field name="planned_amount" string="Allowed Amount" readonly='0'/>
-                            <field name="planned_amount_100" string="21-22 Budget (C)"/>
-                            <field name="last_year_planned_amount" string="20-21 Budget (B)" readonly='1'/>
-                            <field name="last_2_year_planned_amount" string="19-20 Budget (A)" readonly='1'/>
+                            <field name="planned_amount" readonly='0'/>
+                            <field name="planned_amount_100" />
+                            <field name="last_year_planned_amount" readonly='1'/>
+                            <field name="last_2_year_planned_amount" readonly='1'/>
                         </group>
                         <group name="calculations">
                             <field name="contingency_amount"/>

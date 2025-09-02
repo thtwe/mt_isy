@@ -586,51 +586,51 @@ class CapitalBudgetTemplate(models.Model):
 
                 result['arch'] = etree.tostring(doc, encoding='unicode')
         
-        elif view_type == 'form' and self._module == 'mt_isy':
-            if view_id == form_ref_view_id.id:
-                # if not 'params' in self._context.keys():
-                #     return result
-                # if not 'id' in self._context.get('params').keys():
-                #     return result
-                if not 'params' in self._context.keys() or not 'id' in self._context.get('params',{}).keys():
-                    if self._context.get('state','0')=='3': # Future
-                        val = self._get_year_from_to('future')
-                    elif self._context.get('state','0')=='2': # Current
-                        val = self._get_year_from_to('current')
-                    else: # Current
-                        val = self._get_year_from_to('last')
-                    past_year = val['last_year']
-                    current_year = val['current_year']
-                    past_2_year = val['last_2_year']
-                else:
-                    obj_budget = self.env['capital.budget.template'].search(
-                        [('id', '=', self._context.get('params')['id'] or False)])
-                    if obj_budget:
-                        past_year = str(obj_budget.from_date.year - 1)[2::] + "/" + str(obj_budget.to_date.year - 1)[2::]
-                        current_year = str(obj_budget.from_date.year)[2::] + "/" + str(obj_budget.to_date.year)[2::]
-                        past_2_year = str(obj_budget.from_date.year - 2)[2::] + "/" + str(obj_budget.to_date.year - 2)[2::]
-                    else:
-                        past_year = "Past Year Budget (B)"
-                        current_year = "Current Year Budget (C)"
-                        past_2_year = "Future Year Budget (A)"
+        # elif view_type == 'form' and self._module == 'mt_isy':
+        #     if view_id == form_ref_view_id.id:
+        #         # if not 'params' in self._context.keys():
+        #         #     return result
+        #         # if not 'id' in self._context.get('params').keys():
+        #         #     return result
+        #         if not 'params' in self._context.keys() or not 'id' in self._context.get('params',{}).keys():
+        #             if self._context.get('state','0')=='3': # Future
+        #                 val = self._get_year_from_to('future')
+        #             elif self._context.get('state','0')=='2': # Current
+        #                 val = self._get_year_from_to('current')
+        #             else: # Current
+        #                 val = self._get_year_from_to('last')
+        #             past_year = val['last_year']
+        #             current_year = val['current_year']
+        #             past_2_year = val['last_2_year']
+        #         else:
+        #             obj_budget = self.env['capital.budget.template'].search(
+        #                 [('id', '=', self._context.get('params')['id'] or False)])
+        #             if obj_budget:
+        #                 past_year = str(obj_budget.from_date.year - 1)[2::] + "/" + str(obj_budget.to_date.year - 1)[2::]
+        #                 current_year = str(obj_budget.from_date.year)[2::] + "/" + str(obj_budget.to_date.year)[2::]
+        #                 past_2_year = str(obj_budget.from_date.year - 2)[2::] + "/" + str(obj_budget.to_date.year - 2)[2::]
+        #             else:
+        #                 past_year = "Past Year Budget (B)"
+        #                 current_year = "Current Year Budget (C)"
+        #                 past_2_year = "Future Year Budget (A)"
                 
-                current_year_budget = current_year + "- Budget(C)"
-                past_year_budget = past_year + "- Budget(B)"
-                past_2_year_budget = past_2_year + "- Budget(A)"
+        #         current_year_budget = current_year + "- Budget(C)"
+        #         past_year_budget = past_year + "- Budget(B)"
+        #         past_2_year_budget = past_2_year + "- Budget(A)"
 
-                current_year_ref = doc.xpath("//field[@name='planned_amount']")
-                current_year_ref[0].set("string", current_year_budget+" [85%]")
-                current_year_ref = doc.xpath("//field[@name='planned_amount_100']")
-                current_year_ref[0].set("string", current_year_budget+" [100%]")
+        #         current_year_ref = doc.xpath("//field[@name='planned_amount']")
+        #         current_year_ref[0].set("string", current_year_budget+" [85%]")
+        #         current_year_ref = doc.xpath("//field[@name='planned_amount_100']")
+        #         current_year_ref[0].set("string", current_year_budget+" [100%]")
 
-                past_year_ref = doc.xpath("//field[@name='last_year_planned_amount']")
-                past_year_ref[0].set("string", past_year_budget)
+        #         past_year_ref = doc.xpath("//field[@name='last_year_planned_amount']")
+        #         past_year_ref[0].set("string", past_year_budget)
 
-                past_2_year_ref = doc.xpath(
-                    "//field[@name='last_2_year_planned_amount']")
-                past_2_year_ref[0].set("string", past_2_year_budget)
+        #         past_2_year_ref = doc.xpath(
+        #             "//field[@name='last_2_year_planned_amount']")
+        #         past_2_year_ref[0].set("string", past_2_year_budget)
 
-                result['arch'] = etree.tostring(doc, encoding='unicode')
+        #         result['arch'] = etree.tostring(doc, encoding='unicode')
 
         return result
 
