@@ -246,7 +246,7 @@ class BudgetDisplayConsolidatedWizard(models.TransientModel):
             # GALA account requested by SL
             account_ids += self.env['account.account'].sudo().search([('code','=','451006'),('company_id','in',[4,1])])
             _logger.debug(account_ids)
-        
+
         if not account_ids:
             raise ValidationError(_("No records found."))
         query = """

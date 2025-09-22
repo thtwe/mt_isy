@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Custom Payslip Format -->
+    <template id="report_payslip_cashpack">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="slip">
+                <div style="font-family: Arial, sans-serif; font-size: 13px;">
+                    <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr>
+                            <td style="width:60%; font-weight: bold;">Sr</td>
+                            <td style="text-align: right;">
+                                <t t-esc="serial"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Employee/Name</td>
+                            <td style="text-align: right;">
+                                <t t-esc="slip.employee_id.name"/>
+                            </td>
+                        </tr>
+
+                        <!-- Net Salary Logic -->
+                        <t t-set="net_line" t-value="slip.line_ids.filtered(lambda l: l.code == 'PETTYCASHNETLOCAL')[:1]"/> <!-- Local-->
+                        <t t-if="net_line">
+                            <t t-set="net_amount" t-value="net_line.total"/>
+                            <t t-set="usd_fifty" t-value="int(net_amount // 50 * 50)"/>
+                            <t t-set="remainder" t-value="net_amount - usd_fifty"/>
+                            <t t-set="rate" t-value="2100"/> <!-- hardcoded, can be dynamic -->
+                            <t t-set="mmk_value" t-value="remainder * rate"/>
+                            <t t-set="rounded_mmk" t-value="(mmk_value // 1000 * 1000) if (mmk_value % 1000) &lt; 500 else ((mmk_value // 1000 + 1) * 1000)"/>
+                            <tr>
+                                <td style="font-weight: bold;">USD</td>
+                                <td style="text-align: right;">
+                                    <!-- Replace slip.contract_id.wage with your USD field -->
+                                    <t t-esc="'{:,.0f}'.format(usd_fifty)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold;">MMK @ 2100</td>
+                                <td style="text-align: right;">
+                                    <t t-esc="'{:,.0f}'.format(rounded_mmk)"/>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <!-- Net Salary Logic -->
+                        <t t-set="net_line" t-value="slip.line_ids.filtered(lambda l: l.code == 'TDB')[:1]"/> <!-- Expatriate-->
+                        <t t-if="net_line">
+                            <tr>
+                                <td style="font-weight: bold;">USD</td>
+                                <td style="text-align: right;">
+                                    <!-- Replace slip.contract_id.wage with your USD field -->
+                                    <t t-esc="'{:,.0f}'.format(net_line.total)"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="2" style="text-align: left; font-weight: bold;">
+                                <t t-esc="slip.date_from.strftime('%b-%y')"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Paper Format for Payslip Cashpack Portrait-->
+    <record id="paperformat_payslip_cashpack" model="report.paperformat">
+        <field name="name">Payslip Cashpack Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field> <!-- 🔹 This controls it -->
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+
+    <!-- Report Action -->
+    <record id="action_report_payslip_cashpack" model="ir.actions.report">
+        <field name="name">Payslip Cashpack</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mt_isy.report_payslip_cashpack</field> <!-- QWeb template ID -->
+        <field name="report_file">mt_isy.report_payslip_cashpack</field>
+        <field name="paperformat_id" ref="mt_isy.paperformat_payslip_cashpack"/>
+    </record>
+
+</odoo>

@@ -3,3 +3,4 @@
 
 from . import employee_payable_receivable_report
 from . import asset_report_xlsx
+from . import payslip_cashpack_report

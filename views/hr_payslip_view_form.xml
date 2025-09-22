@@ -1,0 +1,23 @@
+<odoo>
+    <!-- Server Action -->
+    <record id="action_server_payslip_cashpack" model="ir.actions.server">
+        <field name="name">Print Payslip Cashpack</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip_run"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip_run"/>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_print_cashpack_payslips()
+        </field>
+    </record>
+
+    <!-- Server Action -->
+    <record id="action_server_payslip_custom" model="ir.actions.server">
+        <field name="name">Print Payslip Cashpack</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_print_payslips()
+        </field>
+    </record>
+</odoo>

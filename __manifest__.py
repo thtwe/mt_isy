@@ -71,7 +71,9 @@
         'report/capex_report.xml',
         'report/stock_report.xml',
         'report/payroll_request_process_report.xml',
-        'report/asset_report_action.xml'
+        'report/asset_report_action.xml',
+        'report/payslip_cashpack_report.xml',
+        'views/hr_payslip_view_form.xml',
         
     ],
     "external_dependencies": {"python3": ["pyjwt"]},
