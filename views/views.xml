@@ -200,6 +200,7 @@
                     <field name="first_approver_id" invisible="1"/>
                     <field name="first_checker_id" invisible="1"/>
                     <field name="created_by_director" invisible="1"/>
+                    <field name="coo_final_approver" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//button[@name='get_apprv_hr_manager']" position="replace">
@@ -209,7 +210,7 @@
                         type="object" groups="mt_isy.group_adv_reimb_special_approver"  class="oe_highlight"/>
 
                     <button string="Approve" name="get_apprv_hr_manager"
-                        invisible="not(state == 'check' and first_approver_id == False)"
+                        invisible="not(state == 'check' and (first_approver_id == False or coo_final_approver == True))"
                         type="object" groups="mt_isy.group_adv_reimb_special_approver" class="oe_highlight"/>
 
                     <button string="Approve" name="get_apprv_hr_manager"
@@ -238,7 +239,7 @@
 
                     <!-- First Approval Button -->
                     <button string="First Approval" class="oe_highlight" name="get_first_approval" type="object"
-                        invisible="not (state == 'check' and first_approver_id != False)" groups="mt_isy.group_adv_reimb_approver"/>
+                        invisible="not (state == 'check' and first_approver_id != False and coo_final_approver == False)" groups="mt_isy.group_adv_reimb_approver"/>
                 </button>
 
                 <button name="get_done" position="after">

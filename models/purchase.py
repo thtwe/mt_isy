@@ -116,6 +116,7 @@ class PurchaseOrder(models.Model):
     first_approver_id = fields.Many2one('res.users', string='First Approver')
     created_by_director = fields.Boolean("Created by Director", default=False)
     expiry_date = fields.Date(string="Expiry Date", tracking=True)
+    coo_final_approver = fields.Boolean(string='COO-Final Approver', default=False)
 
     def button_cancel_greg(self):
         for order in self:
@@ -132,6 +133,17 @@ class PurchaseOrder(models.Model):
         for rec_details in self.order_line:
             if str(rec_details.product_id.name) in avoid_rules_accounts.split(",") or\
                 str(rec_details.product_id.default_code) in avoid_rules_accounts.split(","):
+                return True
+
+        return False
+
+    #Check if the amount is less than the allowed amount only need first approve
+    def check_coo_final_approver(self):
+        amount_check = float(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.po_amount_check', 0.00))
+        if amount_check > 0:
+            converted_amount = self.currency_id._convert(self.amount_total, self.company_id.currency_id, self.company_id, self.date_order or fields.Date.today())
+            if converted_amount < amount_check:
                 return True
 
         return False
@@ -348,8 +360,10 @@ class PurchaseOrder(models.Model):
                 if self.env.user.login!='odooadmin@isyedu.org':
                     raise UserError("%s is reviewer for this Purchase Order. You are not allowed to check this."%(self.checker_id.name))
 
-            if self.first_approver_id:
-                order.state = 'to_first_approve'
+            if order.first_approver_id:
+                #If amount is less than allowed amount, then go to final approver to COO
+                order.coo_final_approver = order.check_coo_final_approver()
+                order.state = 'to_first_approve' if not order.coo_final_approver else 'to approve'
             else:
                 order.state = 'to approve'
 
@@ -360,6 +374,12 @@ class PurchaseOrder(models.Model):
                     raise UserError("%s is reviewer for this Purchase Order. You are not allowed to approve this."%(self.first_approver_id.name))
 
             order.state = 'to approve'
+
+    def button_approve(self, force=False):
+        director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
+        if self.env.user.id != director_id  and ((self.coo_final_approver and self.env.user.id != self.first_approver_id.id) or not self.coo_final_approver):
+            raise UserError(_("You are not allowed to approve this Purchase Order."))
+        return super(PurchaseOrder, self).button_approve(force)
 
     def button_confirm(self):
         for order in self:

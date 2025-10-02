@@ -423,10 +423,11 @@ class EmployeeAdvanceExpense(models.Model):
     checked_date = fields.Date(string='Checked Date', \
                         readonly=True, copy=False)
     created_by_director = fields.Boolean("Created by Director", default=False)
+    coo_final_approver = fields.Boolean(string='COO-Final Approver', default=False)
 
     def get_apprv_hr_manager(self):
         director_id = int(self.env['ir.config_parameter'].sudo().get_param('isy.director', 191))
-        if self.env.user.id != director_id and not self.env.user.has_group('base.group_system'):
+        if self.env.user.id != director_id and not self.env.user.has_group('base.group_system') and ((self.coo_final_approver and self.env.user.id != self.first_approver_id.id) or not self.coo_final_approver):
             raise UserError(_('You do not have permission to approve this request.'))
 
         self.state = 'approved_hr_manager'
@@ -577,6 +578,17 @@ class EmployeeAdvanceExpense(models.Model):
     def to_bool(self, value):
         if value:
             return str(value).strip().lower() in ['true', '1', 'yes']
+
+        return False
+
+    #Check if the amount is less than the allowed amount only need first approve
+    def check_coo_final_approver(self):
+        amount_check = float(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.po_amount_check', 0.00))
+        if amount_check > 0:
+            converted_amount = self.currency_id._convert(self.total_amount_expense, self.company_id.currency_id, self.company_id, self.request_date or fields.Date.today())
+            if converted_amount < amount_check:
+                return True
 
         return False
 
@@ -854,6 +866,9 @@ class EmployeeAdvanceExpense(models.Model):
 
         self.state = 'check'
         self.checked_date = time.strftime('%Y-%m-%d')
+
+        #If amount is less than allowed amount, then go to final approver to COO
+        self.coo_final_approver = self.check_coo_final_approver()
 
     def get_first_approval(self):
         if (self.first_approver_id and self.first_approver_id.id!=self.env.user.id):
