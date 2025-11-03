@@ -1696,12 +1696,13 @@ class HrPayslipProcessRequest(models.Model):
                     obj_contract_gty.savings_for_education = car.amount * -1
                     obj_contract_isya.savings_for_education = 0
                 elif car.name == "earthquake":
-                    if employee_type == 'local':
-                        obj_contract_gty.earthquake = car.amount * -1
-                        obj_contract_isya.earthquake = 0
-                    else:
-                        obj_contract_isya.earthquake = car.amount * -1
-                        obj_contract_gty.earthquake = 0
+                    obj_contract_isya.earthquake = car.amount * -1
+
+            if not self._check_gala_usd_allocation():
+                obj_contract_isya.gala_usd = 0
+            if not self._check_earthquake_allocation():
+                obj_contract_isya.earthquake = 0
+
             # these donations are not used anymore.
             obj_contract_isya.donation_uws = 0
             obj_contract_isya.donation_clc = 0
