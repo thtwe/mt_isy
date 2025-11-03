@@ -1815,6 +1815,20 @@ class HrPayslipProcessRequest(models.Model):
             result.check_allocation_request()
             return result
 
+    def to_bool(self, value):
+        if value:
+            return str(value).strip().lower() in ['true', '1', 'yes']
+
+        return False
+
+    def _check_gala_usd_allocation(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.donation_gala_usd_allocation', False))
+
+    def _check_earthquake_allocation(self):
+        return self.to_bool(self.env['ir.config_parameter'].sudo().get_param(
+            'isy.donation_earthquake_allocation', False))
+
     @api.onchange('request_employee_id')
     def _create_cash_allocation_requests(self):
         if self.request_employee_id:
@@ -1842,8 +1856,6 @@ class HrPayslipProcessRequest(models.Model):
                             amount = obj_contract_gty.x_studio_petty_cash * -1
                         # elif key == 'overseas_bank':
                         #     amount = obj_contract.x_studio_overseas_bank  * -1
-                        elif key == 'earthquake':
-                            amount = obj_contract_gty.earthquake * -1
                         result = (0, 0, {
                             'name': key,
                             'amount': amount,
@@ -1856,11 +1868,9 @@ class HrPayslipProcessRequest(models.Model):
                 monthly_retirement_gty = obj_contract_gty.x_studio_expatriate_monthly_retirement
                 monthly_retirement_isya = obj_contract_isya.x_studio_expatriate_monthly_retirement
                 for key, val in CASH_ALLOCATION_TYPE:
-                    # if key in ('gala_usd','donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
-                    if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
-                    # if key in ('earthquake', 'donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
-
-                    #if key in ('donation_chinthe','donation_clc','donation_uws','donation_yas','local_bank_ks','cash_usd','local_bank_mmk', '401_k', 'petty_cash_$'):
+                    is_allocation_category_enabled = True
+                    if key in ('gala_usd', 'earthquake', 'donation_chinthe', 'donation_clc', 'donation_uws', 
+                                'donation_yas', 'local_bank_ks', 'cash_usd', 'local_bank_mmk', 'local_bank_$', '401_k', 'petty_cash_$'):
                         website_url = ''
                         if key == 'local_bank_$':
                             amount = obj_contract_isya.x_studio_local_bank * -1
@@ -1891,18 +1901,23 @@ class HrPayslipProcessRequest(models.Model):
                             amount = obj_contract_isya.donation_chinthe * -1
                             website_url = 'https://isyedu.org/support-isy/isy-partner-projects/'
                         elif key == 'gala_usd':
-                            # continue
-                            amount = obj_contract_isya.gala_usd * -1
+                            if self._check_gala_usd_allocation():
+                                amount = obj_contract_isya.gala_usd * -1
+                            else:
+                                is_allocation_category_enabled = False
                         elif key == 'earthquake':
-                            # continue
-                            amount = obj_contract_isya.earthquake * -1
+                            if self._check_earthquake_allocation():
+                                amount = obj_contract_isya.earthquake * -1
+                            else:
+                                is_allocation_category_enabled = False
                         
-                        result = (0, 0, {
-                            'name': key,
-                            'amount': amount,
-                            'website_url': website_url,
-                        })
-                        cash_allocation_list.append(result)
+                        if is_allocation_category_enabled:
+                            result = (0, 0, {
+                                'name': key,
+                                'amount': amount,
+                                'website_url': website_url,
+                            })
+                            cash_allocation_list.append(result)
             if self.request_employee_id.sudo().is_scholarship_staff:
                 result = (0, 0, {
                     'name': 'savings_for_education',
