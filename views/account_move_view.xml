@@ -66,7 +66,7 @@
                   <field name="x_studio_field_hrbLx" domain="[[&quot;payment_type&quot;,&quot;=&quot;,&quot;outbound&quot;]]" widget="selection" string="Payment Method" studio-view-group-names="User" studio-view-group-ids="46" invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt')" />
                 </xpath>
                 <xpath expr="//button[@name='action_register_payment']" position="replace">
-                  <button name="action_register_payment" id="account_invoice_payment_btn" type="object" class="oe_highlight" invisible="x_studio_field_hrbLx == 2 or state != 'posted' or payment_state not in ('not_paid', 'partial') or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')" string="Register Payment" groups="account.group_cashier" />
+                  <!-- <button name="action_register_payment" id="account_invoice_payment_btn" type="object" class="oe_highlight" invisible="x_studio_field_hrbLx == 2 or state != 'posted' or payment_state not in ('not_paid', 'partial') or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')" string="Register Payment" groups="account.group_cashier" /> -->
 
                   <button name="action_register_payment" id="account_invoice_payment_btn" type="object" class="oe_highlight" invisible="state != 'posted' or payment_state not in ('not_paid', 'partial') or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')" string="Register Payment" groups="account.group_business_manager,__export__.res_groups_177_b9c18b80,account.group_cashier"/>
                 

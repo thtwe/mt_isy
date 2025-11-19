@@ -135,7 +135,6 @@ class HrPayslip(models.Model):
         result_list = []  # Stores results for multiple payslips
 
         for payslip in self:  # Loop over multiple payslips
-            result = {}  # Each payslip has its own dictionary
             localdict = {  # Create a fresh dictionary for each payslip
                 **payslip._get_base_local_dict(),
                 'categories': {},
@@ -146,39 +145,41 @@ class HrPayslip(models.Model):
                 'employee': payslip.employee_id,
                 'contract': payslip.contract_id
             }
-
-        # for rule in sorted(self.struct_id.rule_ids, key=lambda x: x.sequence):
-        for rule in sorted(self.contract_id.structure_type_id.struct_ids_topay.mapped('rule_ids_topay'), key=lambda x: x.sequence):
-            localdict.update({
-                'result': None,
-                'result_qty': 1.0,
-                'result_rate': 100})
-            if rule._satisfy_condition(localdict):
-                amount, qty, rate = rule._compute_rule(localdict)
-                #check if there is already a rule computed with that code
-                previous_amount = rule.code in localdict and localdict[rule.code] or 0.0
-                #set/overwrite the amount computed for this rule in the localdict
-                tot_rule = amount * qty * rate / 100.0
-                localdict[rule.code] = tot_rule
-                localdict['rules'][rule.code] = rule
-                # sum the amount for its salary category
-                localdict = _sum_salary_rule_category(localdict, rule.category_id, tot_rule - previous_amount)
-                # create/overwrite the rule in the temporary results
-                result[rule.code] = {
-                    'sequence': rule.sequence,
-                    'code': rule.code,
-                    'name': rule.name,
-                    #'note': rule.note,
-                    'salary_rule_id': rule.id,
-                    'contract_id': payslip.contract_id.id,
-                    'employee_id': payslip.employee_id.id,
-                    'amount': amount,
-                    'quantity': qty,
-                    'rate': rate,
-                    'total': tot_rule,
-                    'slip_id': payslip.id,
-                }
-        return result.values()
+            # for rule in sorted(self.struct_id.rule_ids, key=lambda x: x.sequence):
+            for rule in sorted(payslip.contract_id.structure_type_id.struct_ids_topay.mapped('rule_ids_topay'), key=lambda x: x.sequence):
+                result = {}  # Each payslip has its own dictionary
+                localdict.update({
+                    'result': None,
+                    'result_qty': 1.0,
+                    'result_rate': 100})
+                if rule._satisfy_condition(localdict):
+                    amount, qty, rate = rule._compute_rule(localdict)
+                    #check if there is already a rule computed with that code
+                    previous_amount = rule.code in localdict and localdict[rule.code] or 0.0
+                    #set/overwrite the amount computed for this rule in the localdict
+                    tot_rule = amount * qty * rate / 100.0
+                    localdict[rule.code] = tot_rule
+                    localdict['rules'][rule.code] = rule
+                    # sum the amount for its salary category
+                    localdict = _sum_salary_rule_category(localdict, rule.category_id, tot_rule - previous_amount)
+                    # create/overwrite the rule in the temporary results
+                    result[rule.code] = {
+                        'sequence': rule.sequence,
+                        'code': rule.code,
+                        'name': rule.name,
+                        #'note': rule.note,
+                        'salary_rule_id': rule.id,
+                        'contract_id': payslip.contract_id.id,
+                        'employee_id': payslip.employee_id.id,
+                        'amount': amount,
+                        'quantity': qty,
+                        'rate': rate,
+                        'total': tot_rule,
+                        'slip_id': payslip.id,
+                    }
+                result_list += list(result.values())
+        return result_list
+        # return result.values()
 
     def get_inputs(self, contracts, date_from, date_to):
         res = []
@@ -324,7 +325,6 @@ class HrPayslip(models.Model):
             credit_sum = 0.0
             date = slip.date or slip.date_to
             currency = slip.company_id.currency_id
-
             name = _('Payslip of %s') % (slip.employee_id.name)
             move_dict = {
                 'narration': name,

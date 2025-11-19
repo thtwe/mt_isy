@@ -221,7 +221,7 @@ class HolidaysRequest(models.Model):
     def _check_accumulated_leave(self, employee, holiday_status):
         employee_obj = self.env['hr.employee'].search([('id', '=', employee.id)])
         if holiday_status.requires_allocation == 'no' and holiday_status.unpaid_accumulated_leave:
-            if (employee_obj.accumulated_leave + holiday_status.unpaid_accumulated_leave) - self.number_of_days < 0:
+            if (employee_obj.accumulated_leave + employee_obj.unpaid_accumulated_leave) - self.number_of_days < 0:
                 raise ValidationError(_('The number of remaining time off is not sufficient for this time off type.'))
 
     def _get_remaining_leave_for_employees(self, employee, holiday_status):
